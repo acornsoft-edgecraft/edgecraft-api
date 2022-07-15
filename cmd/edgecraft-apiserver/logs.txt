@@ -1,0 +1,4 @@
+[INFO]: 2022/07/13 12:52:22.053384 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[ERROR]: 2022/07/13 12:52:22.055706 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:37: cannot parse `host= user= password=xxxxx dbname= port=`: invalid port (strconv.ParseUint: parsing "": invalid syntax)
+[INFO]: 2022/07/13 12:54:51.756606 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[ERROR]: 2022/07/13 12:54:51.759182 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:37: cannot parse `host= user= password=xxxxx dbname= port=`: invalid port (strconv.ParseUint: parsing "": invalid syntax)
