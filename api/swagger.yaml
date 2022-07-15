@@ -1,5 +1,30 @@
 basePath: /api
 definitions:
+  entities.Product:
+    properties:
+      id:
+        type: integer
+      name:
+        type: string
+      price:
+        type: number
+      stock:
+        type: integer
+    type: object
+  entities.TestAPI:
+    properties:
+      api_response:
+        items: {}
+        type: array
+      api_route:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: string
+      updated_at:
+        type: string
+    type: object
   models.Book:
     properties:
       author:
@@ -77,6 +102,44 @@ info:
   title: API
   version: "1.0"
 paths:
+  /test/api/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get product by given ID.
+      parameters:
+      - description: TestAPI ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.TestAPI'
+      summary: get product by given ID
+      tags:
+      - TestAPI
+  /test/apis:
+    get:
+      consumes:
+      - application/json
+      description: Get all exists products.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.TestAPI'
+            type: array
+      summary: get all exists products
+      tags:
+      - TestAPIs
   /v1/book:
     delete:
       consumes:
@@ -233,6 +296,44 @@ paths:
       summary: get all exists books
       tags:
       - Books
+  /v1/product/{id}:
+    get:
+      consumes:
+      - application/json
+      description: Get product by given ID.
+      parameters:
+      - description: Product ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entities.Product'
+      summary: get product by given ID
+      tags:
+      - Product
+  /v1/products:
+    get:
+      consumes:
+      - application/json
+      description: Get all exists products.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entities.Product'
+            type: array
+      summary: get all exists products
+      tags:
+      - Products
   /v1/token/renew:
     post:
       consumes:

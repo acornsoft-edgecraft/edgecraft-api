@@ -1,0 +1,116 @@
+[INFO]: 2022/07/07 18:51:31.382255 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[ERROR]: 2022/07/07 18:51:31.430126 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:37: failed to connect to `host=cgapp-postgres user=postgres database=postgres`: hostname resolving error (lookup cgapp-postgres: no such host)
+[INFO]: 2022/07/07 18:53:49.681148 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/07 18:55:18.139055 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[ERROR]: 2022/07/07 18:55:18.145262 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:37: failed to connect to `host=cgapp-postgres user=postgres database=postgres`: hostname resolving error (lookup cgapp-postgres: no such host)
+[INFO]: 2022/07/07 18:56:28.472953 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/07 19:05:06.366568 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 13:43:04.166737 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 13:50:08.551314 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 14:01:22.310734 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 14:03:26.080428 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 14:35:14.229926 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/product_service.go:16: sql: Scan error on column index 0, name "pro_cod": converting driver.Value type string ("9b173af4-06fe-4d19-bc30-7da0c8d65484") to a int64: invalid syntax
+[WARNING]: 2022/07/12 14:45:17.829489 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/product_service.go:16: sql: Scan error on column index 0, name "pro_cod": converting driver.Value type string ("82924a56-106e-48b2-bcf2-2fcbbc40e8a4") to a int64: invalid syntax
+[INFO]: 2022/07/12 14:48:28.541121 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 14:48:37.712132 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/product_service.go:16: sql: Scan error on column index 0, name "pro_cod": converting driver.Value type string ("99d8c42e-321d-4129-acac-a659335ee27f") to a int64: invalid syntax
+[WARNING]: 2022/07/12 15:08:30.519737 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/product_service.go:16: ERROR: cached plan must not change result type (SQLSTATE 0A000)
+[INFO]: 2022/07/12 15:09:33.216333 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 15:21:24.134563 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 15:21:43.374768 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:27: ERROR: invalid input syntax for type uuid: "1" (SQLSTATE 22P02)
+[WARNING]: 2022/07/12 15:22:30.108386 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:27: ERROR: syntax error at or near "c9e29b" (SQLSTATE 42601)
+[INFO]: 2022/07/12 15:34:46.411632 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 15:36:18.698353 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:27: ERROR: syntax error at or near "c9e29b" (SQLSTATE 42601)
+[WARNING]: 2022/07/12 15:36:59.076951 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:27: ERROR: syntax error at or near "c9e29b" (SQLSTATE 42601)
+[INFO]: 2022/07/12 15:41:02.595492 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 15:41:17.255787 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:40: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.JSONB
+[INFO]: 2022/07/12 15:52:00.955364 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 16:01:13.603182 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 16:03:19.799068 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 16:03:51.008886 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:40: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[INFO]: 2022/07/12 16:09:20.291417 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 16:09:48.026649 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:40: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:09:49.677815 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:40: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:09:50.433917 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:40: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:09:51.094371 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:40: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[INFO]: 2022/07/12 16:10:56.966105 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 16:11:06.039949 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:40: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal object into Go value of type entities.JSONB
+[INFO]: 2022/07/12 16:41:02.656550 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 16:41:11.857091 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:41: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:41:22.608104 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:28: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:42:30.464438 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:41: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:45:23.518632 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:41: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[INFO]: 2022/07/12 16:49:02.420752 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/12 16:49:10.849328 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:41: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:49:12.198808 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:41: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:49:34.160334 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:41: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[WARNING]: 2022/07/12 16:49:42.983734 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:28: sql: Scan error on column index 4, name "api_response": json: cannot unmarshal array into Go value of type entities.APIResponse
+[INFO]: 2022/07/12 17:03:06.212079 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 17:12:56.338668 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 17:16:30.506349 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 17:17:54.325333 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 17:30:01.134497 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 17:34:10.623816 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 17:48:45.696248 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 17:52:25.522144 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/12 18:12:06.465620 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 12:07:23.213163 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 12:11:29.072886 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 12:47:36.310010 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 12:56:08.868552 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 12:56:53.033316 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 12:58:14.309257 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 13:00:03.966027 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/13 13:00:28.268253 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/mock_server_service.go:18: ERROR: syntax error at or near "/" (SQLSTATE 42601)
+[INFO]: 2022/07/13 13:51:01.986525 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 13:55:56.437727 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 14:00:57.556711 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 14:14:19.972152 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 14:22:30.703592 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 14:25:16.694700 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 14:26:01.221531 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 14:28:23.608686 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 15:42:57.807127 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/13 15:43:09.739487 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/mock_server_service.go:17: unsupported data type: &[]: Table not set, please set it like: db.Model(&user) or db.Table("users")
+[INFO]: 2022/07/13 15:44:29.420283 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 15:57:40.656368 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/13 15:57:52.934478 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/mock_server_service.go:17: ERROR: missing FROM-clause entry for table "api_response" (SQLSTATE 42P01)
+[INFO]: 2022/07/13 17:24:49.478539 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 17:36:11.593689 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 17:48:49.667003 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 18:22:54.724045 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 18:27:56.849997 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 18:30:57.398254 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 18:37:11.230844 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/13 18:38:44.003907 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:54: ERROR: column "api_route" does not exist (SQLSTATE 42703)
+[WARNING]: 2022/07/13 18:39:17.098411 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:54: ERROR: column "api_route" does not exist (SQLSTATE 42703)
+[INFO]: 2022/07/13 18:40:28.899100 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 18:46:47.586413 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 19:26:08.639183 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 19:39:27.528228 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/13 19:43:35.346744 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 11:40:39.773196 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 11:41:15.421906 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 11:47:07.802252 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 12:15:29.686590 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 12:17:37.718151 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/14 12:17:46.239232 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:60: unsupported select args &{api_response [] true false <nil> false } []
+[WARNING]: 2022/07/14 12:19:34.182208 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:60: unsupported select args &{api_response [test] true false <nil> false } []
+[INFO]: 2022/07/14 12:48:39.055103 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:09:43.411410 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:18:48.162548 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:19:56.697389 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:20:28.341513 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:21:40.335364 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/14 13:21:46.601504 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:55: sql: Scan error on column index 0, name "?column?": unsupported Scan, storing driver.Value type []uint8 into type *entities.TestAPI
+[INFO]: 2022/07/14 13:23:24.787420 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:24:28.341208 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:44:17.959716 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:45:46.913962 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 13:55:35.153989 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[INFO]: 2022/07/14 15:37:50.421118 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/14 15:38:04.945793 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:60: ERROR: relation "api_response" does not exist (SQLSTATE 42P01)
+[WARNING]: 2022/07/14 15:38:19.368688 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:60: ERROR: relation "api_response" does not exist (SQLSTATE 42P01)
+[INFO]: 2022/07/14 15:39:19.599433 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/14 15:39:29.887365 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:60: ERROR: relation "api_response" does not exist (SQLSTATE 42P01)
+[INFO]: 2022/07/14 15:39:59.071856 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/database/database.go:34: connecting to database
+[WARNING]: 2022/07/14 15:40:13.065930 /Users/dongmook/github-workspace/edgecraft-fork/edgecraft-api-fork/internal/services/test_api_service.go:60: ERROR: relation "api_response" does not exist (SQLSTATE 42P01)
