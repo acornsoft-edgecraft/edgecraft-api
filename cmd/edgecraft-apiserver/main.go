@@ -36,12 +36,17 @@ func main() {
 	app := fiber.New(config)
 
 	// Middlewares.
-	middleware.FiberMiddleware(app) // Register Fiber's middleware for app.
+	middleware.FiberMiddleware(app) // Register Fiber's middleware(cors, logger) for app.
 
 	// Routes.
-	routes.SwaggerRoute(app)  // Register a route for API Docs (Swagger).
-	routes.PublicRoutes(app)  // Register a public routes for app.
-	routes.PrivateRoutes(app) // Register a private routes for app.
+	routes.SwaggerRoute(app)       // Register a route for API Docs (Swagger).
+	routes.PublicRoutes(app)       // Register a public routes for app.
+	routes.PrivateRoutes(app)      // Register a private routes for app.
+	routes.SetupProductRoutes(app) // Register a SetupProductRoutes route for app (used ORM(Gorm)).
+	routes.TestAPIs(app)           // Register a TestRoutes Test API Response route for app (used ORM(Gorm)).
+	routes.MockServerRoutes(app)   // Register a TestRoutes Test API Response route for app (used ORM(Gorm)).
+
+	// Not Found Route.
 	routes.NotFoundRoute(app) // Register route for 404 Error.
 
 	// Start server (with or without graceful shutdown).
