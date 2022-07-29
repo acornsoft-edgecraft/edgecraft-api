@@ -1,5 +1,5 @@
-# Created by https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,go
-# Edit at https://www.toptal.com/developers/gitignore?templates=macos,visualstudiocode,go
+# Created by https://www.toptal.com/developers/gitignore/api/go,macos,visualstudiocode
+# Edit at https://www.toptal.com/developers/gitignore?templates=go,macos,visualstudiocode
 
 ### Go ###
 # If you prefer the allow list template instead of the deny list, see community template:
@@ -86,4 +86,4 @@ Temporary Items
 # Ignore code-workspaces
 *.code-workspace
 
-# End of https://www.toptal.com/developers/gitignore/api/macos,visualstudiocode,go
+# End of https://www.toptal.com/developers/gitignore/api/go,macos,visualstudiocode

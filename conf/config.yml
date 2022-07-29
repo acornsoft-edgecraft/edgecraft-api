@@ -1,0 +1,26 @@
+# Server for front-end
+api:
+  type: "echo"
+  port: 8100
+  host: "0.0.0.0"
+  homePageUrl: "https://edgecraft.k3.acornsoft.io" # URL 셋팅 필요
+  pathPrefix: "/api/v1"
+  secret: "test_secret"
+  langs:
+    - "ko"
+    - "en"
+  langPath: "./conf"
+  mode: "local"  #local:개발자pc dev:kdtidc  prod:
+
+
+# Database
+database:
+  type: "postgres"
+  host: "192.168.77.42"
+  port: "31000"
+  database_name: "edgecraft"
+  schema_name: "edgecraft"
+  username: "edgecraft"
+  password: "edgecraft"
+  max_idle_conns: 5
+  max_open_conns: 40
