@@ -4,7 +4,7 @@ APP_NAME = edgecraft-apiserver
 CMD_DIR = $(PWD)/cmd
 BUILD_DIR = $(PWD)/build
 MIGRATIONS_FOLDER = $(PWD)/scripts/migrations
-DATABASE_URL = postgres://postgres:password@localhost:5432/postgres?sslmode=disable
+DATABASE_URL = postgres://edgecraft:edgecraft@192.168.77.42:31000/edgecraft?sslmode=disable
 # DATABASE_URL = postgres://postgres:password@cgapp-postgres/postgres?sslmode=disable
 
 clean:
@@ -38,51 +38,41 @@ migrate.down:
 migrate.force:
 	migrate -path $(MIGRATIONS_FOLDER) -database "$(DATABASE_URL)" force $(version)
 
-docker.run: docker.network docker.postgres swag docker.fiber docker.redis migrate.up
-# docker.run: docker.network docker.postgres docker.fiber docker.redis migrate.up
+docker.run: docker.network docker.postgres swag docker.edgecraft docker.redis migrate.up
+# docker.run: docker.network docker.postgres docker.edgecraft docker.redis migrate.up
 
 docker.network:
 	docker network inspect dev-network >/dev/null 2>&1 || \
 	docker network create -d bridge dev-network
 
-docker.fiber.build:
-	docker build -t fiber .
+docker.edgecraft.build:
+	docker build -t edgecraft .
 
-docker.fiber: docker.fiber.build
+docker.edgecraft: docker.edgecraft.build
 	docker run --rm -d \
-		--name cgapp-fiber \
+		--name cgapp-edgecraft \
 		--network dev-network \
 		-p 5000:5000 \
-		fiber
+		edgecraft
 
 docker.postgres:
 	docker run --rm -d \
-		--name cgapp-postgres \
+		--name edgecraft-postgres \
 		--network dev-network \
-		-e POSTGRES_USER=postgres \
-		-e POSTGRES_PASSWORD=password \
-		-e POSTGRES_DB=postgres \
+		-e POSTGRES_USER=edgecraft \
+		-e POSTGRES_PASSWORD=edgecraft \
+		-e POSTGRES_DB=edgecraft \
 		-v ${HOME}/dev-postgres/data/:/var/lib/postgresql/data \
 		-p 5432:5432 \
 		postgres
 
-docker.redis:
-	docker run --rm -d \
-		--name cgapp-redis \
-		--network dev-network \
-		-p 6379:6379 \
-		redis
+docker.stop: docker.stop.edgecraft docker.stop.postgres
 
-docker.stop: docker.stop.fiber docker.stop.postgres docker.stop.redis
-
-docker.stop.fiber:
-	docker stop cgapp-fiber
+docker.stop.edgecraft:
+	docker stop cgapp-edgecraft
 
 docker.stop.postgres:
 	docker stop cgapp-postgres
 
-docker.stop.redis:
-	docker stop cgapp-redis
-
-swag:
-	swag init --parseDependency --parseInternal -d $(CMD_DIR)/$(APP_NAME) -o $(PWD)/api
+# swag:
+# 	swag init --parseDependency --parseInternal -d $(CMD_DIR)/$(APP_NAME) -o $(PWD)/api
