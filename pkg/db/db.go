@@ -2,6 +2,7 @@ package db
 
 import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+	"github.com/gofrs/uuid"
 	"gopkg.in/gorp.v2"
 )
 
@@ -28,4 +29,8 @@ type DB interface {
 
 	// tbl_cloud
 	GetAllCloud() ([]model.Cloud, error)
+	GetCloud(uuid.UUID) (*model.Cloud, error)
+	UpdateRegisterCloud(*model.Cloud) (int64, error)
+	CreateRegisterCloud(*model.Cloud) error
+	DeleteRegisterCloud(uuid.UUID) (int64, error)
 }

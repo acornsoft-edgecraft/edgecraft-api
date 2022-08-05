@@ -39,5 +39,9 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 
 	// Cloud
 	v1.GET("/clouds", api.AllCloudListHandler)
+	v1.GET("/clouds/:cloudUid", api.GetCloudHandler)
+	v1.POST("/clouds", api.RegisterCloudHandler)
+	v1.PUT("/clouds/:cloudUid", api.UpdateRegisterCloudHandler)
+	v1.DELETE("/clouds/:cloudUid", api.DeleteRegisterCloudHandler)
 
 }

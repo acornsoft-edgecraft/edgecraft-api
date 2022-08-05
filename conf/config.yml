@@ -16,7 +16,7 @@ api:
 # Database
 database:
   type: "postgres"
-  host: "192.168.77.42"
+  host: "192.168.77.43"
   port: "31000"
   database_name: "edgecraft"
   schema_name: "edgecraft"
