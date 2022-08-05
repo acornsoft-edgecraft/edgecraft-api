@@ -52,7 +52,7 @@ docker.edgecraft: docker.edgecraft.build
 	docker run --rm -d \
 		--name cgapp-edgecraft \
 		--network dev-network \
-		-p 5000:5000 \
+		-p 8100:8100 \
 		edgecraft
 
 docker.postgres:

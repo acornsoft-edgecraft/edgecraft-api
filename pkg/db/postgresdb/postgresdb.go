@@ -102,8 +102,10 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.Db.SetMaxIdleConns(conf.MaxIdleConns)
 	dbmap.Db.SetMaxOpenConns(conf.MaxOpenConns)
 
-	//SetKeys(isAutoIncr bool, fieldNames ...string)
-	dbmap.AddTableWithName(model.Cloud{}, "tbl_cloud").SetKeys(false, "cloud_uid")
+	// SetKeys(isAutoIncr bool, fieldNames ...string)
+	// SetKeys(true) means we have a auto increment primary key, which
+	// will get automatically bound to your struct post-insert
+	dbmap.AddTableWithName(model.Cloud{}, "tbl_cloud").SetKeys(true, "cloud_uid")
 
 	return dbmap
 }
