@@ -33,7 +33,7 @@ jobs:
               VERSION="pr-${{ github.event.number }}"
             fi
           fi
-          echo ::set-output name=prefix::${REGISTRY}/${PROJECT}
+          echo ::set-output name=prefix::${REGISTRY}
           echo ::set-output name=version::${VERSION}
           echo ::set-output name=project::${PROJECT}
       - name: Check out the repository
@@ -51,5 +51,5 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{steps.variables.outputs.prefix}}.${{steps.variables.outputs.project}}:${{steps.variables.outputs.version}}
-            ${{steps.variables.outputs.prefix}}.${{steps.variables.outputs.project}}:latest
+            ${{steps.variables.outputs.prefix}}/${{steps.variables.outputs.project}}:${{steps.variables.outputs.version}}
+            ${{steps.variables.outputs.prefix}}/${{steps.variables.outputs.project}}:latest
