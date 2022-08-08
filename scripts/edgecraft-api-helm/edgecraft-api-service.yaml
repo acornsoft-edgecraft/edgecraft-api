@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: edgecraft-api-service
+  namespace: edgecraft
+spec:
+  type: NodePort
+  selector:
+    app: edgecraft-api
+  ports:
+  - name: edgecraft-api-service-port
+    protocol: TCP
+    port: 8100
+    targetPort: 8100
+    nodePort: 31810

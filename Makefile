@@ -46,14 +46,14 @@ docker.network:
 	docker network create -d bridge dev-network
 
 docker.edgecraft.build:
-	docker build -t edgecraft .
+	docker build -t edgecraft-api .
 
 docker.edgecraft: docker.edgecraft.build
 	docker run --rm -d \
-		--name cgapp-edgecraft \
+		--name edgecraft-api \
 		--network dev-network \
 		-p 8100:8100 \
-		edgecraft
+		edgecraft-api
 
 docker.postgres:
 	docker run --rm -d \

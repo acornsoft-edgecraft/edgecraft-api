@@ -663,3 +663,19 @@
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-04T14:25:01.706+0900","caller":"v4@v4.7.2/echo.go:630","msg":"HTTP process information","02":"/api/v1/clouds","04":200,"05":"26.788536ms","06":"","07":"PostmanRuntime/7.29.2","10":"0","00":"2022-08-04 14:25:01","01":"GET","03":"[::1]:64910","11":"295"}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-04T14:25:14.326+0900","caller":"api/cloud.go:36","msg":"[20000 [::1]:64910 GET /api/v1/clouds/278e1fad-86ff-491a-841e-2845989955a7 null {\"error\":false,\"code\":20000,\"message\":\"정상 처리되었습니다.\",\"data\":{\"cloudUid\":\"278e1fad-86ff-491a-841e-2845989955a7\",\"cloudName\":\"test-1\",\"cloudTpye\":null,\"cloudDesc\":\"\",\"cloudStatus\":\"\",\"creator\":\"user-2\",\"createdAt\":\"2022-08-04T14:16:42.501412Z\",\"updater\":null,\"updatedAt\":null}} ]"}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-04T14:25:14.326+0900","caller":"v4@v4.7.2/echo.go:630","msg":"HTTP process information","07":"PostmanRuntime/7.29.2","01":"GET","03":"[::1]:64910","05":"25.111401ms","06":"","11":"293","00":"2022-08-04 14:25:14","02":"/api/v1/clouds/278e1fad-86ff-491a-841e-2845989955a7","04":200,"10":"0"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:14:36.522+0900","caller":"runtime/asm_amd64.s:1571","msg":"Received interrupt signal"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:14:36.535+0900","caller":"cmd/starter.go:38","msg":"Shutdown HTTP Server..."}
+{"level":"\u001b[31mERROR\u001b[0m","ts":"2022-08-05T12:14:36.535+0900","caller":"cmd/starter.go:42","msg":"HTTP Server stoped: http: Server closed"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:14:36.536+0900","caller":"cmd/starter.go:42","msg":"HTTP Server started...++++++"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:21:00.650+0900","caller":"cmd/starter.go:68","msg":"[Using config file: /Users/dongmook/github-workspace/edgecraft/edgecraft-api/conf/config.yml]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:21:00.653+0900","caller":"cmd/starter.go:79","msg":"Server initialized..."}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:21:00.676+0900","caller":"cobra@v1.5.0/command.go:902","msg":"[Intialize done.]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:21:05.193+0900","caller":"runtime/asm_amd64.s:1571","msg":"Received interrupt signal"}
+{"level":"\u001b[31mERROR\u001b[0m","ts":"2022-08-05T12:21:05.194+0900","caller":"cmd/starter.go:42","msg":"HTTP Server stoped: http: Server closed"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:21:05.194+0900","caller":"cmd/starter.go:42","msg":"HTTP Server started...++++++"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:30:13.263+0900","caller":"cmd/starter.go:68","msg":"[Using config file: /Users/dongmook/github-workspace/edgecraft/edgecraft-api/conf/config.yml]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:30:13.265+0900","caller":"cmd/starter.go:79","msg":"Server initialized..."}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:30:13.287+0900","caller":"cobra@v1.5.0/command.go:902","msg":"[Intialize done.]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:30:22.157+0900","caller":"runtime/asm_amd64.s:1571","msg":"Received interrupt signal"}
+{"level":"\u001b[31mERROR\u001b[0m","ts":"2022-08-05T12:30:22.157+0900","caller":"cmd/starter.go:42","msg":"HTTP Server stoped: http: Server closed"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-08-05T12:30:22.157+0900","caller":"cmd/starter.go:42","msg":"HTTP Server started...++++++"}
