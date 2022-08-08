@@ -1,0 +1,99 @@
+{
+	"cloud": {
+		"name": "ff",
+		"type": 1,
+		"desc": ""
+	},
+	"cluster": {
+		"k8s": {
+			"version": 1,
+			"pod_cidr": "aa",
+			"svc_cidr": "dd"
+		},
+		"baremetal": {
+			"secret_name": "ㅁㅁ",
+			"user_name": "ㅇㅇ",
+			"password": "ㄹㄹ",
+			"image_url": "ㅇㅇ",
+			"image_checksum": "ff",
+			"image_checksum_type": "md5",
+			"image_format": "qcow2",
+			"cp_kubeadm_extra_config": {
+				"pre_kubeadm_commands": "",
+				"post_kubeadm_commands": "",
+				"files": "",
+				"users": "",
+				"ntp": "",
+				"format": ""
+			},
+			"worker_kubeadm_extra_config": {
+				"pre_kubeadm_commands": "",
+				"post_kubeadm_commands": "",
+				"files": "",
+				"users": "",
+				"ntp": "",
+				"format": ""
+			}
+		}
+	},
+	"nodes": {
+		"use_loadbalancer": false,
+		"loadbalancer_address": "",
+		"loadbalancer_port": "",
+		"master_nodes": [{
+			"baremetal": {
+				"host_name": "sadf",
+				"bmc_address": "sadf",
+				"boot_mac_address": "00:b2:8c:ee:22:98",
+				"boot_mode": 0,
+				"online_power": false,
+				"external_provisioning": false
+			},
+			"node": {
+				"node_name": "sadf",
+				"ip_address": "safd",
+				"label": [{
+					"key": "",
+					"value": ""
+				}]
+			}
+		}],
+		"worker_nodes": [{
+			"baremetal": {
+				"host_name": "sadf",
+				"bmc_address": "sadf",
+				"boot_mac_address": "00:b2:8c:ee:22:98",
+				"boot_mode": 0,
+				"online_power": false,
+				"external_provisioning": false
+			},
+			"node": {
+				"node_name": "sadf",
+				"ip_address": "safd",
+				"label": [{
+					"key": "",
+					"value": ""
+				}]
+			}
+		}]
+	},
+	"etcd_storage": {
+		"etcd": {
+			"use_external_etcd": false,
+			"endpoints": [{
+				"ip_address": "",
+				"port": ""
+			}],
+			"ca_file": "",
+			"cert_file": "",
+			"key_file": ""
+		},
+		"storage_class": {
+			"use_ceph": false,
+			"label1": "",
+			"label2": "",
+			"label3": ""
+		}
+	},
+	"openstack": {}
+}
