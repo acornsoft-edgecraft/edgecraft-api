@@ -30,7 +30,21 @@ type DB interface {
 	// tbl_cloud
 	GetAllCloud() ([]model.Cloud, error)
 	GetCloud(uuid.UUID) (*model.Cloud, error)
-	UpdateRegisterCloud(*model.Cloud) (int64, error)
-	CreateRegisterCloud(*model.Cloud) error
-	DeleteRegisterCloud(uuid.UUID) (int64, error)
+	UpdateCloud(*model.Cloud) (int64, error)
+	CreateCloud(*model.Cloud) error
+	DeleteCloud(uuid.UUID) (int64, error)
+
+	// tbl_cloud_cluster
+	GetAllCloudCluster() ([]model.CloudCluster, error)
+	GetCloudCluster(uuid.UUID, string) (*model.CloudCluster, error)
+	UpdateCloudCluster(*model.CloudCluster) (int64, error)
+	CreateCloudCluster(*model.CloudCluster) error
+	DeleteCloudCluster(uuid.UUID) (int64, error)
+
+	// tbl_cloud_node
+	GetAllCloudNode() ([]model.CloudNode, error)
+	GetCloudNode(uuid.UUID) (*model.CloudNode, error)
+	UpdateCloudNode(*model.CloudNode) (int64, error)
+	CreateCloudNode(*model.CloudNode) error
+	DeleteCloudNode(uuid.UUID) (int64, error)
 }

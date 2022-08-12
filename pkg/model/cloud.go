@@ -9,9 +9,9 @@ import (
 // used pointer
 type Cloud struct {
 	CloudUID    *uuid.UUID `json:"cloudUid" db:"cloud_uid, default:uuid_generate_v4()"`
-	CloudName   *string    `json:"cloudName" db:"cloud_name"`
-	CloudType   *string    `json:"cloudTpye" db:"cloud_type"`
-	CloudDesc   *string    `json:"cloudDesc" db:"cloud_description"`
+	CloudName   *string    `json:"name" db:"cloud_name"`
+	CloudType   *string    `json:"type" db:"cloud_type"`
+	CloudDesc   *string    `json:"desc" db:"cloud_description"`
 	CloudStatus *string    `json:"cloudStatus" db:"cloud_state"`
 	Creator     *string    `json:"creator" db:"creator"`
 	CreatedAt   *time.Time `json:"createdAt" db:"created_at"`

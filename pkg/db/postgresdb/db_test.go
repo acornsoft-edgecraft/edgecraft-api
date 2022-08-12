@@ -74,7 +74,7 @@ func Test_Transaction(t *testing.T) {
 	}
 
 	// 여러개의 query 실행
-	err = txdb.CreateRegisterCloud(req)
+	err = txdb.CreateCloud(req)
 	if err != nil {
 		txErr := txdb.Rollback()
 		if txErr != nil {
@@ -105,7 +105,7 @@ func Test_DeleteCloud(t *testing.T) {
 	// 모델 생성
 	req := uuid.FromStringOrNil("2e622c54-556d-4e7c-8b4f-1619dd01d781")
 
-	count, err := db.DeleteRegisterCloud(req)
+	count, err := db.DeleteCloud(req)
 	if err != nil {
 		fmt.Printf("error : %s", err)
 	}

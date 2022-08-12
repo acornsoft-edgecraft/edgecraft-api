@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: edgecraft-api
-        image: 192.168.77.30/edgecraft/edgecraft-api:v0.3.0-beta.1
+        image: ghcr.io/acornsoft-edgecraft/edgecraft-api:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8100
