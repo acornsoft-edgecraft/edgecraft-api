@@ -1,28 +1,48 @@
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/gofrs/uuid"
 )
 
-type CloudNodes struct {
-	CloudClusterNodeUid  *uuid.UUID `jsong:"" db:"cloud_cluster_node_uid"`
-	CloudUid             *uuid.UUID `jsong:"" db:"cloud_uid"`
-	CloudClusterUid      *uuid.UUID `jsong:"" db:"cloud_cluster_uid"`
-	CloudName            *string    `jsong:"" db:"cloud_name"`
-	CloudNodeType        *string    `jsong:"" db:"cloud_node_type"`
-	CloudNodeState       *string    `jsong:"" db:"cloud_node_state"`
-	CloudNodeHostName    *string    `jsong:"" db:"cloud_node_host_name"`
-	CloudNodeName        *string    `jsong:"" db:"cloud_node_name"`
-	CloudNodeBmcAddress  *string    `jsong:"" db:"cloud_node_bmc_address"`
-	CloudNodeMacAddress  *string    `jsong:"" db:"cloud_node_mac_address"`
-	CloudNodeIp          *string    `jsong:"" db:"cloud_node_ip"`
-	CloudNodeServiceType *string    `jsong:"" db:"cloud_node_service_type"`
-	CloudNodeLabel       *string    `jsong:"" db:"cloud_node_label"`
-	OsdPath              *string    `jsong:"" db:"osd_path"`
-	Creator              *string    `jsong:"" db:"creator"`
-	CreatedAt            *time.Time `jsong:"" db:"created_at"`
-	Updater              *string    `jsong:"" db:"updater"`
-	UpdatedAt            *time.Time `jsong:"" db:"updated_at"`
+type CloudNode struct {
+	CloudNodeUid                  *uuid.UUID `json:"cloud_node_uid" db:"cloud_node_uid, default:uuid_generate_v4()"`
+	CloudUid                      *uuid.UUID `json:"cloud_uid" db:"cloud_uid"`
+	CloudClusterUid               *uuid.UUID `json:"cloud_cluster_uid" db:"cloud_cluster_uid"`
+	CloudNodeType                 *string    `json:"cloud_node_type" db:"cloud_node_type"`
+	CloudNodeState                *string    `json:"cloud_node_state" db:"cloud_node_state"`
+	CloudNodeHostName             *string    `json:"host_name" db:"cloud_node_host_name"`
+	CloudNodeBmcAddress           *string    `json:"bmc_address" db:"cloud_node_bmc_address"`
+	CloudNodeMacAddress           *string    `json:"boot_mac_address" db:"cloud_node_mac_address"`
+	CloudNodeBootMode             *string    `json:"boot_mode" db:"cloud_node_boot_mode"`
+	CloudNodeOnlinePower          *bool      `json:"online_power" db:"cloud_node_online_power"`
+	CloudNodeExternalProvisioning *bool      `json:"external_provisioning" db:"cloud_node_external_provisioning"`
+	CloudNodeName                 *string    `json:"node_name" db:"cloud_node_name"`
+	CloudNodeIp                   *string    `json:"ip_address" db:"cloud_node_ip"`
+	CloudNodeLabel                *Labels    `json:"labels" db:"cloud_node_label"`
+	OsdPath                       *string    `json:"osd_path" db:"osd_path"`
+	Creator                       *string    `json:"creator" db:"creator"`
+	CreatedAt                     *time.Time `json:"created_at" db:"created_at"`
+	Updater                       *string    `json:"updater" db:"updater"`
+	UpdatedAt                     *time.Time `json:"updated_at" db:"updated_at"`
+}
+
+type Labels []interface{}
+
+// Value Marshal
+func (a Labels) Value() (driver.Value, error) {
+	return json.Marshal(a)
+}
+
+// Scan Unmarshal
+func (a *Labels) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
+	}
+	return json.Unmarshal(b, &a)
 }

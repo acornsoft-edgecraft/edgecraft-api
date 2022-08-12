@@ -1,38 +1,38 @@
 {
 	"cloud": {
-		"name": "ff",
-		"type": 1,
-		"desc": ""
+		"name": "클라우드-01",
+		"type": "baremetal",
+		"desc": "TEST CLOUD"
 	},
 	"cluster": {
 		"k8s": {
-			"version": 1,
-			"pod_cidr": "aa",
-			"svc_cidr": "dd"
+			"version": "v1.22.4",
+			"pod_cidr": "10.10.0.0/24",
+			"svc_cidr": "192.168.0.0/24"
 		},
 		"baremetal": {
-			"secret_name": "ㅁㅁ",
-			"user_name": "ㅇㅇ",
-			"password": "ㄹㄹ",
-			"image_url": "ㅇㅇ",
-			"image_checksum": "ff",
+			"secret_name": "secret-name",
+			"user_name": "test",
+			"password": "PassW0rd!@",
+			"image_url": "http://192.168.0.1/ubuntu.qcow2",
+			"image_checksum": "http://192.168.0.1/ubuntu.qcow2.md5sum",
 			"image_checksum_type": "md5",
 			"image_format": "qcow2",
 			"cp_kubeadm_extra_config": {
-				"pre_kubeadm_commands": "",
-				"post_kubeadm_commands": "",
-				"files": "",
-				"users": "",
-				"ntp": "",
-				"format": ""
+				"pre_kubeadm_commands": {},
+				"post_kubeadm_commands": {},
+				"files": {},
+				"users": {},
+				"ntp": {},
+				"format": {}
 			},
 			"worker_kubeadm_extra_config": {
-				"pre_kubeadm_commands": "",
-				"post_kubeadm_commands": "",
-				"files": "",
-				"users": "",
-				"ntp": "",
-				"format": ""
+				"pre_kubeadm_commands": {},
+				"post_kubeadm_commands": {},
+				"files": {},
+				"users": {},
+				"ntp": {},
+				"format": {}
 			}
 		}
 	},
@@ -40,50 +40,60 @@
 		"use_loadbalancer": false,
 		"loadbalancer_address": "",
 		"loadbalancer_port": "",
-		"master_nodes": [{
-			"baremetal": {
-				"host_name": "sadf",
-				"bmc_address": "sadf",
-				"boot_mac_address": "00:b2:8c:ee:22:98",
-				"boot_mode": 0,
-				"online_power": false,
-				"external_provisioning": false
-			},
-			"node": {
-				"node_name": "sadf",
-				"ip_address": "safd",
-				"label": [{
-					"key": "",
-					"value": ""
-				}]
+		"master_nodes": [
+			{
+				"baremetal": {
+					"host_name": "host_name-1",
+					"bmc_address": "192.169.22.55",
+					"boot_mac_address": "00:b2:8c:ee:22:98",
+					"boot_mode": 0,
+					"online_power": false,
+					"external_provisioning": false
+				},
+				"node": {
+					"node_name": "master-1",
+					"ip_address": "192.168.34.44",
+					"labels": [
+						{
+							"key": "node-role.kubernetes.io",
+							"value": "master"
+						}
+					]
+				}
 			}
-		}],
-		"worker_nodes": [{
-			"baremetal": {
-				"host_name": "sadf",
-				"bmc_address": "sadf",
-				"boot_mac_address": "00:b2:8c:ee:22:98",
-				"boot_mode": 0,
-				"online_power": false,
-				"external_provisioning": false
-			},
-			"node": {
-				"node_name": "sadf",
-				"ip_address": "safd",
-				"label": [{
-					"key": "",
-					"value": ""
-				}]
+		],
+		"worker_nodes": [
+			{
+				"baremetal": {
+					"host_name": "host-name01",
+					"bmc_address": "192.158.23.3",
+					"boot_mac_address": "00:b2:8c:ee:22:98",
+					"boot_mode": 0,
+					"online_power": false,
+					"external_provisioning": false
+				},
+				"node": {
+					"node_name": "worker-01",
+					"ip_address": "192.168.55.44",
+					"labels": [
+						{
+							"key": "node-role.kubernetes.io",
+							"value": "worker"
+						}
+					]
+				}
 			}
-		}]
+		]
 	},
 	"etcd_storage": {
 		"etcd": {
 			"use_external_etcd": false,
-			"endpoints": [{
-				"ip_address": "",
-				"port": ""
-			}],
+			"endpoints": [
+				{
+					"ip_address": "",
+					"port": ""
+				}
+			],
 			"ca_file": "",
 			"cert_file": "",
 			"key_file": ""
