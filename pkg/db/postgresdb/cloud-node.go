@@ -9,10 +9,26 @@ const getAllCloudNodeSQL = `
 SELECT *
 FROM tbl_cloud_node c 
 `
+const selectCloudNodeSQL = `
+SELECT *
+FROM tbl_cloud_node c
+WHERE
+cloud_uid = $1
+`
 
 // RegisterCloud - Registration a new Cloud
 func (db *DB) CreateCloudNode(create *model.CloudNode) error {
 	return db.GetClient().Insert(create)
+}
+
+// SelectCloudCluster - Returns a matching value for cloud clusters
+func (db *DB) SelectCloudNode(uid uuid.UUID) (*model.CloudNode, error) {
+	var res *model.CloudNode
+	_, err := db.GetClient().Select(&res, selectCloudNodeSQL, uid)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
 }
 
 // GetUserRole - Returns a UserRole

@@ -10,15 +10,32 @@ SELECT *
 FROM tbl_cloud_cluster c 
 `
 
-// RegisterCloud - Registration a new Cloud
+const selectCloudClusterSQL = `
+SELECT *
+FROM tbl_cloud_cluster c
+WHERE
+cloud_uid = $1
+`
+
+// RegisterCloudCluster - Registration a new CloudCluster
 func (db *DB) CreateCloudCluster(create *model.CloudCluster) error {
 	return db.GetClient().Insert(create)
 }
 
-// GetUserRole - Returns a UserRole
-func (db *DB) GetCloudCluster(uid uuid.UUID, i string) (*model.CloudCluster, error) {
+// SelectCloudCluster - Returns a matching value for cloud clusters
+func (db *DB) SelectCloudCluster(uid uuid.UUID) (*model.CloudCluster, error) {
+	var res *model.CloudCluster
+	_, err := db.GetClient().Select(&res, selectCloudClusterSQL, uid)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
 
-	obj, err := db.GetClient().Get(&model.CloudCluster{}, nil, uid)
+// GetCloudCluster - Returns a CloudCluster
+func (db *DB) GetCloudCluster(uid uuid.UUID) (*model.CloudCluster, error) {
+
+	obj, err := db.GetClient().Get(&model.CloudCluster{}, uid)
 	if err != nil {
 		return nil, err
 	}

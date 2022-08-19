@@ -34,21 +34,23 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
 	}
 
-	// resCloudCluster, err := a.Db.GetCloudCluster(cloudUid, "cloud")
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if resCloudCluster == nil {
-	// 	return response.ErrorfReqRes(c, resCloudCluster, common.DatabaseFalseData, err)
-	// }
+	resCloudCluster, err := a.Db.SelectCloudCluster(cloudUid)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if resCloudCluster == nil {
+		return response.ErrorfReqRes(c, resCloudCluster, common.DatabaseFalseData, err)
+	}
 
-	// resCloudNode, err := a.Db.GetCloudNode(cloudUid)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if resCloudNode == nil {
-	// 	return response.ErrorfReqRes(c, resCloudNode, common.DatabaseFalseData, err)
-	// }
+	resCloudNode, err := a.Db.SelectCloudNode(cloudUid)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if resCloudNode == nil {
+		return response.ErrorfReqRes(c, resCloudNode, common.DatabaseFalseData, err)
+	}
 
-	return response.Write(c, nil, nil)
+	var res mr.RegisterCloud
+
+	return response.Write(c, nil, &res)
 }
 
 func (a *API) UpdateCloudHandler(c echo.Context) error {
