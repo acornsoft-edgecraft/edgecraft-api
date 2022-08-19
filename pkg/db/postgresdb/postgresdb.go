@@ -106,8 +106,8 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	// SetKeys(true) means we have a auto increment primary key, which
 	// will get automatically bound to your struct post-insert
 	dbmap.AddTableWithName(model.Cloud{}, "tbl_cloud").SetKeys(true, "cloud_uid")
-	dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(false, "cloud_cluster_uid", "cloud_uid")
-	dbmap.AddTableWithName(model.CloudNode{}, "tbl_cloud_node").SetKeys(false, "cloud_node_uid", "cloud_uid", "cloud_cluster_uid")
+	dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(true, "cloud_cluster_uid")
+	dbmap.AddTableWithName(model.CloudNode{}, "tbl_cloud_node").SetKeys(true, "cloud_node_uid")
 
 	return dbmap
 }
