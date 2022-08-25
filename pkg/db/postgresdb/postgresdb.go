@@ -107,7 +107,14 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	// will get automatically bound to your struct post-insert
 	dbmap.AddTableWithName(model.Cloud{}, "tbl_cloud").SetKeys(true, "cloud_uid")
 	dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(true, "cloud_cluster_uid")
+	dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	dbmap.AddTableWithName(model.K8s{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	dbmap.AddTableWithName(model.ClusterBaremetal{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	dbmap.AddTableWithName(model.Etcd{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	dbmap.AddTableWithName(model.ClusterNodes{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
 	dbmap.AddTableWithName(model.CloudNode{}, "tbl_cloud_node").SetKeys(true, "cloud_node_uid")
+	dbmap.AddTableWithName(model.MasterNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
+	dbmap.AddTableWithName(model.WorkerNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
 
 	return dbmap
 }

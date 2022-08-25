@@ -14,26 +14,60 @@ SELECT *
 FROM tbl_cloud_node c
 WHERE
 cloud_uid = $1
+and cloud_cluster_uid = $2
 `
 
-// RegisterCloud - Registration a new Cloud
+// CreateCloudNode - Registration a new Cloud Nodes
 func (db *DB) CreateCloudNode(create *model.CloudNode) error {
 	return db.GetClient().Insert(create)
 }
 
-// SelectCloudCluster - Returns a matching value for cloud clusters
-func (db *DB) SelectCloudNode(uid uuid.UUID) (*model.CloudNode, error) {
-	var res *model.CloudNode
-	_, err := db.GetClient().Select(&res, selectCloudNodeSQL, uid)
+// SelectCloudNode - Returns a matching value for cloud clusters
+func (db *DB) SelectCloudNode(uid uuid.UUID, clusterUid uuid.UUID) ([]model.CloudNode, error) {
+	var res []model.CloudNode
+	_, err := db.GetClient().Select(&res, selectCloudNodeSQL, uid, clusterUid)
 	if err != nil {
 		return nil, err
 	}
 	return res, nil
 }
 
-// GetUserRole - Returns a UserRole
-func (db *DB) GetCloudNode(uid uuid.UUID) (*model.CloudNode, error) {
-	obj, err := db.GetClient().Get(&model.CloudNode{}, uid)
+// SelectMasterCloudNode - Returns a SelectMasterCloudNode
+func (db *DB) SelectMasterCloudNode(uid uuid.UUID, clusterUid uuid.UUID) ([]model.CloudNode, error) {
+	var res []model.CloudNode
+	_, err := db.GetClient().Select(&res, selectCloudNodeSQL, uid, clusterUid)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+
+	// obj, err := db.GetClient().Get(&model.MasterNode{}, uid, clusterUid)
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// if obj != nil {
+	// 	res := obj.([]model.MasterNode)
+	// 	return res, nil
+	// }
+	// return nil, nil
+}
+
+// SelectWorkerCloudNode - Returns a SelectWorkerCloudNode
+func (db *DB) SelectWorkerCloudNode(uid uuid.UUID, clusterUid uuid.UUID) ([]model.CloudNode, error) {
+	obj, err := db.GetClient().Get(&model.CloudNode{}, uid, clusterUid)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.([]model.CloudNode)
+		return res, nil
+	}
+	return nil, nil
+}
+
+// GetCloudNode - Returns a GetCloudNode
+func (db *DB) GetCloudNode(uid uuid.UUID, clusterUid uuid.UUID) (*model.CloudNode, error) {
+	obj, err := db.GetClient().Get(&model.CloudNode{}, uid, clusterUid)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +78,7 @@ func (db *DB) GetCloudNode(uid uuid.UUID) (*model.CloudNode, error) {
 	return nil, nil
 }
 
-// GetAllCloud - Returns all Cloud list
+// GetAllCloudNode - Returns all Cloud list
 func (db *DB) GetAllCloudNode() ([]model.CloudNode, error) {
 	var res []model.CloudNode
 	_, err := db.GetClient().Select(&res, getAllCloudNodeSQL)

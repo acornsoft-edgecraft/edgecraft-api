@@ -16,16 +16,24 @@ api:
 # Database
 database:
   type: "postgres"
-  host: "localhost"
-  port: "5432"
-  # host: "192.168.77.43"
-  # port: "31000"
-  database_name: "postgres"
-  # database_name: "edgecraft"
+  host: "192.168.77.43"
+  port: "31000"
+  database_name: "edgecraft"
   schema_name: "edgecraft"
-  username: "postgres"
-  # username: "edgecraft"
-  password: "password"
-  # password: "edgecraft"
+  username: "edgecraft"
+  password: "edgecraft"
   max_idle_conns: 5
   max_open_conns: 40
+
+
+# Local Database
+# database:
+#   type: "postgres"
+#   host: "localhost"
+#   port: "5432"
+#   database_name: "edgecraft"
+#   schema_name: "edgecraft"
+#   password: "edgecraft"
+#   username: "edgecraft"
+#   max_idle_conns: 5
+#   max_open_conns: 40

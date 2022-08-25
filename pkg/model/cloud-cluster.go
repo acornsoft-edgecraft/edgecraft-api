@@ -25,7 +25,7 @@ type CloudCluster struct {
 	CloudClusterImageFormat           *string                `json:"image_format" db:"cloud_cluster_image_format"`
 	CloudClusterMasterExtraConfig     *ExtraConfig           `json:"cp_kubeadm_extra_config" db:"cloud_cluster_master_extra_config"`
 	CloudClusterWorkerExtraConfig     *ExtraConfig           `json:"worker_kubeadm_extra_config" db:"cloud_cluster_worker_extra_config"`
-	CloudClusterLoadbalancerUse       *bool                  `json:"use_loadbalancer" db:"cloud_cluster_loadbalancer_use"`
+	CloudClusterLoadbalancerUse       *bool                  `json:"use_loadbalancer" db:"cloud_cluster_loadbalancer_use, default:false"`
 	CloudClusterLoadbalancerAddress   *string                `json:"loadbalancer_address" db:"cloud_cluster_loadbalancer_address"`
 	CloudClusterLoadbalancerPort      *string                `json:"loadbalancer_port" db:"ccloud_cluster_loadbalancer_port"`
 	CloudClusterExternalEtcdUse       *bool                  `json:"cloudClusterExternalEtcdUse" db:"cloud_cluster_external_etcd_use"`
@@ -57,12 +57,16 @@ type CloudCluster struct {
 // }
 
 type K8s struct {
-	CloudK8sVersion         *string `json:"version" db:"cloud_k8s_version"`
-	CloudClusterPodCidr     *string `json:"pod_cidr" db:"cloud_cluster_pod_cidr"`
-	CloudClusterServiceCidr *string `json:"svc_cidr" db:"cloud_cluster_service_cidr"`
+	CloudUid                *uuid.UUID `json:"-" db:"cloud_uid"`
+	CloudClusterUid         *uuid.UUID `json:"-" db:"cloud_cluster_uid"`
+	CloudK8sVersion         *string    `json:"version" db:"cloud_k8s_version"`
+	CloudClusterPodCidr     *string    `json:"pod_cidr" db:"cloud_cluster_pod_cidr"`
+	CloudClusterServiceCidr *string    `json:"svc_cidr" db:"cloud_cluster_service_cidr"`
 }
 
-type Baremetal struct {
+type ClusterBaremetal struct {
+	CloudUid                          *uuid.UUID   `json:"-" db:"cloud_uid"`
+	CloudClusterUid                   *uuid.UUID   `json:"-" db:"cloud_cluster_uid"`
 	CloudClusterBmcCredentialSecret   *string      `json:"secret_name" db:"cloud_cluster_bmc_credential_secret"`
 	CloudClusterBmcCredentialUser     *string      `json:"user_name" db:"cloud_cluster_bmc_credential_user"`
 	CloudClusterBmcCredentialPassword *string      `json:"password" db:"cloud_cluster_bmc_credential_password"`
@@ -74,22 +78,31 @@ type Baremetal struct {
 	CloudClusterWorkerExtraConfig     *ExtraConfig `json:"worker_kubeadm_extra_config" db:"cloud_cluster_worker_extra_config"`
 }
 
-// type Nodes struct {
-// 	CloudClusterLoadbalancerUse     *bool   `json:"use_loadbalancer" db:"cloud_cluster_loadbalancer_use"`
-// 	CloudClusterLoadbalancerAddress *string `json:"loadbalancer_address" db:"cloud_cluster_loadbalancer_address"`
-// 	CloudClusterLoadbalancerPort    *string `json:"loadbalancer_port" db:"ccloud_cluster_loadbalancer_port"`
-// }
+type ClusterNodes struct {
+	CloudUid                        *uuid.UUID `json:"-" db:"cloud_uid"`
+	CloudClusterUid                 *uuid.UUID `json:"-" db:"cloud_cluster_uid"`
+	CloudClusterLoadbalancerUse     *bool      `json:"use_loadbalancer" db:"cloud_cluster_loadbalancer_use"`
+	CloudClusterLoadbalancerAddress *string    `json:"loadbalancer_address" db:"cloud_cluster_loadbalancer_address"`
+	CloudClusterLoadbalancerPort    *string    `json:"loadbalancer_port" db:"ccloud_cluster_loadbalancer_port"`
+}
 
+type EtcdStorage struct {
+	Etcd                     Etcd          `json:"etcd"`
+	CloudClusterStorageClass *StorageClass `json:"storage_class" db:"cloud_cluster_storage_class"`
+}
 type Etcd struct {
+	CloudUid                    *uuid.UUID             `json:"-" db:"cloud_uid"`
+	CloudClusterUid             *uuid.UUID             `json:"-" db:"cloud_cluster_uid"`
 	CloudClusterExternalEtcdUse *bool                  `json:"use_external_etcd" db:"cloud_cluster_external_etcd_use"`
-	ExternalEtcdEndPoints       *ExternalEtcdEndPoints `json:"endpoints"`
+	ExternalEtcdEndPoints       *ExternalEtcdEndPoints `json:"endpoints" db:"external_etcd_endpoints"`
 	ExternalEtcdCertificateCa   *string                `json:"ca_file" db:"external_etcd_certificate_ca"`
 	ExternalEtcdCertificateCert *string                `json:"cert_file" db:"external_etcd_certificate_cert"`
 	ExternalEtcdCertificateKey  *string                `json:"key_file" db:"external_etcd_certificate_key"`
 }
 
 type StorageClass struct {
-	StorageClass interface{} `json:"storage_class"`
+	Use_ceph bool    `json:"use_ceph" db:"-, default:false"`
+	Labels   []Label `json:"label"`
 }
 
 // Value Marshal
