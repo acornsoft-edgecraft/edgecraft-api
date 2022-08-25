@@ -15,7 +15,7 @@ type Cloud struct {
 	CloudStatus *string    `json:"cloudStatus" db:"cloud_state"`
 	Creator     *string    `json:"creator" db:"creator"`
 	CreatedAt   *time.Time `json:"createdAt" db:"created_at"`
-	Updater     *string    `json:"updater" db:"updater"`
+	Updater     *string    `json:"updater" db:"updater" validate:""`
 	UpdatedAt   *time.Time `json:"updatedAt" db:"updated_at"`
 }
 

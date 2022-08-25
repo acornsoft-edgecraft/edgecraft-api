@@ -15,7 +15,7 @@ func (db *DB) CreateCloud(create *model.Cloud) error {
 	return db.GetClient().Insert(create)
 }
 
-// GetUserRole - Returns a UserRole
+// GetCloud - Returns a GetCloud
 func (db *DB) GetCloud(uid uuid.UUID) (*model.Cloud, error) {
 	obj, err := db.GetClient().Get(&model.Cloud{}, uid)
 	if err != nil {

@@ -32,6 +32,59 @@ func (db *DB) SelectCloudCluster(uid uuid.UUID) (*model.CloudCluster, error) {
 	return res, nil
 }
 
+// SelectK8sCloudCluster - Returns a matching value for cloud clusters
+func (db *DB) SelectK8sCloudCluster(uid uuid.UUID) (*model.K8s, error) {
+	// var res *model.K8s
+	obj, err := db.GetClient().Get(&model.K8s{}, uid)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.K8s)
+		return res, nil
+	}
+	return nil, nil
+}
+
+// SelectBaremetalCloudCluster - Returns a matching value for cloud clusters
+func (db *DB) SelectBaremetalCloudCluster(uid uuid.UUID) (*model.ClusterBaremetal, error) {
+	obj, err := db.GetClient().Get(&model.ClusterBaremetal{}, uid)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.ClusterBaremetal)
+		return res, nil
+	}
+	return nil, nil
+}
+
+// SelectNodeCloudCluster - Returns a matching value for cloud clusters
+func (db *DB) SelectNodeCloudCluster(uid uuid.UUID) (*model.ClusterNodes, error) {
+	obj, err := db.GetClient().Get(&model.ClusterNodes{}, uid)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.ClusterNodes)
+		return res, nil
+	}
+	return nil, nil
+}
+
+// SelectNodeCloudCluster - Returns a matching value for cloud clusters
+func (db *DB) SelectEtcdCloudCluster(uid uuid.UUID) (*model.Etcd, error) {
+	obj, err := db.GetClient().Get(&model.Etcd{}, uid)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.Etcd)
+		return res, nil
+	}
+	return nil, nil
+}
+
 // GetCloudCluster - Returns a CloudCluster
 func (db *DB) GetCloudCluster(uid uuid.UUID) (*model.CloudCluster, error) {
 

@@ -38,14 +38,20 @@ type DB interface {
 	GetAllCloudCluster() ([]model.CloudCluster, error)
 	GetCloudCluster(uuid.UUID) (*model.CloudCluster, error)
 	SelectCloudCluster(uuid.UUID) (*model.CloudCluster, error)
+	SelectEtcdCloudCluster(uuid.UUID) (*model.Etcd, error)
+	SelectK8sCloudCluster(uuid.UUID) (*model.K8s, error)
+	SelectBaremetalCloudCluster(uuid.UUID) (*model.ClusterBaremetal, error)
+	SelectNodeCloudCluster(uuid.UUID) (*model.ClusterNodes, error)
 	UpdateCloudCluster(*model.CloudCluster) (int64, error)
 	CreateCloudCluster(*model.CloudCluster) error
 	DeleteCloudCluster(uuid.UUID) (int64, error)
 
 	// tbl_cloud_node
 	GetAllCloudNode() ([]model.CloudNode, error)
-	GetCloudNode(uuid.UUID) (*model.CloudNode, error)
-	SelectCloudNode(uuid.UUID) (*model.CloudNode, error)
+	GetCloudNode(uuid.UUID, uuid.UUID) (*model.CloudNode, error)
+	SelectCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
+	SelectMasterCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
+	SelectWorkerCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
 	UpdateCloudNode(*model.CloudNode) (int64, error)
 	CreateCloudNode(*model.CloudNode) error
 	DeleteCloudNode(uuid.UUID) (int64, error)
