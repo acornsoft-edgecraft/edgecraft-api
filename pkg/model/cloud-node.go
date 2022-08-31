@@ -32,18 +32,18 @@ type CloudNode struct {
 }
 
 type MasterNode struct {
-	CloudNodeUid    *uuid.UUID    `json:"-" db:"cloud_node_uid"`
-	CloudUid        *uuid.UUID    `json:"-" db:"cloud_uid"`
-	CloudClusterUid *uuid.UUID    `json:"-" db:"cloud_cluster_uid"`
-	Baremetal       NodeBaremetal `json:"baremetal"`
-	Node            Nodes         `json:"node" db:"-"`
+	CloudNodeUid *uuid.UUID `json:"cloud_node_uid" db:"cloud_node_uid"`
+	// CloudUid        *uuid.UUID    `json:"-" db:"cloud_uid"`
+	// CloudClusterUid *uuid.UUID    `json:"-" db:"cloud_cluster_uid"`
+	Baremetal NodeBaremetal `json:"baremetal"`
+	Node      Nodes         `json:"node" db:"-"`
 }
 type WorkerNode struct {
-	CloudNodeUid    *uuid.UUID    `json:"-" db:"cloud_node_uid"`
-	CloudUid        *uuid.UUID    `json:"-" db:"cloud_uid"`
-	CloudClusterUid *uuid.UUID    `json:"-" db:"cloud_cluster_uid"`
-	Baremetal       NodeBaremetal `json:"baremetal" db:"-"`
-	Node            Nodes         `json:"node" db:"-"`
+	CloudNodeUid *uuid.UUID `json:"cloud_node_uid" db:"cloud_node_uid"`
+	// CloudUid        *uuid.UUID    `json:"-" db:"cloud_uid"`
+	// CloudClusterUid *uuid.UUID    `json:"-" db:"cloud_cluster_uid"`
+	Baremetal NodeBaremetal `json:"baremetal" db:"-"`
+	Node      Nodes         `json:"node" db:"-"`
 }
 type NodeBaremetal struct {
 	CloudNodeHostName             *string `json:"host_name" db:"cloud_node_host_name"`

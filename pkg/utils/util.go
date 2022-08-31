@@ -2,6 +2,7 @@ package utils
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"strings"
@@ -49,4 +50,12 @@ func RenderTmpl(tmplName string, templ string, obj interface{}) (string, error) 
 	}
 
 	return buff.String(), err
+}
+
+func Print(data interface{}) {
+	b, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		fmt.Println("error:", err)
+	}
+	fmt.Print(string(b))
 }

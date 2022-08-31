@@ -113,8 +113,8 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.AddTableWithName(model.Etcd{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
 	dbmap.AddTableWithName(model.ClusterNodes{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
 	dbmap.AddTableWithName(model.CloudNode{}, "tbl_cloud_node").SetKeys(true, "cloud_node_uid")
-	dbmap.AddTableWithName(model.MasterNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
-	dbmap.AddTableWithName(model.WorkerNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
+	// dbmap.AddTableWithName(model.MasterNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
+	// dbmap.AddTableWithName(model.WorkerNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
 
 	return dbmap
 }

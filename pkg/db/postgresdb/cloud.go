@@ -1,7 +1,10 @@
 package postgresdb
 
 import (
+	"fmt"
+
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 )
 
@@ -28,6 +31,19 @@ func (db *DB) GetCloud(uid uuid.UUID) (*model.Cloud, error) {
 	return nil, nil
 }
 
+// GetCloud - Returns a GetCloud
+func (db *DB) GetFieldCloud(uid uuid.UUID, field string) (*model.Cloud, error) {
+	obj, err := db.GetClient().Get(&model.Cloud{}, uid)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.Cloud)
+		return res, nil
+	}
+	return nil, nil
+}
+
 // GetAllCloud - Returns all Cloud list
 func (db *DB) GetAllCloud() ([]model.Cloud, error) {
 	var res []model.Cloud
@@ -41,6 +57,8 @@ func (db *DB) GetAllCloud() ([]model.Cloud, error) {
 // UpdateCloud - saves the given RegisterCloud struct
 func (db *DB) UpdateCloud(req *model.Cloud) (int64, error) {
 	// Find and Update
+	fmt.Println("-- UpdateCloud --")
+	utils.Print(req)
 	count, err := db.GetClient().Update(req)
 	if err != nil {
 		return -1, err

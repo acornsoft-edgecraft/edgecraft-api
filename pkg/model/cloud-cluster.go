@@ -11,11 +11,11 @@ import (
 
 // used pointer
 type CloudCluster struct {
-	CloudClusterUid                   *uuid.UUID             `json:"cloudClusterUid" db:"cloud_cluster_uid, default:uuid_generate_v4()"`
-	CloudUid                          *uuid.UUID             `json:"cloudUid" db:"cloud_uid"`
-	CloudK8sVersion                   *string                `json:"cloudK8sVersion" db:"cloud_k8s_version"`
-	CloudClusterPodCidr               *string                `json:"cloudClusterPodCidr" db:"cloud_cluster_pod_cidr"`
-	CloudClusterServiceCidr           *string                `json:"cloudClusterServiceCidr" db:"cloud_cluster_service_cidr"`
+	CloudClusterUid                   *uuid.UUID             `json:"cloud_cluster_uid" db:"cloud_cluster_uid, default:uuid_generate_v4()"`
+	CloudUid                          *uuid.UUID             `json:"cloud_uid" db:"cloud_uid"`
+	CloudK8sVersion                   *string                `json:"version" db:"cloud_k8s_version"`
+	CloudClusterPodCidr               *string                `json:"pod_cidr" db:"cloud_cluster_pod_cidr"`
+	CloudClusterServiceCidr           *string                `json:"svc_cidr" db:"cloud_cluster_service_cidr"`
 	CloudClusterBmcCredentialSecret   *string                `json:"secret_name" db:"cloud_cluster_bmc_credential_secret"`
 	CloudClusterBmcCredentialUser     *string                `json:"user_name" db:"cloud_cluster_bmc_credential_user"`
 	CloudClusterBmcCredentialPassword *string                `json:"password" db:"cloud_cluster_bmc_credential_password"`
@@ -28,11 +28,11 @@ type CloudCluster struct {
 	CloudClusterLoadbalancerUse       *bool                  `json:"use_loadbalancer" db:"cloud_cluster_loadbalancer_use, default:false"`
 	CloudClusterLoadbalancerAddress   *string                `json:"loadbalancer_address" db:"cloud_cluster_loadbalancer_address"`
 	CloudClusterLoadbalancerPort      *string                `json:"loadbalancer_port" db:"ccloud_cluster_loadbalancer_port"`
-	CloudClusterExternalEtcdUse       *bool                  `json:"cloudClusterExternalEtcdUse" db:"cloud_cluster_external_etcd_use"`
+	CloudClusterExternalEtcdUse       *bool                  `json:"use_external_etcd" db:"cloud_cluster_external_etcd_use, default:false"`
 	ExternalEtcdEndPoints             *ExternalEtcdEndPoints `json:"endpoints" db:"external_etcd_endpoints"`
-	ExternalEtcdCertificateCa         *string                `json:"externalEtcdCertificateCa" db:"external_etcd_certificate_ca"`
-	ExternalEtcdCertificateCert       *string                `json:"externalEtcdCertificateCert" db:"external_etcd_certificate_cert"`
-	ExternalEtcdCertificateKey        *string                `json:"externalEtcdCertificateKey" db:"external_etcd_certificate_key"`
+	ExternalEtcdCertificateCa         *string                `json:"ca_file" db:"external_etcd_certificate_ca"`
+	ExternalEtcdCertificateCert       *string                `json:"cert_file" db:"external_etcd_certificate_cert"`
+	ExternalEtcdCertificateKey        *string                `json:"key_file" db:"external_etcd_certificate_key"`
 	CloudClusterStorageClass          *StorageClass          `json:"storage_class" db:"cloud_cluster_storage_class"`
 	CloudClusterState                 *string                `json:"cloudClusterState" db:"cloud_cluster_state"`
 	Creator                           *string                `json:"creator" db:"creator"`
@@ -93,7 +93,7 @@ type EtcdStorage struct {
 type Etcd struct {
 	CloudUid                    *uuid.UUID             `json:"-" db:"cloud_uid"`
 	CloudClusterUid             *uuid.UUID             `json:"-" db:"cloud_cluster_uid"`
-	CloudClusterExternalEtcdUse *bool                  `json:"use_external_etcd" db:"cloud_cluster_external_etcd_use"`
+	CloudClusterExternalEtcdUse *bool                  `json:"use_external_etcd" db:"cloud_cluster_external_etcd_use", default:false`
 	ExternalEtcdEndPoints       *ExternalEtcdEndPoints `json:"endpoints" db:"external_etcd_endpoints"`
 	ExternalEtcdCertificateCa   *string                `json:"ca_file" db:"external_etcd_certificate_ca"`
 	ExternalEtcdCertificateCert *string                `json:"cert_file" db:"external_etcd_certificate_cert"`

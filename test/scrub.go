@@ -1,98 +1,25 @@
-/*
- * Copyright (c) 2022 Nutanix Inc. All rights reserved.
- *
- * Author: Shyamsunder Rathi - shyam.rathi@nutanix.com
- * MIT License
- */
-
-// Package scrub implements a scrubbing utility to hide sensitive fields from a struct.
-//
-// This utility can be used to purge sensitive fields from a deeply nested struct
-// at any level. This is useful for scenarios such as logging structures which may
-// contain user passwords, secret keys, passphrases, etc.
-//
-// Notes & Caveates
-//
-// Only exported fields of a struct can be scrubbed (fields starting with a
-// capital letter). Reflect package cannot modify unexported (private) fields.
-// Also, The input struct must be passed by its address, otherwise the values
-// of its fields cannot be changed.
-//
-// Example
-//
-//    T := testScrub{
-//       Username: "administrator",
-//       Password: "my_secret_passphrase",
-//       Codes:    []string{"pass1", "pass2", "pass3"},
-//    }
-//
-//    fieldsToScrub := map[string]bool{"password": true, "codes": true}
-//
-//    out := Scrub(&T, fieldsToScrub)
-//    log.Println(out)
-//    OUTPUT: {username:administrator Password:******** Codes:[******** ******** ********]}
-package scrub
+package test
 
 import (
-	"encoding/json"
+	"fmt"
 	"reflect"
-	"strings"
 )
 
-// DefaultToScrub contains default field names to scrub.
-// NOTE: these fields should be all lowercase. Comparison is case insensitive.
-var DefaultToScrub = map[string]bool{
-	"password": true,
-}
-
 // Scrub scrubs all the specified string fields in the 'input' struct
-// at any level recursively and returns a JSON-formatted string of the
-// scrubbed struct.
-func Scrub(input interface{}, fieldsToScrub map[string]bool) string {
-	if input == nil {
+func Scrub(input interface{}, fieldsToScrub interface{}) interface{} {
+	if input == nil || fieldsToScrub == nil {
 		// Return json representation of 'nil' input
 		return "null"
 	}
 
-	if fieldsToScrub == nil {
-		fieldsToScrub = DefaultToScrub
-	}
-
-	// Call a recursive function to find and scrub fields in input at any level.
-	savedValues := make([]string, 0)
-	scrubInternal(input, "", fieldsToScrub, &savedValues, true /* mask */)
-
-	// Get a JSON marshalled string from the scrubb string to return.
-	var b []byte
-	b, _ = json.Marshal(input)
-
 	// Restore all the scrubbed values back to the original values in the struct.
-	scrubInternal(input, "", fieldsToScrub, &savedValues, false /* unmask */)
+	scrubInternal(input, "", fieldsToScrub)
 
 	// Return the scrubbed string
-	return string(b)
+	return input
 }
 
-// scrubInternal scrubs all the specified string fields in the 'input' struct
-// at any level recursively and returns a JSON formatted string of the scrubbed struct.
-// It restores the struct back to the original values before returning.
-//
-// It loops over the given 'target' struct recursively, looking for 'string'
-// field names specified in 'fieldsToScrub'. If found, it saves the value in
-// 'savedValues' and scrubs the value with '********'.
-// If 'mask' is set to false, then it reverses the operation by replacing all masked
-// fields with the original value saved in 'savedValues'.
-//
-// A typical usage is to call this API with an empty 'savedValues' with 'mask' as true to
-// scrub all sensitive values in the struct. Afterwards, call it back with the filled
-// 'savedValues' with 'mask' as false to restore the original struct.
-//
-// NOTE: 'savedValues' must be preserved by the caller to restore the original struct
-// and must not be modified.
-//
-// This is an internal API. It should not be used directly by any caller.
-func scrubInternal(target interface{}, fieldName string, fieldsToScrub map[string]bool,
-	savedValues *[]string, mask bool) {
+func scrubInternal(target interface{}, fieldName string, fieldsToScrub interface{}) {
 
 	// if target is not pointer, then immediately return
 	// modifying struct's field requires addressable object
@@ -141,8 +68,7 @@ func scrubInternal(target interface{}, fieldName string, fieldsToScrub map[strin
 				continue
 			}
 
-			scrubInternal(fValue.Addr().Interface(), fType.Name, fieldsToScrub,
-				savedValues, mask)
+			scrubInternal(fValue.Addr().Interface(), fType.Name, fieldsToScrub)
 		}
 		return
 	}
@@ -167,9 +93,7 @@ func scrubInternal(target interface{}, fieldName string, fieldsToScrub map[strin
 				// but that is not recommended in Golang.
 				continue
 			}
-
-			scrubInternal(arrValue.Addr().Interface(), fieldName, fieldsToScrub,
-				savedValues, mask)
+			scrubInternal(arrValue.Addr().Interface(), fieldName, fieldsToScrub)
 		}
 
 		return
@@ -182,18 +106,13 @@ func scrubInternal(target interface{}, fieldName string, fieldsToScrub map[strin
 		return
 	}
 
-	if _, ok := fieldsToScrub[strings.ToLower(fieldName)]; ok {
-		// Scrub this string value. Other types are not scrubbed.
-		if targetValue.CanSet() && targetValue.Kind() == reflect.String && !targetValue.IsZero() {
-			if mask {
-				// Save the value, so that it can be restored later.
-				*savedValues = append(*savedValues, targetValue.String())
-				targetValue.SetString("********")
-			} else {
-				// Restore from the saved value.
-				targetValue.SetString((*savedValues)[0])
-				*savedValues = (*savedValues)[1:]
-			}
+	fmt.Println("fieldName: ", fieldName)
+
+	v := reflect.ValueOf(fieldsToScrub).Elem()
+	for i := 0; i < v.NumField(); i++ {
+		typeField := v.Type().Field(i)
+		if fieldName == typeField.Name {
+			targetValue.Set(reflect.ValueOf(v.Field(i).Interface()))
 		}
 	}
 }

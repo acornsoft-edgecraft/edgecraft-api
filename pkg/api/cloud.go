@@ -2,8 +2,6 @@ package api
 
 import (
 	"fmt"
-	"reflect"
-	"strings"
 	"time"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
@@ -11,6 +9,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	mr "github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/response"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -59,8 +58,8 @@ func (a *API) SelectCloudHandler(c echo.Context) error {
 	resCloudCluster, err := a.Db.GetCloudCluster(cloudUid)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if resCloud == nil {
-		return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
+	} else if resCloudCluster == nil {
+		return response.ErrorfReqRes(c, resCloudCluster, common.DatabaseFalseData, err)
 	}
 
 	// resCloudNode, err := a.Db.GetCloudNode(cloudUid, *resCloudCluster.CloudClusterUid)
@@ -70,32 +69,32 @@ func (a *API) SelectCloudHandler(c echo.Context) error {
 	// 	return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
 	// }
 
-	resClusterK8s, err := a.Db.SelectK8sCloudCluster(cloudUid)
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if resCloud == nil {
-		return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
-	}
+	// resClusterK8s, err := a.Db.SelectK8sCloudCluster(cloudUid)
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// } else if resCloud == nil {
+	// 	return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
+	// }
 
-	resClusterBaremetal, err := a.Db.SelectBaremetalCloudCluster(cloudUid)
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if resCloud == nil {
-		return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
-	}
+	// resClusterBaremetal, err := a.Db.SelectBaremetalCloudCluster(cloudUid)
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// } else if resCloud == nil {
+	// 	return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
+	// }
 
 	resCloudNode, err := a.Db.SelectNodeCloudCluster(cloudUid)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if resCloud == nil {
-		return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
+	} else if resCloudNode == nil {
+		return response.ErrorfReqRes(c, resCloudNode, common.DatabaseFalseData, err)
 	}
 
-	resNodes, err := a.Db.SelectCloudNode(cloudUid, *resClusterK8s.CloudClusterUid)
+	resNodes, err := a.Db.SelectCloudNode(cloudUid, *resCloudCluster.CloudClusterUid)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if resCloud == nil {
-		return response.ErrorfReqRes(c, resCloud, common.DatabaseFalseData, err)
+	} else if resNodes == nil {
+		return response.ErrorfReqRes(c, resNodes, common.DatabaseFalseData, err)
 	}
 
 	var masterNodes []model.MasterNode
@@ -103,160 +102,94 @@ func (a *API) SelectCloudHandler(c echo.Context) error {
 
 	for _, nodes := range resNodes {
 		if *nodes.CloudNodeType == "master" {
-			masterBarematal := model.NodeBaremetal{
-				CloudNodeHostName:             nodes.CloudNodeHostName,
-				CloudNodeBmcAddress:           nodes.CloudNodeBmcAddress,
-				CloudNodeMacAddress:           nodes.CloudNodeMacAddress,
-				CloudNodeBootMode:             nodes.CloudNodeBootMode,
-				CloudNodeOnlinePower:          nodes.CloudNodeOnlinePower,
-				CloudNodeExternalProvisioning: nodes.CloudNodeExternalProvisioning,
-			}
-			nodes := model.Nodes{
-				CloudNodeName:  nodes.CloudNodeName,
-				CloudNodeIp:    nodes.CloudNodeIp,
-				CloudNodeLabel: nodes.CloudNodeLabel,
-			}
+			// masterBarematal := model.NodeBaremetal{
+			// 	CloudNodeHostName:             nodes.CloudNodeHostName,
+			// 	CloudNodeBmcAddress:           nodes.CloudNodeBmcAddress,
+			// 	CloudNodeMacAddress:           nodes.CloudNodeMacAddress,
+			// 	CloudNodeBootMode:             nodes.CloudNodeBootMode,
+			// 	CloudNodeOnlinePower:          nodes.CloudNodeOnlinePower,
+			// 	CloudNodeExternalProvisioning: nodes.CloudNodeExternalProvisioning,
+			// }
 
-			masterNode := model.MasterNode{
-				Baremetal: masterBarematal,
-				Node:      nodes,
+			// nodes := model.Nodes{
+			// 	CloudNodeName:  nodes.CloudNodeName,
+			// 	CloudNodeIp:    nodes.CloudNodeIp,
+			// 	CloudNodeLabel: nodes.CloudNodeLabel,
+			// }
+
+			// masterNode := model.MasterNode{
+			// 	Baremetal: masterBarematal,
+			// 	Node:      nodes,
+			// }
+
+			var masterNode model.MasterNode
+			if err := utils.SetFieldsInStruct(&masterNode, &nodes); err != nil {
+				logger.Errorf("SetFields In Struct ERROR : %s", err)
 			}
 			masterNodes = append(masterNodes, masterNode)
 		} else if *nodes.CloudNodeType == "worker" {
-			workerBarematal := model.NodeBaremetal{
-				CloudNodeHostName:             nodes.CloudNodeHostName,
-				CloudNodeBmcAddress:           nodes.CloudNodeBmcAddress,
-				CloudNodeMacAddress:           nodes.CloudNodeMacAddress,
-				CloudNodeBootMode:             nodes.CloudNodeBootMode,
-				CloudNodeOnlinePower:          nodes.CloudNodeOnlinePower,
-				CloudNodeExternalProvisioning: nodes.CloudNodeExternalProvisioning,
-			}
-			nodes := model.Nodes{
-				CloudNodeName:  nodes.CloudNodeName,
-				CloudNodeIp:    nodes.CloudNodeIp,
-				CloudNodeLabel: nodes.CloudNodeLabel,
-			}
+			// workerBarematal := model.NodeBaremetal{
+			// 	CloudNodeHostName:             nodes.CloudNodeHostName,
+			// 	CloudNodeBmcAddress:           nodes.CloudNodeBmcAddress,
+			// 	CloudNodeMacAddress:           nodes.CloudNodeMacAddress,
+			// 	CloudNodeBootMode:             nodes.CloudNodeBootMode,
+			// 	CloudNodeOnlinePower:          nodes.CloudNodeOnlinePower,
+			// 	CloudNodeExternalProvisioning: nodes.CloudNodeExternalProvisioning,
+			// }
 
-			workerNode := model.WorkerNode{
-				Baremetal: workerBarematal,
-				Node:      nodes,
+			// nodes := model.Nodes{
+			// 	CloudNodeName:  nodes.CloudNodeName,
+			// 	CloudNodeIp:    nodes.CloudNodeIp,
+			// 	CloudNodeLabel: nodes.CloudNodeLabel,
+			// }
+
+			// workerNode := model.WorkerNode{
+			// 	Baremetal: workerBarematal,
+			// 	Node:      nodes,
+			// }
+
+			var workerNode model.WorkerNode
+			if err := utils.SetFieldsInStruct(&workerNode, &nodes); err != nil {
+				logger.Errorf("SetFields In Struct ERROR : %s", err)
 			}
 			workerNodes = append(workerNodes, workerNode)
 		}
 
 	}
 
-	// var etcd model.Etcd
-	// var storage model.StorageClass
-	ft := reflect.TypeOf(resCloudCluster)
-
 	var res mr.RegisterCloud
-	fType := reflect.TypeOf(res)
-	fmt.Println("fType: ", fType.Kind())
-
-	examiner(ft, fType)
-
-	for i := 0; i < fType.NumField(); i++ {
-		f := fType.Field(i)
-		if f.Name == "adasf" {
-			fmt.Println("end")
-		}
-	}
-
-	fmt.Println("------------------")
-	// b, _ := json.MarshalIndent(res, "", " ")
-	// fmt.Printf("Before : %+v\n", string(b))
-	// SetField(&res, "CloudName", "asdfasdf")
-	// fmt.Printf("After : %+v\n", string(b))
-
-	fmt.Println("----- TypeOfStruct -------------")
-	type Wham struct {
-		Username string   `json:"username,omitempty"`
-		Password string   `json:"password"`
-		ID       int64    `json:"_id"`
-		Homebase []string `json:"homebase"`
-	}
-	// w := Wham{
-	// 	Username: "maria",
-	// 	Password: "hunter2",
-	// 	ID:       42,
-	// 	Homebase: "2434 Main St",
-	// }
-	// var aa Wham
-	// fmt.Printf("%+v\n", aa)
-	// SetField(&aa, "username", "larry")
-	// SetField(&aa, "_id", 44)
-	// SetField(&aa, "homebase", 44)
-	// fmt.Printf("%+v\n", aa)
-
-	// text := "asdfasdf"
-	// aaa := model.Cloud{
-	// 	CloudName: &text,
-	// }
-	// var aaa model.Cloud
-	// bbb, _ := json.MarshalIndent(aaa, "", " ")
-	// fmt.Println("Before: ", string(bbb))
-	// SetField(&aaa, "name", "1111111")
-	// fmt.Println("After: ", string(bbb))
 
 	res.Cloud = *resCloud
-	res.Cluster.K8s = *resClusterK8s
-	res.Cluster.Baremetal = *resClusterBaremetal
-	res.Nodes.CloudClusterLoadbalancerUse = resCloudNode.CloudClusterLoadbalancerUse
-	res.Nodes.CloudClusterLoadbalancerAddress = resCloudNode.CloudClusterLoadbalancerAddress
-	res.Nodes.CloudClusterLoadbalancerPort = resCloudNode.CloudClusterLoadbalancerPort
+	// res.Cluster.K8s = *resClusterK8s
+	// res.Cluster.Baremetal = *resClusterBaremetal
+
+	// Set Cluster fields
+	if err := utils.SetFieldsInStruct(&res.Cluster, resCloudCluster); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+
+	// Set Nodes fields
+	if err := utils.SetFieldsInStruct(&res.Nodes, resCloudNode); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+	// res.Nodes.CloudClusterLoadbalancerUse = resCloudNode.CloudClusterLoadbalancerUse
+	// res.Nodes.CloudClusterLoadbalancerAddress = resCloudNode.CloudClusterLoadbalancerAddress
+	// res.Nodes.CloudClusterLoadbalancerPort = resCloudNode.CloudClusterLoadbalancerPort
 	res.Nodes.MasterNode = masterNodes
 	res.Nodes.WorkerNode = workerNodes
-	res.EtcdStorage.Etcd.CloudClusterExternalEtcdUse = resCloudCluster.CloudClusterExternalEtcdUse
-	res.EtcdStorage.Etcd.ExternalEtcdEndPoints = resCloudCluster.ExternalEtcdEndPoints
-	res.EtcdStorage.Etcd.ExternalEtcdCertificateCa = resCloudCluster.ExternalEtcdCertificateCa
-	res.EtcdStorage.Etcd.ExternalEtcdCertificateCert = resCloudCluster.ExternalEtcdCertificateCert
-	res.EtcdStorage.Etcd.ExternalEtcdCertificateKey = resCloudCluster.ExternalEtcdCertificateKey
-	res.EtcdStorage.CloudClusterStorageClass = resCloudCluster.CloudClusterStorageClass
+
+	// Set ETCD fields
+	if err := utils.SetFieldsInStruct(&res.EtcdStorage, resCloudCluster); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+	// res.EtcdStorage.Etcd.CloudClusterExternalEtcdUse = resCloudCluster.CloudClusterExternalEtcdUse
+	// res.EtcdStorage.Etcd.ExternalEtcdEndPoints = resCloudCluster.ExternalEtcdEndPoints
+	// res.EtcdStorage.Etcd.ExternalEtcdCertificateCa = resCloudCluster.ExternalEtcdCertificateCa
+	// res.EtcdStorage.Etcd.ExternalEtcdCertificateCert = resCloudCluster.ExternalEtcdCertificateCert
+	// res.EtcdStorage.Etcd.ExternalEtcdCertificateKey = resCloudCluster.ExternalEtcdCertificateKey
+	// res.EtcdStorage.CloudClusterStorageClass = resCloudCluster.CloudClusterStorageClass
 
 	return response.Write(c, nil, &res)
-}
-
-func examiner(t reflect.Type, ftype reflect.Type) {
-	switch t.Kind() {
-	case reflect.Array, reflect.Chan, reflect.Map, reflect.Ptr, reflect.Slice:
-		examiner(t.Elem(), ftype)
-	case reflect.Struct:
-		for i := 0; i < t.NumField(); i++ {
-			f := t.Field(i)
-			fmt.Println("asdfasdf:: ", f.Name)
-		}
-	}
-}
-
-func SetField(item interface{}, fieldName string, value interface{}) error {
-	v := reflect.ValueOf(item).Elem()
-	if !v.CanAddr() {
-		return fmt.Errorf("cannot assign to the item passed, item must be a pointer in order to assign")
-	}
-	// It's possible we can cache this, which is why precompute all these ahead of time.
-	findJsonName := func(t reflect.StructTag) (string, error) {
-		if jt, ok := t.Lookup("json"); ok {
-			return strings.Split(jt, ",")[0], nil
-		}
-		return "", fmt.Errorf("field %s tag provided does not define a json tag", fieldName)
-	}
-	fieldNames := map[string]int{}
-	for i := 0; i < v.NumField(); i++ {
-		typeField := v.Type().Field(i)
-		tag := typeField.Tag
-		jname, _ := findJsonName(tag)
-		fieldNames[jname] = i
-	}
-
-	fieldNum, ok := fieldNames[fieldName]
-	if !ok {
-		return fmt.Errorf("field %s does not exist within the provided item", fieldName)
-	}
-	fieldVal := v.Field(fieldNum)
-	// fieldVal.SetString(value)
-	fieldVal.Set(reflect.ValueOf(value))
-	return nil
 }
 
 func (a *API) UpdateCloudHandler(c echo.Context) error {
@@ -268,13 +201,11 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 
 	now := time.Now()
 
-	var req model.Cloud
+	var req mr.RegisterCloud
 	err = getRequestData(c.Request(), &req)
 	if err != nil {
 		return response.ErrorfReqRes(c, req, common.CodeInvalidData, err)
 	}
-	req.CloudUID = &cloudUid
-	req.UpdatedAt = &now
 
 	// -- Service Logic
 	// Start. Transaction 얻어옴
@@ -283,14 +214,238 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, req, common.CodeFailedDatabase, err)
 	}
 
-	// Clud 등록 업데이트
-	count, err := txdb.UpdateCloud(&req)
+	// 1. Cloud 등록 업데이트
+	var cloud model.Cloud
+	getCloud, err := txdb.GetCloud(cloudUid)
 	if err != nil {
 		txErr := txdb.Rollback()
 		if txErr != nil {
 			logger.Info("DB Rollback Failed.", txErr)
 		}
 		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+	} else if getCloud == nil {
+		return response.ErrorfReqRes(c, getCloud, common.DatabaseFalseData, err)
+	}
+
+	// cloud.CloudName = getCloud.CloudName
+	// Set fields in struct
+	// if err := utils.SetFieldsInStruct(&cloud, &req.Cloud); err != nil {
+	// 	logger.Errorf("SetFields In Struct ERROR : %s", err)
+	// }
+
+	user := "user"
+	cloud = *getCloud
+	cloud = req.Cloud
+
+	cloud.UpdatedAt = &now
+	cloud.Updater = &user
+	count, err := txdb.UpdateCloud(&cloud)
+	if err != nil {
+		txErr := txdb.Rollback()
+		if txErr != nil {
+			logger.Info("DB Rollback Failed.", txErr)
+		}
+		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+	}
+
+	// 2. Cluster 등록 업데이트
+	var cluster model.CloudCluster
+	resCloudCluster, err := a.Db.GetCloudCluster(cloudUid)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if resCloudCluster == nil {
+		return response.ErrorfReqRes(c, resCloudCluster, common.DatabaseFalseData, err)
+	}
+
+	cluster = *resCloudCluster
+
+	cluster.CloudK8sVersion = req.Cluster.K8s.CloudK8sVersion
+	cluster.CloudClusterPodCidr = req.Cluster.K8s.CloudClusterPodCidr
+	cluster.CloudClusterServiceCidr = req.Cluster.K8s.CloudClusterServiceCidr
+	cluster.CloudClusterBmcCredentialSecret = req.Cluster.Baremetal.CloudClusterBmcCredentialSecret
+	cluster.CloudClusterBmcCredentialUser = req.Cluster.Baremetal.CloudClusterBmcCredentialUser
+	cluster.CloudClusterBmcCredentialPassword = req.Cluster.Baremetal.CloudClusterBmcCredentialPassword
+	cluster.CloudClusterImageUrl = req.Cluster.Baremetal.CloudClusterImageUrl
+	cluster.CloudClusterImageChecksum = req.Cluster.Baremetal.CloudClusterImageChecksum
+	cluster.CloudClusterImageChecksumType = req.Cluster.Baremetal.CloudClusterImageChecksumType
+	cluster.CloudClusterImageFormat = req.Cluster.Baremetal.CloudClusterImageFormat
+	cluster.CloudClusterMasterExtraConfig = req.Cluster.Baremetal.CloudClusterMasterExtraConfig
+	cluster.CloudClusterWorkerExtraConfig = req.Cluster.Baremetal.CloudClusterWorkerExtraConfig
+	cluster.CloudClusterLoadbalancerUse = req.Nodes.CloudClusterLoadbalancerUse
+	cluster.CloudClusterLoadbalancerAddress = req.Nodes.CloudClusterLoadbalancerAddress
+	cluster.CloudClusterLoadbalancerPort = req.Nodes.CloudClusterLoadbalancerPort
+	cluster.CloudClusterExternalEtcdUse = req.EtcdStorage.Etcd.CloudClusterExternalEtcdUse
+	cluster.ExternalEtcdEndPoints = req.EtcdStorage.Etcd.ExternalEtcdEndPoints
+	cluster.ExternalEtcdCertificateCa = req.EtcdStorage.Etcd.ExternalEtcdCertificateCa
+	cluster.ExternalEtcdCertificateCert = req.EtcdStorage.Etcd.ExternalEtcdCertificateCert
+	cluster.ExternalEtcdCertificateKey = req.EtcdStorage.Etcd.ExternalEtcdCertificateKey
+	cluster.CloudClusterStorageClass = req.EtcdStorage.CloudClusterStorageClass
+
+	cluster.Updater = &user
+	cluster.UpdatedAt = &now
+	cluster.CloudUid = cloud.CloudUID
+
+	count, err = txdb.UpdateCloudCluster(&cluster)
+	if err != nil {
+		txErr := txdb.Rollback()
+		if txErr != nil {
+			logger.Info("DB Rollback Failed.", txErr)
+		}
+		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+	}
+
+	// 3. Node 등록 업데이트
+	var node model.CloudNode
+	resCloudNode, err := a.Db.SelectNodeCloudCluster(cloudUid)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if resCloudNode == nil {
+		return response.ErrorfReqRes(c, resCloudNode, common.DatabaseFalseData, err)
+	}
+
+	resNodes, err := a.Db.SelectCloudNode(cloudUid, *resCloudCluster.CloudClusterUid)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if resNodes == nil {
+		return response.ErrorfReqRes(c, resNodes, common.DatabaseFalseData, err)
+	}
+
+	nodeType := ""
+
+	// - MasterNode 등록 업데이트
+	fieldNames := map[string]uuid.UUID{}
+	for _, master := range req.Nodes.MasterNode {
+		for _, field := range resNodes {
+			fmt.Println("req: ", *master.CloudNodeUid)
+			fmt.Println("field: ", *field.CloudNodeUid)
+			if master.CloudNodeUid != nil && master.CloudNodeUid == field.CloudNodeUid {
+				field.CloudNodeHostName = master.Baremetal.CloudNodeHostName
+				field.CloudNodeBmcAddress = master.Baremetal.CloudNodeBmcAddress
+				field.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
+				field.CloudNodeBootMode = master.Baremetal.CloudNodeBootMode
+				field.CloudNodeOnlinePower = master.Baremetal.CloudNodeOnlinePower
+				field.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
+				field.CloudNodeExternalProvisioning = master.Baremetal.CloudNodeExternalProvisioning
+				field.CloudNodeName = master.Node.CloudNodeName
+				field.CloudNodeIp = master.Node.CloudNodeIp
+				field.CloudNodeLabel = master.Node.CloudNodeLabel
+
+				field.Updater = &user
+				field.UpdatedAt = &now
+
+				count, err = txdb.UpdateCloudNode(&field)
+				if err != nil {
+					txErr := txdb.Rollback()
+					if txErr != nil {
+						logger.Info("DB Rollback Failed.", txErr)
+					}
+					return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+				}
+			}
+		}
+		if master.CloudNodeUid == nil {
+			nodeType = "master"
+			node.CloudNodeType = &nodeType
+			node.CloudNodeHostName = master.Baremetal.CloudNodeHostName
+			node.CloudNodeBmcAddress = master.Baremetal.CloudNodeBmcAddress
+			node.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
+			node.CloudNodeBootMode = master.Baremetal.CloudNodeBootMode
+			node.CloudNodeOnlinePower = master.Baremetal.CloudNodeOnlinePower
+			node.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
+			node.CloudNodeExternalProvisioning = master.Baremetal.CloudNodeExternalProvisioning
+			node.CloudNodeName = master.Node.CloudNodeName
+			node.CloudNodeIp = master.Node.CloudNodeIp
+			node.CloudNodeLabel = master.Node.CloudNodeLabel
+
+			node.Creator = &user
+			node.CreatedAt = &now
+			node.CloudUid = cloud.CloudUID
+			node.CloudClusterUid = cluster.CloudClusterUid
+
+			node.CreatedAt = &now
+
+			err = txdb.CreateCloudNode(&node)
+			if err != nil {
+				txErr := txdb.Rollback()
+				if txErr != nil {
+					logger.Info("DB Rollback Failed.", txErr)
+				}
+				return response.ErrorfReqRes(c, req, common.CodeFailedDatabase, err)
+			}
+		}
+	}
+
+	// - WorkerrNode 등록 업데이트
+	for _, worker := range req.Nodes.WorkerNode {
+		for _, field := range resNodes {
+			if worker.CloudNodeUid != nil && worker.CloudNodeUid == field.CloudNodeUid {
+				field.CloudNodeHostName = worker.Baremetal.CloudNodeHostName
+				field.CloudNodeBmcAddress = worker.Baremetal.CloudNodeBmcAddress
+				field.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
+				field.CloudNodeBootMode = worker.Baremetal.CloudNodeBootMode
+				field.CloudNodeOnlinePower = worker.Baremetal.CloudNodeOnlinePower
+				field.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
+				field.CloudNodeExternalProvisioning = worker.Baremetal.CloudNodeExternalProvisioning
+				field.CloudNodeName = worker.Node.CloudNodeName
+				field.CloudNodeIp = worker.Node.CloudNodeIp
+				field.CloudNodeLabel = worker.Node.CloudNodeLabel
+
+				field.Updater = &user
+				field.UpdatedAt = &now
+
+				count, err = txdb.UpdateCloudNode(&field)
+				if err != nil {
+					txErr := txdb.Rollback()
+					if txErr != nil {
+						logger.Info("DB Rollback Failed.", txErr)
+					}
+					return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+				}
+			}
+		}
+		if worker.CloudNodeUid == nil {
+			nodeType = "worker"
+			node.CloudNodeType = &nodeType
+			node.CloudNodeHostName = worker.Baremetal.CloudNodeHostName
+			node.CloudNodeBmcAddress = worker.Baremetal.CloudNodeBmcAddress
+			node.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
+			node.CloudNodeBootMode = worker.Baremetal.CloudNodeBootMode
+			node.CloudNodeOnlinePower = worker.Baremetal.CloudNodeOnlinePower
+			node.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
+			node.CloudNodeExternalProvisioning = worker.Baremetal.CloudNodeExternalProvisioning
+			node.CloudNodeName = worker.Node.CloudNodeName
+			node.CloudNodeIp = worker.Node.CloudNodeIp
+			node.CloudNodeLabel = worker.Node.CloudNodeLabel
+
+			node.Creator = &user
+			node.CreatedAt = &now
+			node.CloudUid = cloud.CloudUID
+			node.CloudClusterUid = cluster.CloudClusterUid
+
+			err = txdb.CreateCloudNode(&node)
+			if err != nil {
+				txErr := txdb.Rollback()
+				if txErr != nil {
+					logger.Info("DB Rollback Failed.", txErr)
+				}
+				return response.ErrorfReqRes(c, req, common.CodeFailedDatabase, err)
+			}
+			fmt.Println("--CreateCloudNode -- ", node.CloudNodeUid)
+		}
+	}
+
+	for _, remove := range fieldNames {
+
+		fmt.Println("----remove: ", remove)
+		// Update Nodes 삭제
+		// count, err = txdb.DeleteCloudNode(remove)
+		// if err != nil {
+		// 	txErr := txdb.Rollback()
+		// 	if txErr != nil {
+		// 		logger.Info("DB Rollback Failed.", txErr)
+		// 	}
+		// 	return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+		// }
 	}
 
 	// End. Transaction Commit
@@ -337,29 +492,48 @@ func (a *API) RegisterCloudHandler(c echo.Context) error {
 
 	// 2. Cluster 등록
 	var cluster model.CloudCluster
+	if err := utils.SetFieldsInStruct(&cluster, &req.Cluster.K8s); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+	if err := utils.SetFieldsInStruct(&cluster, &req.Cluster.Baremetal); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+	if err := utils.SetFieldsInStruct(&cluster, &req.Nodes); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+	if err := utils.SetFieldsInStruct(&cluster, &req.EtcdStorage.Etcd); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+	if err := utils.SetFieldsInStruct(&cluster, &req.EtcdStorage); err != nil {
+		logger.Errorf("SetFields In Struct ERROR : %s", err)
+	}
+	// if err := utils.SetFieldsInStruct(&cluster, &req); err != nil {
+	// 	logger.Errorf("SetFields In Struct ERROR : %s", err)
+	// }
+	// cluster.CloudK8sVersion = req.Cluster.K8s.CloudK8sVersion
+	// cluster.CloudClusterPodCidr = req.Cluster.K8s.CloudClusterPodCidr
+	// cluster.CloudClusterServiceCidr = req.Cluster.K8s.CloudClusterServiceCidr
+	// cluster.CloudClusterBmcCredentialSecret = req.Cluster.Baremetal.CloudClusterBmcCredentialSecret
+	// cluster.CloudClusterBmcCredentialUser = req.Cluster.Baremetal.CloudClusterBmcCredentialUser
+	// cluster.CloudClusterBmcCredentialPassword = req.Cluster.Baremetal.CloudClusterBmcCredentialPassword
+	// cluster.CloudClusterImageUrl = req.Cluster.Baremetal.CloudClusterImageUrl
+	// cluster.CloudClusterImageChecksum = req.Cluster.Baremetal.CloudClusterImageChecksum
+	// cluster.CloudClusterImageChecksumType = req.Cluster.Baremetal.CloudClusterImageChecksumType
+	// cluster.CloudClusterImageFormat = req.Cluster.Baremetal.CloudClusterImageFormat
+	// cluster.CloudClusterMasterExtraConfig = req.Cluster.Baremetal.CloudClusterMasterExtraConfig
+	// cluster.CloudClusterWorkerExtraConfig = req.Cluster.Baremetal.CloudClusterWorkerExtraConfig
+	// cluster.CloudClusterLoadbalancerUse = req.Nodes.CloudClusterLoadbalancerUse
+	// cluster.CloudClusterLoadbalancerAddress = req.Nodes.CloudClusterLoadbalancerAddress
+	// cluster.CloudClusterLoadbalancerPort = req.Nodes.CloudClusterLoadbalancerPort
+	// cluster.CloudClusterExternalEtcdUse = req.EtcdStorage.Etcd.CloudClusterExternalEtcdUse
+	// cluster.ExternalEtcdEndPoints = req.EtcdStorage.Etcd.ExternalEtcdEndPoints
+	// cluster.ExternalEtcdCertificateCa = req.EtcdStorage.Etcd.ExternalEtcdCertificateCa
+	// cluster.ExternalEtcdCertificateCert = req.EtcdStorage.Etcd.ExternalEtcdCertificateCert
+	// cluster.ExternalEtcdCertificateKey = req.EtcdStorage.Etcd.ExternalEtcdCertificateKey
+	// cluster.CloudClusterStorageClass = req.EtcdStorage.CloudClusterStorageClass
+
 	cluster.CreatedAt = &now
 	cluster.CloudUid = cloud.CloudUID
-	cluster.CloudK8sVersion = req.Cluster.K8s.CloudK8sVersion
-	cluster.CloudClusterPodCidr = req.Cluster.K8s.CloudClusterPodCidr
-	cluster.CloudClusterServiceCidr = req.Cluster.K8s.CloudClusterServiceCidr
-	cluster.CloudClusterBmcCredentialSecret = req.Cluster.Baremetal.CloudClusterBmcCredentialSecret
-	cluster.CloudClusterBmcCredentialUser = req.Cluster.Baremetal.CloudClusterBmcCredentialUser
-	cluster.CloudClusterBmcCredentialPassword = req.Cluster.Baremetal.CloudClusterBmcCredentialPassword
-	cluster.CloudClusterImageUrl = req.Cluster.Baremetal.CloudClusterImageUrl
-	cluster.CloudClusterImageChecksum = req.Cluster.Baremetal.CloudClusterImageChecksum
-	cluster.CloudClusterImageChecksumType = req.Cluster.Baremetal.CloudClusterImageChecksumType
-	cluster.CloudClusterImageFormat = req.Cluster.Baremetal.CloudClusterImageFormat
-	cluster.CloudClusterMasterExtraConfig = req.Cluster.Baremetal.CloudClusterMasterExtraConfig
-	cluster.CloudClusterWorkerExtraConfig = req.Cluster.Baremetal.CloudClusterWorkerExtraConfig
-	cluster.CloudClusterLoadbalancerUse = req.Nodes.CloudClusterLoadbalancerUse
-	cluster.CloudClusterLoadbalancerAddress = req.Nodes.CloudClusterLoadbalancerAddress
-	cluster.CloudClusterLoadbalancerPort = req.Nodes.CloudClusterLoadbalancerPort
-	cluster.CloudClusterExternalEtcdUse = req.EtcdStorage.Etcd.CloudClusterExternalEtcdUse
-	cluster.ExternalEtcdEndPoints = req.EtcdStorage.Etcd.ExternalEtcdEndPoints
-	cluster.ExternalEtcdCertificateCa = req.EtcdStorage.Etcd.ExternalEtcdCertificateCa
-	cluster.ExternalEtcdCertificateCert = req.EtcdStorage.Etcd.ExternalEtcdCertificateCert
-	cluster.ExternalEtcdCertificateKey = req.EtcdStorage.Etcd.ExternalEtcdCertificateKey
-	cluster.CloudClusterStorageClass = req.EtcdStorage.CloudClusterStorageClass
 
 	err = txdb.CreateCloudCluster(&cluster)
 	if err != nil {
@@ -452,8 +626,28 @@ func (a *API) DeleteCloudHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
 	}
 
-	// 1. cloud 삭제
-	count, err := txdb.DeleteCloud(cloudUid)
+	// 1. Cloud - Nodes 삭제
+	count, err := txdb.DeleteAllCloudNode(cloudUid)
+	if err != nil {
+		txErr := txdb.Rollback()
+		if txErr != nil {
+			logger.Info("DB Rollback Failed.", txErr)
+		}
+		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+	}
+
+	// 2. Cloud - Cluster 삭제
+	count, err = txdb.DeleteAllCloudCluster(cloudUid)
+	if err != nil {
+		txErr := txdb.Rollback()
+		if txErr != nil {
+			logger.Info("DB Rollback Failed.", txErr)
+		}
+		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+	}
+
+	// 3. Cloud - Cloud 삭제
+	count, err = txdb.DeleteCloud(cloudUid)
 	if err != nil {
 		txErr := txdb.Rollback()
 		if txErr != nil {
