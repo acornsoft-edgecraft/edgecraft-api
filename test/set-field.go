@@ -1,4 +1,4 @@
-package utils
+package test
 
 import (
 	"fmt"
@@ -8,7 +8,7 @@ import (
 )
 
 // Iterate through Fields of the Struct
-func TypeOfStruct(input interface{}, fieldsToRedact interface{}) (interface{}, error) {
+func SetFieldOfStruct(input interface{}, fieldsToRedact interface{}) (interface{}, error) {
 	if input == nil {
 		// Return json representation of 'nil' input
 		logger.Errorf("input struct nil.")
@@ -20,13 +20,13 @@ func TypeOfStruct(input interface{}, fieldsToRedact interface{}) (interface{}, e
 	// b, _ = json.Marshal(input)
 
 	// Restore all the scrubbed values back to the original values in the struct.
-	scrubInternal(fieldsToRedact, "", input)
+	scrubInternalPP(fieldsToRedact, "", input)
 
 	// Return the scrubbed string
 	return fieldsToRedact, nil
 }
 
-func scrubInternal(target interface{}, fieldName string, input interface{}) {
+func scrubInternalPP(target interface{}, fieldName string, input interface{}) {
 
 	// if target is not pointer, then immediately return
 	// modifying struct's field requires addressable object
@@ -75,7 +75,7 @@ func scrubInternal(target interface{}, fieldName string, input interface{}) {
 				continue
 			}
 
-			scrubInternal(fValue.Addr().Interface(), fType.Name, input)
+			scrubInternalPP(fValue.Addr().Interface(), fType.Name, input)
 		}
 		return
 	}
@@ -101,7 +101,7 @@ func scrubInternal(target interface{}, fieldName string, input interface{}) {
 				continue
 			}
 
-			scrubInternal(arrValue.Addr().Interface(), fieldName, input)
+			scrubInternalPP(arrValue.Addr().Interface(), fieldName, input)
 		}
 
 		return

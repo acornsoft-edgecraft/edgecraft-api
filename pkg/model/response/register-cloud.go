@@ -2,6 +2,7 @@ package model
 
 import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+	"github.com/gofrs/uuid"
 )
 
 // used pointer
@@ -14,8 +15,9 @@ type RegisterCloud struct {
 }
 
 type Cluster struct {
-	K8s       model.K8s              `json:"k8s"`
-	Baremetal model.ClusterBaremetal `json:"baremetal"`
+	CloudClusterUid *uuid.UUID             `json:"cloud_cluster_uid"`
+	K8s             model.K8s              `json:"k8s"`
+	Baremetal       model.ClusterBaremetal `json:"baremetal"`
 }
 
 type Nodes struct {

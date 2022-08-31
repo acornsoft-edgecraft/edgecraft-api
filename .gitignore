@@ -88,3 +88,6 @@ Temporary Items
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/go,macos,visualstudiocode
+.gitignore
+__debug_bin
+log.log

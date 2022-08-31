@@ -45,6 +45,7 @@ type DB interface {
 	UpdateCloudCluster(*model.CloudCluster) (int64, error)
 	CreateCloudCluster(*model.CloudCluster) error
 	DeleteCloudCluster(uuid.UUID) (int64, error)
+	DeleteAllCloudCluster(uuid.UUID) (int64, error)
 
 	// tbl_cloud_node
 	GetAllCloudNode() ([]model.CloudNode, error)
@@ -55,4 +56,5 @@ type DB interface {
 	UpdateCloudNode(*model.CloudNode) (int64, error)
 	CreateCloudNode(*model.CloudNode) error
 	DeleteCloudNode(uuid.UUID) (int64, error)
+	DeleteAllCloudNode(uuid.UUID) (int64, error)
 }

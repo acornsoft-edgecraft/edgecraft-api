@@ -14,7 +14,7 @@ CREATE TABLE edgecraft.tbl_cloud_cluster (
 	cloud_cluster_pod_cidr varchar(100) NULL,
 	cloud_cluster_service_cidr varchar(100) NULL,
 	cloud_cluster_loadbalancer_address varchar(50) NULL,
-	ccloud_cluster_loadbalancer_port varchar(4) NULL,
+	ccloud_cluster_loadbalancer_port varchar(6) NULL,
 	cloud_cluster_image_url varchar(255) NULL,
 	cloud_cluster_image_checksum varchar(255) NULL,
 	cloud_cluster_image_checksum_type varchar(30) NULL,

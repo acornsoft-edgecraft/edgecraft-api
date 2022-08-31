@@ -49,5 +49,8 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 
 	// Cloud - Node
 	v1.GET("/clouds/:cloudID/nodes", api.AllCloudNodeListHandler)
+	v1.GET("/clouds/:cloudID/nodes", api.GetCloudNodeHandler)
+	// v1.POST("/clouds/:cloudID/nodes", api.)
+	v1.DELETE("/clouds/:cloudID/nodes", api.AllCloudNodeListHandler)
 
 }
