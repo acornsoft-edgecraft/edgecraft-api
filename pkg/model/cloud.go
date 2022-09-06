@@ -14,9 +14,23 @@ type Cloud struct {
 	CloudDesc   *string    `json:"desc" db:"cloud_description"`
 	CloudStatus *string    `json:"status" db:"cloud_state"`
 	Creator     *string    `json:"creator" db:"creator"`
-	CreatedAt   *time.Time `json:"createdAt" db:"created_at"`
+	CreatedAt   *time.Time `json:"created_at" db:"created_at"`
 	Updater     *string    `json:"updater" db:"updater" validate:""`
-	UpdatedAt   *time.Time `json:"updatedAt" db:"updated_at"`
+	UpdatedAt   *time.Time `json:"updated_at" db:"updated_at"`
+}
+
+// used pointer
+type ResCloud struct {
+	CloudUID    *uuid.UUID `json:"cloudUid" db:"cloud_uid, default:uuid_generate_v4()"`
+	CloudName   *string    `json:"name" db:"cloud_name"`
+	CloudType   *string    `json:"type" db:"cloud_type"`
+	CloudDesc   *string    `json:"desc" db:"cloud_description"`
+	CloudStatus *string    `json:"status" db:"cloud_state"`
+	NodeCount   *int       `json:"nodeCount" db:"node_count"`
+	Creator     *string    `json:"creator" db:"creator"`
+	CreatedAt   *time.Time `json:"created_at" db:"created_at"`
+	Updater     *string    `json:"updater" db:"updater" validate:""`
+	UpdatedAt   *time.Time `json:"updated_at" db:"updated_at"`
 }
 
 // used nullstring type

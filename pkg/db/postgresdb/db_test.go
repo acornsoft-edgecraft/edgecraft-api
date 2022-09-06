@@ -15,21 +15,25 @@ import (
 )
 
 func getDbObject() (db.DB, error) {
-	//TODO config 설정
-	// type: "postgres"
-	// host: "edge-dev.acornsoft.io"
-	// port: "31219"
-	// database_name: "liteedge"
-	// username: "liteedge"
-	// password: "liteedge2020"
-	// max_idle_conns: 5
-	// max_open_conns: 100
+	//TODO config 설정\
+	// dbConfig := &Config{
+	// 	Type:         "postgres",
+	// 	DatabaseName: "edgecraft",
+	// 	SchemaName:   "edgecraft",
+	// 	Host:         "192.168.77.42",
+	// 	Port:         "31000",
+	// 	UserName:     "edgecraft",
+	// 	Password:     "edgecraft",
+	// 	MaxIdleConns: 5,
+	// 	MaxOpenConns: 100,
+	// }
+	// - localhost
 	dbConfig := &Config{
 		Type:         "postgres",
 		DatabaseName: "edgecraft",
 		SchemaName:   "edgecraft",
-		Host:         "192.168.77.42",
-		Port:         "31000",
+		Host:         "localhost",
+		Port:         "5432",
 		UserName:     "edgecraft",
 		Password:     "edgecraft",
 		MaxIdleConns: 5,
@@ -47,6 +51,140 @@ func Test_GetAllCloud(t *testing.T) {
 	db, _ := getDbObject()
 	defer db.CloseConnection()
 	getClouds, err := db.GetAllCloud()
+	if err != nil {
+		fmt.Printf("error : %s", err)
+	}
+
+	// 출력
+	var buffer bytes.Buffer
+	err = PrettyEncode(getClouds, &buffer)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(buffer.String())
+}
+
+func Test_GetAllCodeGroup(t *testing.T) {
+	db, _ := getDbObject()
+	defer db.CloseConnection()
+	getClouds, err := db.GetAllCodeGroup()
+	if err != nil {
+		fmt.Printf("error : %s", err)
+	}
+
+	// 출력
+	var buffer bytes.Buffer
+	err = PrettyEncode(getClouds, &buffer)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(buffer.String())
+}
+
+func Test_CreateCodeGroup(t *testing.T) {
+
+	item1 := "CLOUD_STATUS"
+	item2 := "클라우드 상태 코드"
+	item3 := true
+	item11 := "CLOUD_TYPE"
+	item12 := "클라우드 유형"
+	item13 := true
+	item21 := "K8S_VERSION"
+	item22 := "Kubernetes Versio n"
+	item23 := true
+	item31 := "IMAGE_CHECKSUM_TYPE"
+	item32 := "Image Checksum Type"
+	item33 := true
+	item41 := "IMAGE_FORMAT"
+	item42 := "Image Format"
+	item43 := true
+	item51 := "BOOT_MODE"
+	item52 := "Boot Mode"
+	item53 := true
+	item61 := "NODE_TYPE"
+	item62 := "Node TypeNode Type"
+	item63 := true
+
+	data := model.CodeGroup{
+		CodeGroupName:        &item1,
+		CodeGroupDescription: &item2,
+		UseYn:                &item3,
+	}
+	data1 := model.CodeGroup{
+		CodeGroupName:        &item11,
+		CodeGroupDescription: &item12,
+		UseYn:                &item13,
+	}
+	data2 := model.CodeGroup{
+		CodeGroupName:        &item21,
+		CodeGroupDescription: &item22,
+		UseYn:                &item23,
+	}
+	data3 := model.CodeGroup{
+		CodeGroupName:        &item31,
+		CodeGroupDescription: &item32,
+		UseYn:                &item33,
+	}
+	data4 := model.CodeGroup{
+		CodeGroupName:        &item41,
+		CodeGroupDescription: &item42,
+		UseYn:                &item43,
+	}
+	data5 := model.CodeGroup{
+		CodeGroupName:        &item51,
+		CodeGroupDescription: &item52,
+		UseYn:                &item53,
+	}
+	data6 := model.CodeGroup{
+		CodeGroupName:        &item61,
+		CodeGroupDescription: &item62,
+		UseYn:                &item63,
+	}
+	arrayData := []model.CodeGroup{
+		data1,
+		data2,
+		data3,
+		data4,
+		data5,
+		data6,
+	}
+
+	db, _ := getDbObject()
+	defer db.CloseConnection()
+	for _, i := range arrayData {
+		err := db.CreateCodeGroup(&i)
+		if err != nil {
+			fmt.Printf("error : %s", err)
+		}
+	}
+	err := db.CreateCodeGroup(&data)
+	if err != nil {
+		fmt.Printf("error : %s", err)
+	}
+
+	// 출력
+	var buffer bytes.Buffer
+	err = PrettyEncode(arrayData, &buffer)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(buffer.String())
+}
+
+func Test_SearchCodeGroup(t *testing.T) {
+
+	aa := "CLOUD_STATUS"
+	bb := true
+	cc := "클라우드 상태 코드"
+	searchCodeGroup := model.CodeGroup{
+		CodeGroupName:        &aa,
+		UseYn:                &bb,
+		CodeGroupDescription: &cc,
+	}
+
+	db, _ := getDbObject()
+	defer db.CloseConnection()
+	getClouds, err := db.SearchCodeGroup(searchCodeGroup)
 	if err != nil {
 		fmt.Printf("error : %s", err)
 	}

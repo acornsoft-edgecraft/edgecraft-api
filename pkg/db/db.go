@@ -28,7 +28,8 @@ type DB interface {
 	GetClient() SQLExecutor
 
 	// tbl_cloud
-	GetAllCloud() ([]model.Cloud, error)
+	GetAllCloud() ([]model.ResCloud, error)
+	GetSearchCloud(u model.Cloud) ([]model.Cloud, error)
 	GetCloud(uuid.UUID) (*model.Cloud, error)
 	UpdateCloud(*model.Cloud) (int64, error)
 	CreateCloud(*model.Cloud) error
@@ -54,7 +55,21 @@ type DB interface {
 	SelectMasterCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
 	SelectWorkerCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
 	UpdateCloudNode(*model.CloudNode) (int64, error)
+	UpdateCloudNodes([]*model.CloudNode) (int64, error)
 	CreateCloudNode(*model.CloudNode) error
 	DeleteCloudNode(uuid.UUID) (int64, error)
 	DeleteAllCloudNode(uuid.UUID) (int64, error)
+
+	// tbl_code_group
+	CreateCodeGroup(*model.CodeGroup) error
+	GetAllCodeGroup() ([]model.CodeGroup, error)
+	GetCodeGroup(uuid.UUID) (*model.CodeGroup, error)
+	SelectCodeGroup(uuid.UUID) ([]model.CodeGroup, error)
+	SearchCodeGroup(model.CodeGroup) ([]model.CodeGroup, error)
+
+	// tbl_code
+	GetAllCode() ([]model.Code, error)
+	GetCode(uuid.UUID) (*model.Code, error)
+	SelectCode(uuid.UUID) ([]model.Code, error)
+	SearchCode(model.Code) ([]model.Code, error)
 }

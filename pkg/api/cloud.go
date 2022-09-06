@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
@@ -10,6 +9,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	mr "github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
+	"github.com/emirpasic/gods/sets/hashset"
 	"github.com/gofrs/uuid"
 	"github.com/labstack/echo/v4"
 )
@@ -312,19 +312,27 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 
 	nodeType := ""
 
+	var resNodeUid []interface{}
+	for _, nodes := range resNodes {
+		resNodeUid = append(resNodeUid, nodes.CloudNodeUid)
+	}
+
+	resRemoveNodes := hashset.New()
+	resRemoveNodes.Add(resNodeUid...)
+
+	setRemoveNodes := hashset.New()
+	var updateNodes []*model.CloudNode
 	// - MasterNode 등록 업데이트
-	fieldNames := map[string]uuid.UUID{}
 	for _, master := range req.Nodes.MasterNode {
 		for _, field := range resNodes {
-			fmt.Println("req: ", *master.CloudNodeUid)
-			fmt.Println("field: ", *field.CloudNodeUid)
-			if master.CloudNodeUid != nil && master.CloudNodeUid == field.CloudNodeUid {
+			if master.CloudNodeUid != nil && *master.CloudNodeUid == *field.CloudNodeUid {
+				// nodeType = "master"
+				// field.CloudNodeType = &nodeType
 				field.CloudNodeHostName = master.Baremetal.CloudNodeHostName
 				field.CloudNodeBmcAddress = master.Baremetal.CloudNodeBmcAddress
 				field.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
 				field.CloudNodeBootMode = master.Baremetal.CloudNodeBootMode
 				field.CloudNodeOnlinePower = master.Baremetal.CloudNodeOnlinePower
-				field.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
 				field.CloudNodeExternalProvisioning = master.Baremetal.CloudNodeExternalProvisioning
 				field.CloudNodeName = master.Node.CloudNodeName
 				field.CloudNodeIp = master.Node.CloudNodeIp
@@ -333,16 +341,19 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 				field.Updater = &user
 				field.UpdatedAt = &now
 
-				count, err = txdb.UpdateCloudNode(&field)
-				if err != nil {
-					txErr := txdb.Rollback()
-					if txErr != nil {
-						logger.Info("DB Rollback Failed.", txErr)
-					}
-					return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
-				}
+				updateNodes = append(updateNodes, &field)
+				// count, err = txdb.UpdateCloudNode(&field)
+				// if err != nil {
+				// 	txErr := txdb.Rollback()
+				// 	if txErr != nil {
+				// 		logger.Info("DB Rollback Failed.", txErr)
+				// 	}
+				// 	return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+				// }
+				setRemoveNodes.Add(field.CloudNodeUid)
 			}
 		}
+		// New Node
 		if master.CloudNodeUid == nil {
 			nodeType = "master"
 			node.CloudNodeType = &nodeType
@@ -351,7 +362,6 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 			node.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
 			node.CloudNodeBootMode = master.Baremetal.CloudNodeBootMode
 			node.CloudNodeOnlinePower = master.Baremetal.CloudNodeOnlinePower
-			node.CloudNodeMacAddress = master.Baremetal.CloudNodeMacAddress
 			node.CloudNodeExternalProvisioning = master.Baremetal.CloudNodeExternalProvisioning
 			node.CloudNodeName = master.Node.CloudNodeName
 			node.CloudNodeIp = master.Node.CloudNodeIp
@@ -362,8 +372,6 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 			node.CloudUid = cloud.CloudUID
 			node.CloudClusterUid = cluster.CloudClusterUid
 
-			node.CreatedAt = &now
-
 			err = txdb.CreateCloudNode(&node)
 			if err != nil {
 				txErr := txdb.Rollback()
@@ -372,19 +380,21 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 				}
 				return response.ErrorfReqRes(c, req, common.CodeFailedDatabase, err)
 			}
+			setRemoveNodes.Add(node.CloudNodeUid)
 		}
 	}
 
 	// - WorkerrNode 등록 업데이트
 	for _, worker := range req.Nodes.WorkerNode {
 		for _, field := range resNodes {
-			if worker.CloudNodeUid != nil && worker.CloudNodeUid == field.CloudNodeUid {
+			if worker.CloudNodeUid != nil && *worker.CloudNodeUid == *field.CloudNodeUid {
+				// nodeType = "worker"
+				// field.CloudNodeType = &nodeType
 				field.CloudNodeHostName = worker.Baremetal.CloudNodeHostName
 				field.CloudNodeBmcAddress = worker.Baremetal.CloudNodeBmcAddress
 				field.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
 				field.CloudNodeBootMode = worker.Baremetal.CloudNodeBootMode
 				field.CloudNodeOnlinePower = worker.Baremetal.CloudNodeOnlinePower
-				field.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
 				field.CloudNodeExternalProvisioning = worker.Baremetal.CloudNodeExternalProvisioning
 				field.CloudNodeName = worker.Node.CloudNodeName
 				field.CloudNodeIp = worker.Node.CloudNodeIp
@@ -393,16 +403,19 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 				field.Updater = &user
 				field.UpdatedAt = &now
 
-				count, err = txdb.UpdateCloudNode(&field)
-				if err != nil {
-					txErr := txdb.Rollback()
-					if txErr != nil {
-						logger.Info("DB Rollback Failed.", txErr)
-					}
-					return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
-				}
+				updateNodes = append(updateNodes, &field)
+				// count, err = txdb.UpdateCloudNode(&field)
+				// if err != nil {
+				// 	txErr := txdb.Rollback()
+				// 	if txErr != nil {
+				// 		logger.Info("DB Rollback Failed.", txErr)
+				// 	}
+				// 	return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+				// }
+				setRemoveNodes.Add(field.CloudNodeUid)
 			}
 		}
+		// New Node
 		if worker.CloudNodeUid == nil {
 			nodeType = "worker"
 			node.CloudNodeType = &nodeType
@@ -411,7 +424,6 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 			node.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
 			node.CloudNodeBootMode = worker.Baremetal.CloudNodeBootMode
 			node.CloudNodeOnlinePower = worker.Baremetal.CloudNodeOnlinePower
-			node.CloudNodeMacAddress = worker.Baremetal.CloudNodeMacAddress
 			node.CloudNodeExternalProvisioning = worker.Baremetal.CloudNodeExternalProvisioning
 			node.CloudNodeName = worker.Node.CloudNodeName
 			node.CloudNodeIp = worker.Node.CloudNodeIp
@@ -430,22 +442,35 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 				}
 				return response.ErrorfReqRes(c, req, common.CodeFailedDatabase, err)
 			}
-			fmt.Println("--CreateCloudNode -- ", node.CloudNodeUid)
+			setRemoveNodes.Add(node.CloudNodeUid)
 		}
 	}
 
-	for _, remove := range fieldNames {
+	// Update Nodes
+	count, err = txdb.UpdateCloudNodes(updateNodes)
+	if err != nil {
+		txErr := txdb.Rollback()
+		if txErr != nil {
+			logger.Info("DB Rollback Failed.", txErr)
+		}
+		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+	}
 
-		fmt.Println("----remove: ", remove)
-		// Update Nodes 삭제
-		// count, err = txdb.DeleteCloudNode(remove)
-		// if err != nil {
-		// 	txErr := txdb.Rollback()
-		// 	if txErr != nil {
-		// 		logger.Info("DB Rollback Failed.", txErr)
-		// 	}
-		// 	return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
-		// }
+	// Remove Node Updated
+	difference := resRemoveNodes.Difference(setRemoveNodes)
+	for _, r := range difference.Values() {
+		for _, d := range resNodes {
+			if r == d.CloudNodeUid {
+				count, err = txdb.DeleteCloudNode(*d.CloudNodeUid)
+				if err != nil {
+					txErr := txdb.Rollback()
+					if txErr != nil {
+						logger.Info("DB Rollback Failed.", txErr)
+					}
+					return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
+				}
+			}
+		}
 	}
 
 	// End. Transaction Commit
@@ -560,7 +585,6 @@ func (a *API) RegisterCloudHandler(c echo.Context) error {
 		node.CloudNodeMacAddress = req.Nodes.MasterNode[i].Baremetal.CloudNodeMacAddress
 		node.CloudNodeBootMode = req.Nodes.MasterNode[i].Baremetal.CloudNodeBootMode
 		node.CloudNodeOnlinePower = req.Nodes.MasterNode[i].Baremetal.CloudNodeOnlinePower
-		node.CloudNodeMacAddress = req.Nodes.MasterNode[i].Baremetal.CloudNodeMacAddress
 		node.CloudNodeExternalProvisioning = req.Nodes.MasterNode[i].Baremetal.CloudNodeExternalProvisioning
 		node.CloudNodeName = req.Nodes.MasterNode[i].Node.CloudNodeName
 		node.CloudNodeIp = req.Nodes.MasterNode[i].Node.CloudNodeIp
@@ -586,7 +610,6 @@ func (a *API) RegisterCloudHandler(c echo.Context) error {
 		node.CloudNodeMacAddress = req.Nodes.WorkerNode[i].Baremetal.CloudNodeMacAddress
 		node.CloudNodeBootMode = req.Nodes.WorkerNode[i].Baremetal.CloudNodeBootMode
 		node.CloudNodeOnlinePower = req.Nodes.WorkerNode[i].Baremetal.CloudNodeOnlinePower
-		node.CloudNodeMacAddress = req.Nodes.WorkerNode[i].Baremetal.CloudNodeMacAddress
 		node.CloudNodeExternalProvisioning = req.Nodes.WorkerNode[i].Baremetal.CloudNodeExternalProvisioning
 		node.CloudNodeName = req.Nodes.WorkerNode[i].Node.CloudNodeName
 		node.CloudNodeIp = req.Nodes.WorkerNode[i].Node.CloudNodeIp
@@ -626,6 +649,8 @@ func (a *API) DeleteCloudHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, cloudUid, common.CodeFailedDatabase, err)
 	}
 
+	utils.Print("--DeleteAllCloudNode--")
+	utils.Print(cloudUid)
 	// 1. Cloud - Nodes 삭제
 	count, err := txdb.DeleteAllCloudNode(cloudUid)
 	if err != nil {
