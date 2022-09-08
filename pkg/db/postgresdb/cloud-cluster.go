@@ -1,10 +1,7 @@
 package postgresdb
 
 import (
-	"fmt"
-
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 )
 
@@ -115,8 +112,8 @@ func (db *DB) GetAllCloudCluster() ([]model.CloudCluster, error) {
 // UpdateCloud - saves the given RegisterCloud struct
 func (db *DB) UpdateCloudCluster(req *model.CloudCluster) (int64, error) {
 	// Find and Update
-	fmt.Println("-- UpdateCloudCluster --")
-	utils.Print(req)
+	// fmt.Println("-- UpdateCloudCluster --")
+	// utils.Print(req)
 	count, err := db.GetClient().Update(req)
 	if err != nil {
 		return -1, err
@@ -135,7 +132,7 @@ func (db *DB) DeleteCloudCluster(uid uuid.UUID) (int64, error) {
 
 // DeleteAllCloudCluster - deletes the RegisterCloud with the given id
 func (db *DB) DeleteAllCloudCluster(uid uuid.UUID) (int64, error) {
-	count, err := db.GetClient().Delete(&model.CloudCluster{CloudClusterUid: &uid})
+	count, err := db.GetClient().Delete(&model.CloudCluster{CloudUid: &uid})
 	if err != nil {
 		return -1, err
 	}

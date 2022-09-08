@@ -18,7 +18,7 @@ import (
 
 // ReturnData - Represents the structure of an response data or error information
 type ReturnData struct {
-	Error   bool        `json:"error"`
+	Error   bool        `json:"isError"`
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
