@@ -65,7 +65,7 @@ func (db *DB) BeginTransaction() (db.DB, error) {
 // Commit transaction commit
 func (db *DB) Commit() error {
 	if db.tx == nil {
-		return fmt.Errorf("Not exist a transaction")
+		return fmt.Errorf("not exist a transaction")
 	}
 	err := db.tx.Commit()
 	if err == nil {
@@ -77,7 +77,7 @@ func (db *DB) Commit() error {
 // Rollback transaction rollback
 func (db *DB) Rollback() error {
 	if db.tx == nil {
-		return fmt.Errorf("Not exist a transaction")
+		return fmt.Errorf("not exist a transaction")
 	}
 	err := db.tx.Rollback()
 	if err == nil {

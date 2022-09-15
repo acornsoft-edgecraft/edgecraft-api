@@ -1,0 +1,146 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "EdgeCraft Swagger API",
+        "contact": {},
+        "version": "0.1.0"
+    },
+    "host": "localhost:8100",
+    "basePath": "/api/v1",
+    "paths": {
+        "/auth": {
+            "post": {
+                "description": "User Login",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Login",
+                "operationId": "Login",
+                "parameters": [
+                    {
+                        "description": "Request json",
+                        "name": "loginInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Login"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds": {
+            "get": {
+                "description": "Get all cloud list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "AllClooudList",
+                "operationId": "AllCloudList",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds/{cloudUid}": {
+            "get": {
+                "description": "Get all cloud list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "AllClooudList",
+                "operationId": "GetCloud",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "cloudUid",
+                        "name": "CloudUID",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/health": {
+            "get": {
+                "description": "for health check",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Common"
+                ],
+                "summary": "Health check k8s-api-gateway",
+                "operationId": "health-check",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "model.Login": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": "ccambo@acornsoft.io"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "1234abcd@Acorn"
+                }
+            }
+        },
+        "response.ReturnData": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {},
+                "isError": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

@@ -1,4 +1,4 @@
-.PHONY: clean build run
+.PHONY: clean critic security lint test build run
 
 APP_NAME = edgecraft-apiserver
 CMD_DIR = $(PWD)/cmd
@@ -10,7 +10,20 @@ DATABASE_URL = postgres://edgecraft:edgecraft@192.168.77.42:31000/edgecraft?sslm
 clean:
 	rm -rf ./build
 
-build: 
+critic:
+	gocritic check -enableAll ./...
+
+security:
+	gosec ./...
+
+lint:
+	golangci-lint run ./...
+
+test: clean critic security lint
+	go test -v -timeout 30s -coverprofile=cover.out -cover ./...
+	go tool cover -func=cover.out
+
+build: test
 	CGO_ENABLED=0 go build -ldflags="-w -s" -o $(BUILD_DIR)/$(APP_NAME) main.go
 
 run: swag build

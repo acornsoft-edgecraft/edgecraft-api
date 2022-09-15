@@ -1,23 +1,27 @@
 package model
 
-import "time"
+import (
+	"strings"
+	"time"
+
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
+	"github.com/gofrs/uuid"
+)
 
 // User User
 type User struct {
-	UserUID       *int       `json:"userUid" db:"user_uid"`
-	UserRoleID    *string    `json:"userRoleId" db:"user_role_id"`
-	Name          *string    `json:"name" db:"name"`
-	UserID        *string    `json:"userId" db:"user_id"`
-	UserPassword  *string    `json:"userPassword" db:"user_password"`
-	Email         *string    `json:"email" db:"email"`
-	Mobile        *string    `json:"mobile" db:"mobile"`
-	Status        *string    `json:"status" db:"status"`
-	AlarmRecvType *string    `json:"alarmRecvType" db:"alarm_recv_type"`
-	RegUserUID    *int       `json:"regUserUid" db:"reg_user_uid"`
-	RegDate       *time.Time `json:"regDate" db:"reg_date"`
-	EdtUserUID    *int       `json:"edtUserUid" db:"edt_user_uid"`
-	EdtDate       *time.Time `json:"edtDate" db:"edt_date"`
-	SearchName    *string    `json:"searchName" db:"-"`
+	UserUID  *uuid.UUID `json:"userUid" db:"user_uid, default:uuid_generate_v4()"`
+	UserRole *string    `json:"userRole" db:"user_role"`
+	Name     *string    `json:"name" db:"user_name"`
+	UserID   *string    `json:"userId" db:"user_id"`
+	Password *string    `json:"password" db:"password"`
+	Email    *string    `json:"email" db:"email"`
+	Status   *string    `json:"status" db:"user_state"`
+	Creator  *string    `json:"creator" db:"creator"`
+	Created  *time.Time `json:"created" db:"created_at"`
+	Updater  *string    `json:"updater" db:"updater"`
+	Updated  *time.Time `json:"updated" db:"updated_at"`
 }
 
 // SearchUser SearchUser
@@ -29,14 +33,14 @@ type SearchUser struct {
 
 // UserLoginHis UserLoginHis
 type UserLoginHis struct {
-	UserLoginUID int64     `json:"userLoginUid,omitempty" db:"user_login_uid"`
-	UserUID      int       `json:"userUid,omitempty" db:"user_uid"`
-	LoginType    string    `json:"loginType,omitempty" db:"login_type"`
-	UserID       string    `json:"userId,omitempty" db:"user_id"`
-	UserAgent    string    `json:"userAgent,omitempty" db:"user_agent"`
-	ConnAddr     string    `json:"connAddr,omitempty" db:"conn_addr"`
-	SuccYn       string    `json:"succYn,omitempty" db:"succ_yn"`
-	RegDate      time.Time `json:"regDate,omitempty" db:"reg_date"`
+	UserLoginUID int64      `json:"userLoginUid,omitempty" db:"user_login_uid"`
+	UserUID      *uuid.UUID `json:"userUid" db:"user_uid, default:uuid_generate_v4()"`
+	LoginType    string     `json:"loginType,omitempty" db:"login_type"`
+	UserID       string     `json:"userId,omitempty" db:"user_id"`
+	UserAgent    string     `json:"userAgent,omitempty" db:"user_agent"`
+	ConnAddr     string     `json:"connAddr,omitempty" db:"conn_addr"`
+	SuccYn       string     `json:"succYn,omitempty" db:"succ_yn"`
+	RegDate      time.Time  `json:"regDate,omitempty" db:"reg_date"`
 }
 
 // UserRole UserRole
@@ -45,10 +49,10 @@ type UserRole struct {
 	UserRoleName *string    `json:"userRoleName,omitempty" db:"user_role_name"`
 	UseYn        *string    `json:"useYn,omitempty" db:"use_yn"`
 	MenuAuths    []MenuAuth `json:"menuAuths,omitempty" db:"-"`
-	RegUserUID   *int       `json:"regserUid" db:"reg_user_uid"`
-	RegDate      *time.Time `json:"regDate" db:"reg_date"`
-	EdtUserUID   *int       `json:"edtUserUid" db:"edt_user_uid"`
-	EdtDate      *time.Time `json:"edtDate" db:"edt_date"`
+	Creator      *string    `json:"creator" db:"creator"`
+	Created      *time.Time `json:"created" db:"created_at"`
+	Updater      *string    `json:"updater" db:"updater"`
+	Updated      *time.Time `json:"updated" db:"updated_at"`
 }
 
 type SearchUserRole struct {
@@ -64,9 +68,20 @@ type MenuAuth struct {
 	UserRoleID *string    `json:"userRoleId,omitempty" db:"user_role_id"`
 	AttrRw     *string    `json:"attrRw,omitempty" db:"attr_rw"`
 	UseYn      *string    `json:"useYn,omitempty" db:"use_yn"`
-	RegUserUID *int       `json:"regUserUid,omitempty" db:"reg_user_uid"`
-	RegDate    *time.Time `json:"regDate,omitempty" db:"reg_date"`
-	EdtUserUID *int       `json:"edtUserUid,omitempty" db:"edt_user_uid"`
-	EdtDate    *time.Time `json:"edtDate,omitempty" db:"edt_date"`
+	Creator    *string    `json:"creator" db:"creator"`
+	Created    *time.Time `json:"created" db:"created_at"`
+	Updater    *string    `json:"updater" db:"updater"`
+	Updated    *time.Time `json:"updated" db:"updated_at"`
 	MenuDispYn *string    `json:"menuDispYn,omitempty" db:"-"`
+}
+
+// MatchPassword - 비밀번호 매칭 검증
+func (u *User) MatchPassword(password string) (int, bool) {
+	// Hash 검증
+	result := strings.Compare(utils.GetHashStr(password), *u.Password)
+	if result != 0 {
+		return common.CodeInvalidUser, false
+	}
+
+	return common.CodeOK, true
 }

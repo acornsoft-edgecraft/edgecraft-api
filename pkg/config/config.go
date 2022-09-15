@@ -15,6 +15,10 @@ import (
 
 // ===== [ Constants and Variables ] =====
 
+const (
+	RESET_PASSWORD = "Edgecr@ft22"
+)
+
 // ===== [ Types ] =====
 
 // Config - Represents the configuration
