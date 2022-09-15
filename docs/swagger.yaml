@@ -1,0 +1,97 @@
+basePath: /api/v1
+definitions:
+  model.Login:
+    properties:
+      email:
+        example: ccambo@acornsoft.io
+        type: string
+      password:
+        example: 1234abcd@Acorn
+        type: string
+    type: object
+  response.ReturnData:
+    properties:
+      code:
+        type: integer
+      data: {}
+      isError:
+        type: boolean
+      message:
+        type: string
+    type: object
+host: localhost:8100
+info:
+  contact: {}
+  title: EdgeCraft Swagger API
+  version: 0.1.0
+paths:
+  /auth:
+    post:
+      description: User Login
+      operationId: Login
+      parameters:
+      - description: Request json
+        in: body
+        name: loginInfo
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: Login
+      tags:
+      - Auth
+  /clouds:
+    get:
+      description: Get all cloud list
+      operationId: AllCloudList
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: AllClooudList
+      tags:
+      - Cloud
+  /clouds/{cloudUid}:
+    get:
+      description: Get all cloud list
+      operationId: GetCloud
+      parameters:
+      - description: cloudUid
+        in: path
+        name: CloudUID
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: AllClooudList
+      tags:
+      - Cloud
+  /health:
+    get:
+      description: for health check
+      operationId: health-check
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: Health check k8s-api-gateway
+      tags:
+      - Common
+swagger: "2.0"

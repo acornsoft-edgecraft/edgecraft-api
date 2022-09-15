@@ -29,7 +29,6 @@ func (i *Instance) Init() {
 
 // Start - Starts the server
 func (i *Instance) Start() {
-
 	// Startup the HTTP Server in a way that we can gracefully shut it down again
 	err := i.HTTPServer.Start(i.Config.API.Host + ":" + i.Config.API.Port)
 	if err != http.ErrServerClosed {

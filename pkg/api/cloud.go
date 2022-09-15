@@ -14,6 +14,14 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// AllCloudListHandler - 전체 클라우드 리스트
+// @Tags Cloud
+// @Summary AllClooudList
+// @Description Get all cloud list
+// @ID AllCloudList
+// @Produce json
+// @Success 200 {object} response.ReturnData
+// @Router /clouds [get]
 func (a *API) AllCloudListHandler(c echo.Context) error {
 	res, err := a.Db.GetAllCloud()
 	if err != nil {
@@ -22,6 +30,15 @@ func (a *API) AllCloudListHandler(c echo.Context) error {
 	return response.Write(c, nil, res)
 }
 
+// AllCloudListHandler - 전체 클라우드 리스트
+// @Tags Cloud
+// @Summary AllClooudList
+// @Description Get all cloud list
+// @ID GetCloud
+// @Produce json
+// @Param CloudUID path string true "cloudUid"
+// @Success 200 {object} response.ReturnData
+// @Router /clouds/{cloudUid} [get]
 func (a *API) GetCloudHandler(c echo.Context) error {
 	// check param UID
 	cloudUid, err := uuid.FromString(c.Param("cloudUid"))

@@ -25,20 +25,20 @@ type User struct {
 }
 
 type User1 struct {
-	Test *string `json:test`
+	Test *string `json:"test"`
 }
 
 type User2 struct {
 	Username *string    `json:"username"`
 	Password *string    `json:"password"`
 	Codes    *[]string  `json:"codes"`
-	Uid      *uuid.UUID `json:uuid`
-	ID       *int       `json:ID`
+	Uid      *uuid.UUID `json:"uuid"`
+	ID       *int       `json:"ID"`
 }
 
 type Target struct {
-	aaa User2 `json:aaa`
-	bbb User1 `json:bbb`
+	aaa User2 `json:"aaa"`
+	bbb User1 `json:"bbb"`
 }
 
 type Personal struct {

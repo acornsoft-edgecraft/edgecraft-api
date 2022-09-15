@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (a *API) AllCloudClusterListHandler(c echo.Context) error {
+func (a *API) GetCloudClustersHandler(c echo.Context) error {
 	res, err := a.Db.GetAllCloudCluster()
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)

@@ -93,7 +93,7 @@ type EtcdStorage struct {
 type Etcd struct {
 	CloudUid                    *uuid.UUID             `json:"-" db:"cloud_uid"`
 	CloudClusterUid             *uuid.UUID             `json:"-" db:"cloud_cluster_uid"`
-	CloudClusterExternalEtcdUse *bool                  `json:"use_external_etcd" db:"cloud_cluster_external_etcd_use", default:false`
+	CloudClusterExternalEtcdUse *bool                  `json:"use_external_etcd" db:"cloud_cluster_external_etcd_use" default:"false"`
 	ExternalEtcdEndPoints       *ExternalEtcdEndPoints `json:"endpoints" db:"external_etcd_endpoints"`
 	ExternalEtcdCertificateCa   *string                `json:"ca_file" db:"external_etcd_certificate_ca"`
 	ExternalEtcdCertificateCert *string                `json:"cert_file" db:"external_etcd_certificate_cert"`
@@ -102,7 +102,7 @@ type Etcd struct {
 
 type StorageClass struct {
 	Use_ceph bool    `json:"use_ceph" db:"-, default:false"`
-	Labels   []Label `json:"label"`
+	Labels   []Label `json:"labels"`
 }
 
 // Value Marshal
@@ -135,7 +135,7 @@ func (a *ExternalEtcdEndPoints) Scan(value interface{}) error {
 	return json.Unmarshal(b, &a)
 }
 
-//- Start - JSONB Interface for JSONB Field of yourTableName Table
+// - Start - JSONB Interface for JSONB Field of yourTableName Table
 type ExtraConfig struct {
 	PreKubeadmCommands  interface{} `json:"pre_kubeadm_commands"`
 	PostKubeadmCommands interface{} `json:"post_kubeadm_commands"`

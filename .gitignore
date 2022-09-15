@@ -91,3 +91,6 @@ Temporary Items
 .gitignore
 __debug_bin
 log.log
+
+edgecraft.env.md
+build/*

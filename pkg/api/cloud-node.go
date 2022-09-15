@@ -12,7 +12,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func (a *API) AllCloudNodeListHandler(c echo.Context) error {
+func (a *API) GetCloudNodesHandler(c echo.Context) error {
 	res, err := a.Db.GetAllCloudNode()
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
@@ -20,7 +20,7 @@ func (a *API) AllCloudNodeListHandler(c echo.Context) error {
 	return response.Write(c, nil, res)
 }
 
-func (a *API) GetCloudNodeHandler(c echo.Context) error {
+func (a *API) AddCloudNodeHandler(c echo.Context) error {
 	// check param UID
 	cloudUid, err := uuid.FromString(c.Param("cloudUid"))
 	if err != nil {

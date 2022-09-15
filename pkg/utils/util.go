@@ -13,6 +13,56 @@ import (
 	"time"
 )
 
+// getTypeString - 지정한 Go 형식을 Refelct를 이용해서 형식 문자열로 반환
+func getTypeString(t reflect.Type) string {
+	if t.PkgPath() == "main" {
+		return t.Name()
+	}
+	return t.String()
+}
+
+// getGoString - 지정한 형식의 데이터를 Reflect를 이용해서 문자열로 반환
+func getGoString(v reflect.Value) string {
+	switch v.Kind() {
+	case reflect.Invalid:
+		return "nil"
+	case reflect.Struct:
+		t := v.Type()
+		out:= getTypeString(t) + "{"
+		for i := 0; i < v.NumField(); i++ {
+			if i > 0 { out += ", "}
+			fieldValue:= v.Field(i)
+			field := t.Field(i)
+			out += fmt.Sprintf("%s: %s", field.Name, getGoString(fieldValue))
+		}
+		out += "}"
+		return out
+	case reflect.Interface, reflect.Ptr:
+		if v.IsZero() {
+			return fmt.Sprintf("(%s)(nil)", getTypeString(v.Type()))
+		}
+		return "&"+getGoString(v.Elem())
+	case reflect.Slice:
+		out:= getTypeString(v.Type())
+		if v.IsZero(){out+="(nil)"} else {
+			out+="{"
+			for i := 0; i < v.Len(); i++ {
+					if i > 0 {out+=", "}
+					out+= getGoString(v.Index(i))
+			}
+			out+="}"
+		}
+		return out
+	default:
+		return fmt.Sprintf("%#v", v)
+	}
+}
+
+// GetGoString - Go Struct를 문자열로 반환
+func GetGoString(v interface{}) string {
+return getGoString(reflect.ValueOf(v))	
+}
+
 // GetValuesFromInterface - 지정된 Interface 형식의 Structure에서 지정한 FIeld 이름을 기준으로 값을 Array로 반환 (using Reflect)
 func GetValuesFromInterface(val interface{}, fields ...string) []interface{} {
 	returnArray := make([]interface{}, 0)
@@ -40,18 +90,14 @@ func GetDataFromRows(rows *sql.Rows) ([]interface{}, error) {
 			switch v.DatabaseTypeName() {
 			case "VARCHAR", "TEXT", "UUID", "TIMESTAMP", "TIMESTAMPTZ":
 				scanArgs[i] = new(sql.NullString)
-				break
 			case "BOOL":
 				scanArgs[i] = new(sql.NullBool)
-				break
 			case "INT4":
 				scanArgs[i] = new(sql.NullInt64)
-				break
 			case "NUMERIC":
 				scanArgs[i] = new(sql.NullFloat64)
 			default:
 				scanArgs[i] = new(sql.NullString)
-				break
 			}
 		}
 
@@ -108,7 +154,7 @@ func StructToMap(obj interface{}) (newMap map[string]interface{}, err error) {
 	return
 }
 
-//RenderTmpl asdf
+// RenderTmpl asdf
 func RenderTmpl(tmplName string, templ string, obj interface{}) (string, error) {
 	var commonTemplate *template.Template
 	var muLock sync.RWMutex // 생성시 중복 방지를 위한 Lock
@@ -142,7 +188,6 @@ func RenderTmpl(tmplName string, templ string, obj interface{}) (string, error) 
 }
 
 func ChkPortOpen(host string, port int) (bool, error) {
-
 	timeout := time.Second
 	conn, err := net.DialTimeout("tcp", net.JoinHostPort(host, strconv.Itoa(port)), timeout)
 	if err != nil {

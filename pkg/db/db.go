@@ -72,4 +72,8 @@ type DB interface {
 	GetCode(uuid.UUID) (*model.Code, error)
 	SelectCode(uuid.UUID) ([]model.Code, error)
 	SearchCode(model.Code) ([]model.Code, error)
+
+	// tbl_user
+	GetUserByEmail(email string) (*model.User, error)
+	// GetUserById(id string) (*model.User, error)
 }
