@@ -59,24 +59,54 @@
                         }
                     }
                 }
-            }
-        },
-        "/clouds/{cloudUid}": {
-            "get": {
-                "description": "Get all cloud list",
+            },
+            "post": {
+                "description": "Register cloud",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
                     "Cloud"
                 ],
-                "summary": "AllClooudList",
-                "operationId": "GetCloud",
+                "summary": "RegisterCloud",
+                "operationId": "RegisterCloud",
+                "parameters": [
+                    {
+                        "description": "Cloud Set",
+                        "name": "cloudSet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CloudSet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds/{cloudUid}": {
+            "get": {
+                "description": "Get specific cloud",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "SelectCloud",
+                "operationId": "SelectCloud",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "cloudUid",
-                        "name": "CloudUID",
+                        "name": "cloudUid",
                         "in": "path",
                         "required": true
                     }
@@ -114,6 +144,215 @@
         }
     },
     "definitions": {
+        "model.BaremetalHostInfo": {
+            "type": "object",
+            "properties": {
+                "bmc_address": {
+                    "type": "string",
+                    "example": "98:03:9b:61:80:48"
+                },
+                "boot_mac_address": {
+                    "type": "string",
+                    "example": "00:b2:8c:ee:22:98"
+                },
+                "boot_mode": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "external_provisioning": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "host_name": {
+                    "type": "string",
+                    "example": "sadf"
+                },
+                "online_power": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "model.BaremetalInfo": {
+            "type": "object",
+            "properties": {
+                "cp_kubeadm_extra_config": {
+                    "$ref": "#/definitions/model.ExtraConfig"
+                },
+                "image_checksum": {
+                    "type": "string",
+                    "example": "http://192.168.0.1/ubuntu.qcow2.md5sum"
+                },
+                "image_checksum_type": {
+                    "type": "string",
+                    "example": "1"
+                },
+                "image_format": {
+                    "type": "string",
+                    "example": "2"
+                },
+                "image_url": {
+                    "type": "string",
+                    "example": "http://192.168.0.1/ubuntu.qcow2"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "asdf"
+                },
+                "secret_name": {
+                    "type": "string",
+                    "example": "secret1"
+                },
+                "user_name": {
+                    "type": "string",
+                    "example": "asdf"
+                },
+                "worker_kubeadm_extra_config": {
+                    "$ref": "#/definitions/model.ExtraConfig"
+                }
+            }
+        },
+        "model.CloudInfo": {
+            "type": "object",
+            "properties": {
+                "cloud_uid": {
+                    "type": "string",
+                    "example": ""
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "Baremtal cloud"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "test cloud"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "1"
+                }
+            }
+        },
+        "model.CloudSet": {
+            "type": "object",
+            "properties": {
+                "cloud": {
+                    "$ref": "#/definitions/model.CloudInfo"
+                },
+                "cluster": {
+                    "$ref": "#/definitions/model.ClusterInfo"
+                },
+                "etcd_storage": {
+                    "$ref": "#/definitions/model.EtcdStorageInfo"
+                },
+                "nodes": {
+                    "$ref": "#/definitions/model.NodesInfo"
+                },
+                "openstack": {
+                    "$ref": "#/definitions/model.OpenstackInfo"
+                }
+            }
+        },
+        "model.ClusterInfo": {
+            "type": "object",
+            "properties": {
+                "baremetal": {
+                    "$ref": "#/definitions/model.BaremetalInfo"
+                },
+                "cluster_uid": {
+                    "type": "string",
+                    "example": ""
+                },
+                "k8s": {
+                    "$ref": "#/definitions/model.KubernetesInfo"
+                }
+            }
+        },
+        "model.EtcdInfo": {
+            "type": "object",
+            "properties": {
+                "ca_file": {
+                    "type": "string",
+                    "example": ""
+                },
+                "cert_file": {
+                    "type": "string",
+                    "example": ""
+                },
+                "endpoints": {
+                    "description": "Endpoints       []UrlInfo `json:\"endpoints\"`",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.UrlInfo"
+                    }
+                },
+                "key_file": {
+                    "type": "string",
+                    "example": ""
+                },
+                "use_external_etcd": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "model.EtcdStorageInfo": {
+            "type": "object",
+            "properties": {
+                "etcd": {
+                    "$ref": "#/definitions/model.EtcdInfo"
+                },
+                "storage_class": {
+                    "$ref": "#/definitions/model.StorageClassInfo"
+                }
+            }
+        },
+        "model.ExtraConfig": {
+            "type": "object",
+            "properties": {
+                "files": {
+                    "type": "string",
+                    "example": "c"
+                },
+                "format": {
+                    "type": "string",
+                    "example": "f"
+                },
+                "ntp": {
+                    "type": "string",
+                    "example": "e"
+                },
+                "post_kubeadm_commands": {
+                    "type": "string",
+                    "example": "b"
+                },
+                "pre_kubeadm_commands": {
+                    "type": "string",
+                    "example": "a"
+                },
+                "users": {
+                    "type": "string",
+                    "example": "d"
+                }
+            }
+        },
+        "model.KubernetesInfo": {
+            "type": "object",
+            "properties": {
+                "pod_cidr": {
+                    "type": "string",
+                    "example": "10.244.0.0/16"
+                },
+                "svc_cidr": {
+                    "type": "string",
+                    "example": "10.244.0.0/16"
+                },
+                "version": {
+                    "type": "string",
+                    "example": "1"
+                }
+            }
+        },
         "model.Login": {
             "type": "object",
             "properties": {
@@ -124,6 +363,104 @@
                 "password": {
                     "type": "string",
                     "example": "1234abcd@Acorn"
+                }
+            }
+        },
+        "model.NodeInfo": {
+            "type": "object",
+            "properties": {
+                "ip_address": {
+                    "type": "string",
+                    "example": "sadf"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {}
+                },
+                "node_name": {
+                    "type": "string",
+                    "example": "sadf"
+                }
+            }
+        },
+        "model.NodeSpecificInfo": {
+            "type": "object",
+            "properties": {
+                "baremetalHost": {
+                    "$ref": "#/definitions/model.BaremetalHostInfo"
+                },
+                "node": {
+                    "$ref": "#/definitions/model.NodeInfo"
+                },
+                "node_uid": {
+                    "type": "string",
+                    "example": ""
+                }
+            }
+        },
+        "model.NodesInfo": {
+            "type": "object",
+            "properties": {
+                "loadbalancer_address": {
+                    "type": "string",
+                    "example": ""
+                },
+                "loadbalancer_port": {
+                    "type": "string",
+                    "example": ""
+                },
+                "master_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.NodeSpecificInfo"
+                    }
+                },
+                "use_loadbalancer": {
+                    "type": "boolean",
+                    "example": false
+                },
+                "worker_nodes": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.NodeSpecificInfo"
+                    }
+                }
+            }
+        },
+        "model.OpenstackInfo": {
+            "type": "object"
+        },
+        "model.StorageClassInfo": {
+            "type": "object",
+            "properties": {
+                "label1": {
+                    "type": "string",
+                    "example": ""
+                },
+                "label2": {
+                    "type": "string",
+                    "example": ""
+                },
+                "label3": {
+                    "type": "string",
+                    "example": ""
+                },
+                "use_ceph": {
+                    "type": "boolean",
+                    "example": false
+                }
+            }
+        },
+        "model.UrlInfo": {
+            "type": "object",
+            "properties": {
+                "ip_address": {
+                    "type": "string",
+                    "example": ""
+                },
+                "port": {
+                    "type": "string",
+                    "example": ""
                 }
             }
         },

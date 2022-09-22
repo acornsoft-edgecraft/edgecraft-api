@@ -47,13 +47,13 @@ func (db *DB) SelectK8sCloudCluster(uid uuid.UUID) (*model.K8s, error) {
 }
 
 // SelectBaremetalCloudCluster - Returns a matching value for cloud clusters
-func (db *DB) SelectBaremetalCloudCluster(uid uuid.UUID) (*model.ClusterBaremetal, error) {
-	obj, err := db.GetClient().Get(&model.ClusterBaremetal{}, uid)
+func (db *DB) SelectBaremetalCloudCluster(uid uuid.UUID) (*model.Baremetal, error) {
+	obj, err := db.GetClient().Get(&model.Baremetal{}, uid)
 	if err != nil {
 		return nil, err
 	}
 	if obj != nil {
-		res := obj.(*model.ClusterBaremetal)
+		res := obj.(*model.Baremetal)
 		return res, nil
 	}
 	return nil, nil

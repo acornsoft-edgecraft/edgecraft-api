@@ -1,5 +1,152 @@
 basePath: /api/v1
 definitions:
+  model.BaremetalHostInfo:
+    properties:
+      bmc_address:
+        example: 98:03:9b:61:80:48
+        type: string
+      boot_mac_address:
+        example: 00:b2:8c:ee:22:98
+        type: string
+      boot_mode:
+        example: "1"
+        type: string
+      external_provisioning:
+        example: false
+        type: boolean
+      host_name:
+        example: sadf
+        type: string
+      online_power:
+        example: false
+        type: boolean
+    type: object
+  model.BaremetalInfo:
+    properties:
+      cp_kubeadm_extra_config:
+        $ref: '#/definitions/model.ExtraConfig'
+      image_checksum:
+        example: http://192.168.0.1/ubuntu.qcow2.md5sum
+        type: string
+      image_checksum_type:
+        example: "1"
+        type: string
+      image_format:
+        example: "2"
+        type: string
+      image_url:
+        example: http://192.168.0.1/ubuntu.qcow2
+        type: string
+      password:
+        example: asdf
+        type: string
+      secret_name:
+        example: secret1
+        type: string
+      user_name:
+        example: asdf
+        type: string
+      worker_kubeadm_extra_config:
+        $ref: '#/definitions/model.ExtraConfig'
+    type: object
+  model.CloudInfo:
+    properties:
+      cloud_uid:
+        example: ""
+        type: string
+      desc:
+        example: Baremtal cloud
+        type: string
+      name:
+        example: test cloud
+        type: string
+      type:
+        example: "1"
+        type: string
+    type: object
+  model.CloudSet:
+    properties:
+      cloud:
+        $ref: '#/definitions/model.CloudInfo'
+      cluster:
+        $ref: '#/definitions/model.ClusterInfo'
+      etcd_storage:
+        $ref: '#/definitions/model.EtcdStorageInfo'
+      nodes:
+        $ref: '#/definitions/model.NodesInfo'
+      openstack:
+        $ref: '#/definitions/model.OpenstackInfo'
+    type: object
+  model.ClusterInfo:
+    properties:
+      baremetal:
+        $ref: '#/definitions/model.BaremetalInfo'
+      cluster_uid:
+        example: ""
+        type: string
+      k8s:
+        $ref: '#/definitions/model.KubernetesInfo'
+    type: object
+  model.EtcdInfo:
+    properties:
+      ca_file:
+        example: ""
+        type: string
+      cert_file:
+        example: ""
+        type: string
+      endpoints:
+        description: Endpoints       []UrlInfo `json:"endpoints"`
+        items:
+          $ref: '#/definitions/model.UrlInfo'
+        type: array
+      key_file:
+        example: ""
+        type: string
+      use_external_etcd:
+        example: false
+        type: boolean
+    type: object
+  model.EtcdStorageInfo:
+    properties:
+      etcd:
+        $ref: '#/definitions/model.EtcdInfo'
+      storage_class:
+        $ref: '#/definitions/model.StorageClassInfo'
+    type: object
+  model.ExtraConfig:
+    properties:
+      files:
+        example: c
+        type: string
+      format:
+        example: f
+        type: string
+      ntp:
+        example: e
+        type: string
+      post_kubeadm_commands:
+        example: b
+        type: string
+      pre_kubeadm_commands:
+        example: a
+        type: string
+      users:
+        example: d
+        type: string
+    type: object
+  model.KubernetesInfo:
+    properties:
+      pod_cidr:
+        example: 10.244.0.0/16
+        type: string
+      svc_cidr:
+        example: 10.244.0.0/16
+        type: string
+      version:
+        example: "1"
+        type: string
+    type: object
   model.Login:
     properties:
       email:
@@ -7,6 +154,74 @@ definitions:
         type: string
       password:
         example: 1234abcd@Acorn
+        type: string
+    type: object
+  model.NodeInfo:
+    properties:
+      ip_address:
+        example: sadf
+        type: string
+      labels:
+        items: {}
+        type: array
+      node_name:
+        example: sadf
+        type: string
+    type: object
+  model.NodeSpecificInfo:
+    properties:
+      baremetalHost:
+        $ref: '#/definitions/model.BaremetalHostInfo'
+      node:
+        $ref: '#/definitions/model.NodeInfo'
+      node_uid:
+        example: ""
+        type: string
+    type: object
+  model.NodesInfo:
+    properties:
+      loadbalancer_address:
+        example: ""
+        type: string
+      loadbalancer_port:
+        example: ""
+        type: string
+      master_nodes:
+        items:
+          $ref: '#/definitions/model.NodeSpecificInfo'
+        type: array
+      use_loadbalancer:
+        example: false
+        type: boolean
+      worker_nodes:
+        items:
+          $ref: '#/definitions/model.NodeSpecificInfo'
+        type: array
+    type: object
+  model.OpenstackInfo:
+    type: object
+  model.StorageClassInfo:
+    properties:
+      label1:
+        example: ""
+        type: string
+      label2:
+        example: ""
+        type: string
+      label3:
+        example: ""
+        type: string
+      use_ceph:
+        example: false
+        type: boolean
+    type: object
+  model.UrlInfo:
+    properties:
+      ip_address:
+        example: ""
+        type: string
+      port:
+        example: ""
         type: string
     type: object
   response.ReturnData:
@@ -60,14 +275,34 @@ paths:
       summary: AllClooudList
       tags:
       - Cloud
+    post:
+      description: Register cloud
+      operationId: RegisterCloud
+      parameters:
+      - description: Cloud Set
+        in: body
+        name: cloudSet
+        required: true
+        schema:
+          $ref: '#/definitions/model.CloudSet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: RegisterCloud
+      tags:
+      - Cloud
   /clouds/{cloudUid}:
     get:
-      description: Get all cloud list
-      operationId: GetCloud
+      description: Get specific cloud
+      operationId: SelectCloud
       parameters:
       - description: cloudUid
         in: path
-        name: CloudUID
+        name: cloudUid
         required: true
         type: string
       produces:
@@ -77,7 +312,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.ReturnData'
-      summary: AllClooudList
+      summary: SelectCloud
       tags:
       - Cloud
   /health:

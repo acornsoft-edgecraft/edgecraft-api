@@ -55,3 +55,21 @@ ALTER TABLE "edgecraft"."tbl_code"
 		)
 		ON UPDATE NO ACTION ON DELETE NO ACTION
 		NOT VALID;
+
+-- 기본 데이터
+INSERT INTO "edgecraft"."tbl_code"
+(
+	"code_group_uid",
+	"code_id",
+	"code_name",
+	"code_display_order",
+	"code_description",
+	"use_yn",
+	"creator",
+	"created_at",
+	"updater",
+	"updated_at"
+)
+VALUES
+((SELECT code_group_uid FROM "edgecraft"."tbl_code" WHERE "code_name" = 'ks8_versions'), '1', '1.22.0', '0', '1.22.0', 'Y', 'system', NOW(), 'system', NOW()),
+((SELECT code_group_uid FROM "edgecraft"."tbl_code" WHERE "code_name" = 'ks8_versions'), '2', '1.23.0', '1', '1.23.0', 'Y', 'system', NOW(), 'system', NOW())

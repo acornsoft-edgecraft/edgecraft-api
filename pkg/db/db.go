@@ -28,37 +28,41 @@ type DB interface {
 	GetClient() SQLExecutor
 
 	// tbl_cloud
-	GetAllCloud() ([]model.ResCloud, error)
-	GetSearchCloud(u model.Cloud) ([]model.Cloud, error)
-	GetCloud(uuid.UUID) (*model.Cloud, error)
-	UpdateCloud(*model.Cloud) (int64, error)
-	CreateCloud(*model.Cloud) error
-	DeleteCloud(uuid.UUID) (int64, error)
+	GetAllCloud() ([]model.CloudList, error)
+	InsertCloud(*model.CloudTable) error
+	GetCloud(string) (*model.CloudTable, error)
+	// GetSearchCloud(u model.Cloud) ([]model.Cloud, error)
+	// GetCloud(uuid.UUID) (*model.Cloud, error)
+	// UpdateCloud(*model.Cloud) (int64, error)
+	// CreateCloud(*model.Cloud) error
+	// DeleteCloud(uuid.UUID) (int64, error)
 
 	// tbl_cloud_cluster
-	GetAllCloudCluster() ([]model.CloudCluster, error)
-	GetCloudCluster(uuid.UUID) (*model.CloudCluster, error)
-	SelectCloudCluster(uuid.UUID) (*model.CloudCluster, error)
-	SelectEtcdCloudCluster(uuid.UUID) (*model.Etcd, error)
-	SelectK8sCloudCluster(uuid.UUID) (*model.K8s, error)
-	SelectBaremetalCloudCluster(uuid.UUID) (*model.ClusterBaremetal, error)
-	SelectNodeCloudCluster(uuid.UUID) (*model.ClusterNodes, error)
-	UpdateCloudCluster(*model.CloudCluster) (int64, error)
-	CreateCloudCluster(*model.CloudCluster) error
-	DeleteCloudCluster(uuid.UUID) (int64, error)
-	DeleteAllCloudCluster(uuid.UUID) (int64, error)
+	InsertCluster(*model.ClusterTable) error
+	// GetAllCloudCluster() ([]model.CloudCluster, error)
+	GetCloudCluster(string) (*model.ClusterTable, error)
+	// SelectCloudCluster(uuid.UUID) (*model.CloudCluster, error)
+	// SelectEtcdCloudCluster(uuid.UUID) (*model.Etcd, error)
+	// SelectK8sCloudCluster(uuid.UUID) (*model.K8s, error)
+	// SelectBaremetalCloudCluster(uuid.UUID) (*model.Baremetal, error)
+	// SelectNodeCloudCluster(uuid.UUID) (*model.ClusterNodes, error)
+	// UpdateCloudCluster(*model.CloudCluster) (int64, error)
+	// CreateCloudCluster(*model.CloudCluster) error
+	// DeleteCloudCluster(uuid.UUID) (int64, error)
+	// DeleteAllCloudCluster(uuid.UUID) (int64, error)
 
 	// tbl_cloud_node
-	GetAllCloudNode() ([]model.CloudNode, error)
-	GetCloudNode(uuid.UUID, uuid.UUID) (*model.CloudNode, error)
-	SelectCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
-	SelectMasterCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
-	SelectWorkerCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
-	UpdateCloudNode(*model.CloudNode) (int64, error)
-	UpdateCloudNodes([]*model.CloudNode) (int64, error)
-	CreateCloudNode(*model.CloudNode) error
-	DeleteCloudNode(uuid.UUID) (int64, error)
-	DeleteAllCloudNode(uuid.UUID) (int64, error)
+	InsertNode(*model.NodeTable) error
+	// GetAllCloudNode() ([]model.CloudNode, error)
+	// GetCloudNode(uuid.UUID, uuid.UUID) (*model.CloudNode, error)
+	// SelectCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
+	// SelectMasterCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
+	// SelectWorkerCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
+	// UpdateCloudNode(*model.CloudNode) (int64, error)
+	// UpdateCloudNodes([]*model.CloudNode) (int64, error)
+	// CreateCloudNode(*model.CloudNode) error
+	// DeleteCloudNode(uuid.UUID) (int64, error)
+	// DeleteAllCloudNode(uuid.UUID) (int64, error)
 
 	// tbl_code_group
 	CreateCodeGroup(*model.CodeGroup) error
