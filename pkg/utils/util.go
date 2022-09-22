@@ -11,6 +11,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/gofrs/uuid"
 )
 
 // getTypeString - 지정한 Go 형식을 Refelct를 이용해서 형식 문자열로 반환
@@ -28,10 +30,12 @@ func getGoString(v reflect.Value) string {
 		return "nil"
 	case reflect.Struct:
 		t := v.Type()
-		out:= getTypeString(t) + "{"
+		out := getTypeString(t) + "{"
 		for i := 0; i < v.NumField(); i++ {
-			if i > 0 { out += ", "}
-			fieldValue:= v.Field(i)
+			if i > 0 {
+				out += ", "
+			}
+			fieldValue := v.Field(i)
 			field := t.Field(i)
 			out += fmt.Sprintf("%s: %s", field.Name, getGoString(fieldValue))
 		}
@@ -41,16 +45,20 @@ func getGoString(v reflect.Value) string {
 		if v.IsZero() {
 			return fmt.Sprintf("(%s)(nil)", getTypeString(v.Type()))
 		}
-		return "&"+getGoString(v.Elem())
+		return "&" + getGoString(v.Elem())
 	case reflect.Slice:
-		out:= getTypeString(v.Type())
-		if v.IsZero(){out+="(nil)"} else {
-			out+="{"
+		out := getTypeString(v.Type())
+		if v.IsZero() {
+			out += "(nil)"
+		} else {
+			out += "{"
 			for i := 0; i < v.Len(); i++ {
-					if i > 0 {out+=", "}
-					out+= getGoString(v.Index(i))
+				if i > 0 {
+					out += ", "
+				}
+				out += getGoString(v.Index(i))
 			}
-			out+="}"
+			out += "}"
 		}
 		return out
 	default:
@@ -60,7 +68,7 @@ func getGoString(v reflect.Value) string {
 
 // GetGoString - Go Struct를 문자열로 반환
 func GetGoString(v interface{}) string {
-return getGoString(reflect.ValueOf(v))	
+	return getGoString(reflect.ValueOf(v))
 }
 
 // GetValuesFromInterface - 지정된 Interface 형식의 Structure에서 지정한 FIeld 이름을 기준으로 값을 Array로 반환 (using Reflect)
@@ -206,4 +214,9 @@ func Print(data interface{}) {
 		fmt.Println("error:", err)
 	}
 	fmt.Print(string(b), "\n")
+}
+
+// GenerateUUID - UUID 생성
+func GenerateUUID() uuid.UUID {
+	return uuid.Must(uuid.NewV4())
 }

@@ -131,7 +131,7 @@ func (a *API) UpdateCodeGroupHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, req, common.CodeInvalidData, err)
 	}
 	req.CloudUID = &codeGroupUid
-	req.UpdatedAt = &now
+	req.CUInfo.UpdatedAt = &now
 
 	// -- Service Logic
 	// Start. Transaction 얻어옴

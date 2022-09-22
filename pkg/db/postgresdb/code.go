@@ -93,7 +93,7 @@ func (db *DB) UpdateCode(req *model.Code) (int64, error) {
 
 // SelectCode - Returns a SelectCode
 func (db *DB) SelectCode(uid uuid.UUID) ([]model.Code, error) {
-	obj, err := db.GetClient().Get(&model.CloudNode{}, uid)
+	obj, err := db.GetClient().Get(&model.Code{}, uid)
 	if err != nil {
 		return nil, err
 	}

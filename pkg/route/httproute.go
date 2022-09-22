@@ -38,11 +38,11 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	v1.GET("/health", middleware.HealthCheck)
 
 	// Common - CodeGroup
-	v1.GET("/codegroups", api.AllCodeGroupListHandler)
-	v1.POST("/codegroups", api.RegisterCodeGroupHandler)
-	v1.POST("/codegroups/search", api.CodeGroupSearchHandler)
-	// v1.PUT("/cgroups/:cgroupUid", api.UpdateCloudHandler)
-	// v1.DELETE("/cgroups/:cgroupsUid", api.DeleteCloudHandler)
+	// v1.GET("/codegroups", api.AllCodeGroupListHandler)
+	// v1.POST("/codegroups", api.RegisterCodeGroupHandler)
+	// v1.POST("/codegroups/search", api.CodeGroupSearchHandler)
+	// // v1.PUT("/cgroups/:cgroupUid", api.UpdateCloudHandler)
+	// // v1.DELETE("/cgroups/:cgroupsUid", api.DeleteCloudHandler)
 
 	// Common - Code
 	v1.GET("/codes", api.AllCloudListHandler)
@@ -51,14 +51,14 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	v1.GET("/clouds", api.AllCloudListHandler)
 	v1.GET("/clouds/:cloudUid", api.SelectCloudHandler)
 	v1.POST("/clouds", api.RegisterCloudHandler)
-	v1.PUT("/clouds/:cloudUid", api.UpdateCloudHandler)
-	v1.DELETE("/clouds/:cloudUid", api.DeleteCloudHandler)
+	// v1.PUT("/clouds/:cloudUid", api.UpdateCloudHandler)
+	// v1.DELETE("/clouds/:cloudUid", api.DeleteCloudHandler)
 
 	// Cloud - Node
-	v1.GET("/clouds/:cloudID/nodes", api.GetCloudNodesHandler)
-	v1.POST("/clouds/:cloudID/nodes", api.AddCloudNodeHandler)
-	v1.PUT("/clouds/:cloudID/nodes/:nodeID", api.UpdateCloudNodeHandler)
-	v1.DELETE("/clouds/:cloudID/nodes/:nodeID", api.DeleteCloudNodeHandler)
+	// v1.GET("/clouds/:cloudID/nodes", api.GetCloudNodesHandler)
+	// v1.POST("/clouds/:cloudID/nodes", api.AddCloudNodeHandler)
+	// v1.PUT("/clouds/:cloudID/nodes/:nodeID", api.UpdateCloudNodeHandler)
+	// v1.DELETE("/clouds/:cloudID/nodes/:nodeID", api.DeleteCloudNodeHandler)
 
 	// Cloud - App
 	// v1.GET("/clouds/:cloudID/apps", api.GetCloudAppHandler)
@@ -80,11 +80,11 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	// v1.GET("/clouds/:cloudID/kore-board", api.GetCloudKoreBoardHandler)
 
 	// Cloud/Cluster
-	v1.GET("/clouds/:cloudID/clusters", api.GetCloudClustersHandler)           // 클러스터 목록 조회
-	v1.GET("/clouds/:cloudID/clusters/:clusterID", api.GetCloudClusterHandler) // 클러스터 상세 기본 정보 조회
-	// v1.POST("/clouds/:cloudID/clusters", api.AddCloudClusterHandler)                 // 클러스터 등록/생성
-	v1.PUT("/clouds/:cloudID/clusters/:clusterID", api.UpdateCloudClusterHandler)    // 클러스터 등록 정보 수정
-	v1.DELETE("/clouds/:cloudID/clusters/:clusterID", api.DeleteCloudClusterHandler) // 클러스터 삭제
+	// v1.GET("/clouds/:cloudID/clusters", api.GetCloudClustersHandler)           // 클러스터 목록 조회
+	// v1.GET("/clouds/:cloudID/clusters/:clusterID", api.GetCloudClusterHandler) // 클러스터 상세 기본 정보 조회
+	// // v1.POST("/clouds/:cloudID/clusters", api.AddCloudClusterHandler)                 // 클러스터 등록/생성
+	// v1.PUT("/clouds/:cloudID/clusters/:clusterID", api.UpdateCloudClusterHandler)    // 클러스터 등록 정보 수정
+	// v1.DELETE("/clouds/:cloudID/clusters/:clusterID", api.DeleteCloudClusterHandler) // 클러스터 삭제
 
 	// Cloud/Cluster - NodeSet
 	// v1.GET("/clouds/:cloudID/clusters/:clusterID/nodesets", api.GetCloudClusterNodeSetHandler)                  // 클러스터 상세 노드셋 정보 조회

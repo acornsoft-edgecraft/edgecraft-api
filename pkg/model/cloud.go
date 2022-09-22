@@ -3,34 +3,91 @@ package model
 import (
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 )
 
-// used pointer
-type Cloud struct {
-	CloudUID    *uuid.UUID `json:"cloudUid" db:"cloud_uid, default:uuid_generate_v4()"`
-	CloudName   *string    `json:"name" db:"cloud_name"`
-	CloudType   *string    `json:"type" db:"cloud_type"`
-	CloudDesc   *string    `json:"desc" db:"cloud_description"`
-	CloudStatus *string    `json:"status" db:"cloud_state"`
-	Creator     *string    `json:"creator" db:"creator"`
-	CreatedAt   *time.Time `json:"created_at" db:"created_at"`
-	Updater     *string    `json:"updater" db:"updater" validate:""`
-	UpdatedAt   *time.Time `json:"updated_at" db:"updated_at"`
+// CloudSet - Data set of Cluoud
+type CloudSet struct {
+	Cloud       *CloudInfo       `json:"cloud"`
+	Cluster     *ClusterInfo     `json:"cluster"`
+	Nodes       *NodesInfo       `json:"nodes"`
+	EtcdStorage *EtcdStorageInfo `json:"etcd_storage"`
+	OpenStack   *OpenstackInfo   `json:"openstack"`
 }
 
-// used pointer
-type ResCloud struct {
-	CloudUID    *uuid.UUID `json:"cloudUid" db:"cloud_uid, default:uuid_generate_v4()"`
-	CloudName   *string    `json:"name" db:"cloud_name"`
-	CloudType   *string    `json:"type" db:"cloud_type"`
-	CloudDesc   *string    `json:"desc" db:"cloud_description"`
-	CloudStatus *string    `json:"status" db:"cloud_state"`
-	NodeCount   *int       `json:"nodeCount" db:"node_count"`
-	Creator     *string    `json:"creator" db:"creator"`
-	CreatedAt   *time.Time `json:"created_at" db:"created_at"`
-	Updater     *string    `json:"updater" db:"updater" validate:""`
-	UpdatedAt   *time.Time `json:"updated_at" db:"updated_at"`
+// ToTable - CloudInfo를 대상 Table 정보에 매핑 처리
+func (ci *CloudSet) ToTable() (cloudTable *CloudTable, clusterTable *ClusterTable, nodeTables []*NodeTable) {
+	var now = time.Now()
+	var creator = "system"
+
+	// Cloud Table
+	cloudTable = &CloudTable{}
+	ci.Cloud.ToTable(cloudTable)
+	cloudTable.Creator = creator
+	cloudTable.Created = now
+
+	// Cluster Table
+	clusterTable = &ClusterTable{}
+	ci.Cluster.ToTable(clusterTable)
+	ci.EtcdStorage.ToTable(clusterTable)
+	clusterTable.CloudUid = cloudTable.CloudUID
+	clusterTable.Creator = creator
+	clusterTable.Created = now
+
+	nodeTables = ci.Nodes.ToTable(clusterTable)
+	for _, node := range nodeTables {
+		node.CloudUid = cloudTable.CloudUID
+		node.ClusterUid = clusterTable.ClusterUid
+		node.Creator = creator
+		node.Created = now
+	}
+
+	// TODO: Openstack
+
+	return
+}
+
+// CloudInfo - Data of Cloud
+type CloudInfo struct {
+	CloudUID string `json:"cloud_uid" db:"-" example:""`
+	Name     string `json:"name" example:"test cloud"`
+	Type     string `json:"type" example:"1"`
+	Desc     string `json:"desc" example:"Baremtal cloud"`
+}
+
+// NewKey - Make new UUID V4
+func (ci *CloudInfo) NewKey() {
+	if ci.CloudUID == "" {
+		ci.CloudUID = uuid.Must(uuid.NewV4()).String()
+	}
+}
+
+// ToTable - CloudInfo정보를 Table 정보로 설정
+func (ci *CloudInfo) ToTable(cloudTable *CloudTable) {
+	ci.NewKey()
+	utils.CopyTo(&cloudTable, ci)
+	cloudTable.Status = "1"
+}
+
+// FromTable - 테이블의 정보를 CluoudInfo 정보로 설정
+func (ci *CloudInfo) FromTable(cloudTable *CloudTable) {
+	ci.CloudUID = cloudTable.CloudUID
+	ci.Name = cloudTable.Name
+	ci.Type = cloudTable.Type
+	ci.Desc = cloudTable.Desc
+}
+
+// CloudList - List of Clouds
+type CloudList struct {
+	CloudUID  string    `json:"cloud_uid" db:"cloud_uid"`
+	Name      string    `json:"name" db:"name"`
+	Type      string    `json:"type" db:"type"`
+	Desc      string    `json:"desc" db:"description"`
+	Status    string    `json:"status" db:"state"`
+	NodeCount int       `json:"nodeCount" db:"nodecount"`
+	Version   string    `json:"version" db:"version"`
+	Created   time.Time `json:"created" db:"created_at"`
 }
 
 // used nullstring type

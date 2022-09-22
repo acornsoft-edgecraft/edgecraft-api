@@ -102,22 +102,28 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.Db.SetMaxIdleConns(conf.MaxIdleConns)
 	dbmap.Db.SetMaxOpenConns(conf.MaxOpenConns)
 
-	// SetKeys(isAutoIncr bool, fieldNames ...string)
-	// SetKeys(true) means we have a auto increment primary key, which
-	// will get automatically bound to your struct post-insert
-	dbmap.AddTableWithName(model.Cloud{}, "tbl_cloud").SetKeys(true, "cloud_uid")
-	dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(true, "cloud_cluster_uid")
-	dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
-	dbmap.AddTableWithName(model.K8s{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
-	dbmap.AddTableWithName(model.ClusterBaremetal{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
-	dbmap.AddTableWithName(model.Etcd{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
-	dbmap.AddTableWithName(model.ClusterNodes{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
-	dbmap.AddTableWithName(model.CloudNode{}, "tbl_cloud_node").SetKeys(true, "cloud_node_uid")
-	dbmap.AddTableWithName(model.DelCloudNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid")
-	dbmap.AddTableWithName(model.CodeGroup{}, "tbl_code_group").SetKeys(true, "code_group_uid")
-	dbmap.AddTableWithName(model.Code{}, "tbl_code").SetKeys(true, "code_uid")
-	// dbmap.AddTableWithName(model.MasterNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
-	// dbmap.AddTableWithName(model.WorkerNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
+	// For Cloud (manual key)
+	dbmap.AddTableWithName(model.CloudTable{}, "tbl_cloud").SetKeys(false, "cloud_uid")
+	dbmap.AddTableWithName(model.ClusterTable{}, "tbl_cloud_cluster").SetKeys(false, "cluster_uid")
+	dbmap.AddTableWithName(model.NodeTable{}, "tbl_cloud_node").SetKeys(false, "node_uid")
+
+	// // SetKeys(isAutoIncr bool, fieldNames ...string)
+	// // SetKeys(true) means we have a auto increment primary key, which
+	// // will get automatically bound to your struct post-insert
+
+	// dbmap.AddTableWithName(model.Cloud{}, "tbl_cloud").SetKeys(true, "cloud_uid")
+	// dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(true, "cloud_cluster_uid")
+	// dbmap.AddTableWithName(model.CloudCluster{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	// dbmap.AddTableWithName(model.K8s{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	// dbmap.AddTableWithName(model.Baremetal{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	// dbmap.AddTableWithName(model.Etcd{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	// dbmap.AddTableWithName(model.ClusterNodes{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid")
+	// dbmap.AddTableWithName(model.CloudNode{}, "tbl_cloud_node").SetKeys(true, "cloud_node_uid")
+	// dbmap.AddTableWithName(model.DelCloudNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid")
+	// dbmap.AddTableWithName(model.CodeGroup{}, "tbl_code_group").SetKeys(true, "code_group_uid")
+	// dbmap.AddTableWithName(model.Code{}, "tbl_code").SetKeys(true, "code_uid")
+	// // dbmap.AddTableWithName(model.MasterNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
+	// // dbmap.AddTableWithName(model.WorkerNode{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cloud_cluster_uid")
 
 	return dbmap
 }
