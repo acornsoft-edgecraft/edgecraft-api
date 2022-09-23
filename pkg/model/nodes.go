@@ -10,16 +10,23 @@ import (
 
 // NodeInfo - Data for Node
 type NodeInfo struct {
-	NodeName  string  `json:"node_name" example:"sadf"`
+	Name      string  `json:"node_name" example:"sadf"`
 	IpAddress string  `json:"ip_address" example:"sadf"`
 	Labels    *Labels `json:"labels"`
 }
 
 // ToTable - Node 정보를 테이블로 설정
 func (ni *NodeInfo) ToTable(nodeTable *NodeTable) {
-	nodeTable.Name = ni.NodeName
+	nodeTable.Name = ni.Name
 	nodeTable.Ipaddress = ni.IpAddress
 	nodeTable.Labels = ni.Labels
+}
+
+// FromTable - 테이블 정보를 Node 정보로 설정
+func (ni *NodeInfo) FromTable(nodeTable *NodeTable) {
+	ni.Name = nodeTable.Name
+	ni.IpAddress = nodeTable.Ipaddress
+	ni.Labels = nodeTable.Labels
 }
 
 // NodeSpecificInfo - Data for Node Spec
@@ -44,6 +51,17 @@ func (nsi *NodeSpecificInfo) ToTable(nodeTable *NodeTable) {
 	nsi.Node.ToTable(nodeTable)
 
 	nodeTable.NodeUid = nsi.NodeUid
+}
+
+// FromTable - 테이블 정보를 Node Specific 정보로 설정
+func (nsi *NodeSpecificInfo) FromTable(nodeTable *NodeTable) {
+	nsi.NodeUid = nodeTable.NodeUid
+
+	nsi.BaremetalHost = &BaremetalHostInfo{}
+	nsi.Node = &NodeInfo{}
+
+	nsi.BaremetalHost.FromTable(nodeTable)
+	nsi.Node.FromTable(nodeTable)
 }
 
 // NodesInfo - Data for Nodes
@@ -78,4 +96,25 @@ func (ni *NodesInfo) ToTable(clusterTable *ClusterTable) (nodeTables []*NodeTabl
 	}
 
 	return
+}
+
+// FromTable - 테이블 정보를 Nodes 정보로 설정
+func (ni *NodesInfo) FromTable(clusterTable *ClusterTable, nodes []*NodeTable) {
+	ni.UseLoadBalancer = clusterTable.LoadbalancerUse
+	ni.LoadBalancerAddress = clusterTable.LoadbalancerAddress
+	ni.LoadbalancerPort = clusterTable.LoadbalancerPort
+
+	ni.MasterNodes = []*NodeSpecificInfo{}
+	ni.WorkerNodes = []*NodeSpecificInfo{}
+
+	for _, node := range nodes {
+		var nsi *NodeSpecificInfo = &NodeSpecificInfo{}
+		nsi.FromTable(node)
+
+		if node.Type == "1" {
+			ni.MasterNodes = append(ni.MasterNodes, nsi)
+		} else {
+			ni.WorkerNodes = append(ni.WorkerNodes, nsi)
+		}
+	}
 }

@@ -24,7 +24,7 @@ type NodeTable struct {
 	// Node 정보
 	Name      string  `json:"node_name" db:"name"`
 	Ipaddress string  `json:"ip_address" db:"ipaddress"`
-	Labels    *Labels `json:"labels" db:"label"`
+	Labels    *Labels `json:"labels" db:"labels"`
 
 	// Openstack Ceph Path
 	// TODO: (? - 화면에 없음, 향후 조정 필요)
@@ -36,9 +36,4 @@ type NodeTable struct {
 	Created time.Time `json:"created" db:"created_at"`
 	Updater string    `json:"updater" db:"updater"`
 	Updated time.Time `json:"updated" db:"updated_at"`
-}
-
-// MapToSet - Mapping node data to CloudSet
-func (nt *NodeTable) MapToSet(cloudSet *CloudSet) {
-
 }

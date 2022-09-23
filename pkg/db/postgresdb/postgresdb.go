@@ -104,8 +104,8 @@ func newDbMap(conf *Config) *gorp.DbMap {
 
 	// For Cloud (manual key)
 	dbmap.AddTableWithName(model.CloudTable{}, "tbl_cloud").SetKeys(false, "cloud_uid")
-	dbmap.AddTableWithName(model.ClusterTable{}, "tbl_cloud_cluster").SetKeys(false, "cluster_uid")
-	dbmap.AddTableWithName(model.NodeTable{}, "tbl_cloud_node").SetKeys(false, "node_uid")
+	dbmap.AddTableWithName(model.ClusterTable{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid", "cluster_uid")
+	dbmap.AddTableWithName(model.NodeTable{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cluster_uid", "node_uid")
 
 	// // SetKeys(isAutoIncr bool, fieldNames ...string)
 	// // SetKeys(true) means we have a auto increment primary key, which

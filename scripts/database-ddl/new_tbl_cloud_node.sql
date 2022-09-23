@@ -1,9 +1,5 @@
 -- 클라우드 노드
 ALTER TABLE "edgecraft"."tbl_cloud_node"
-	DROP CONSTRAINT IF EXISTS "FK_tbl_cloud_cluster_TO_tbl_cloud_node"; -- 클라우드 클러스터 -> 클라우드 노드
-
--- 클라우드 노드
-ALTER TABLE "edgecraft"."tbl_cloud_node"
 	DROP CONSTRAINT IF EXISTS "PK_tbl_cloud_node"; -- 클라우드 노드 기본키
 
 -- 클라우드 노드 기본키
@@ -30,7 +26,7 @@ CREATE TABLE "edgecraft"."tbl_cloud_node"
 	-- Node 정보
 	"name"            			VARCHAR(30)  			NULL,     -- 클라우드노드이름
 	"ipaddress"            		VARCHAR(30)  			NULL,     -- 클라우드노드IP
-	"label"                		TEXT         			NULL,     -- 클라우드노드라벨
+	"labels"               		JSON         			NULL,     -- 클라우드노드라벨
 	
 	-- Openstack Ceph Path (? - 화면에 없음, 향후 조정 
 	"osd_path"                  VARCHAR(300) 			NULL,     -- OSD경로
@@ -64,18 +60,3 @@ ALTER TABLE "edgecraft"."tbl_cloud_node"
 	PRIMARY KEY
 	USING INDEX "PK_tbl_cloud_node"
 	NOT DEFERRABLE;
-
--- 클라우드 노드
-ALTER TABLE "edgecraft"."tbl_cloud_node"
-	ADD CONSTRAINT "FK_tbl_cloud_cluster_TO_tbl_cloud_node"
-	 -- 클라우드 클러스터 -> 클라우드 노드
-		FOREIGN KEY (
-			"cluster_uid", -- 클라우드클러스터식별자
-			"cloud_uid"          -- 클라우드식별자
-		)
-		REFERENCES "edgecraft"."tbl_cloud_cluster" ( -- 클라우드 클러스터
-			"cluster_uid", -- 클라우드클러스터식별자
-			"cloud_uid"          -- 클라우드식별자
-		)
-		ON UPDATE NO ACTION ON DELETE NO ACTION
-		NOT VALID;
