@@ -7,6 +7,7 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+	"strings"
 )
 
 // StorageClassInfo - Data for Storage Class
@@ -19,29 +20,59 @@ type StorageClassInfo struct {
 
 // ToTable - Storage Class 정보를 테이블로 설정
 func (sci *StorageClassInfo) ToTable(clusterTable *ClusterTable) {
+	// change to StorageClass
+	var storageClass *StorageClass = &StorageClass{}
+	storageClass.UseCeph = sci.UseCeph
+	if sci.Label1 != "" {
+		keyVal := strings.Split(sci.Label1, "=")
+		var label *Label = &Label{Key: keyVal[0], Value: keyVal[1]}
+		storageClass.Labels = append(storageClass.Labels, label)
+	}
+	if sci.Label2 != "" {
+		keyVal := strings.Split(sci.Label2, "=")
+		var label *Label = &Label{Key: keyVal[0], Value: keyVal[1]}
+		storageClass.Labels = append(storageClass.Labels, label)
+	}
+	if sci.Label3 != "" {
+		keyVal := strings.Split(sci.Label3, "=")
+		var label *Label = &Label{Key: keyVal[0], Value: keyVal[1]}
+		storageClass.Labels = append(storageClass.Labels, label)
+	}
 
+	clusterTable.StorageClass = storageClass
 }
 
 // FromTable - 테이블 정보를 Storage Class 정보로 설정
 func (sci *StorageClassInfo) FromTable(clusterTable *ClusterTable) {
-
+	if clusterTable.StorageClass != nil {
+		sci.UseCeph = clusterTable.StorageClass.UseCeph
+		for i, label := range clusterTable.StorageClass.Labels {
+			if i == 0 {
+				sci.Label1 = label.Key + "=" + label.Value
+			} else if i == 1 {
+				sci.Label2 = label.Key + "=" + label.Value
+			} else if i == 2 {
+				sci.Label3 = label.Key + "=" + label.Value
+			}
+		}
+	}
 }
 
 // StorageClass - Data for Storage Class
 type StorageClass struct {
-	Use_ceph bool     `json:"use_ceph" db:"-, default:false"`
-	Labels   []*Label `json:"labels"`
+	UseCeph bool     `json:"use_ceph" db:"-, default:false"`
+	Labels  []*Label `json:"labels"`
 }
 
-// ToTable - Storage Class 정보를 테이블로 설정
-func (sci *StorageClass) ToTable(clusterTable *ClusterTable) {
+// // ToTable - Storage Class 정보를 테이블로 설정
+// func (sci *StorageClass) ToTable(clusterTable *ClusterTable) {
 
-}
+// }
 
-// FromTable - 테이블 정보를 Storage Class 정보로 설정
-func (sci *StorageClass) FromTable(clusterTable *ClusterTable) {
+// // FromTable - 테이블 정보를 Storage Class 정보로 설정
+// func (sci *StorageClass) FromTable(clusterTable *ClusterTable) {
 
-}
+// }
 
 // Value Marshal
 func (a StorageClass) Value() (driver.Value, error) {

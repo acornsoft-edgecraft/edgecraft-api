@@ -11,6 +11,7 @@ import (
 // ClusterInfo - Data for Cluster
 type ClusterInfo struct {
 	ClusterUid string          `json:"cluster_uid" example:""`
+	Status     string          `json:"status"`
 	K8s        *KubernetesInfo `json:"k8s"`
 	Baremetal  *BaremetalInfo  `json:"baremetal"`
 }
@@ -34,6 +35,11 @@ func (ci *ClusterInfo) ToTable(clusterTable *ClusterTable) {
 // FromTable - 테이블에서 Cluster로 정보 설정
 func (ci *ClusterInfo) FromTable(clusterTable *ClusterTable) {
 	ci.ClusterUid = clusterTable.ClusterUid
+	ci.Status = clusterTable.Status
+
+	ci.K8s = &KubernetesInfo{}
+	ci.Baremetal = &BaremetalInfo{}
+
 	ci.K8s.FromTable(clusterTable)
 	ci.Baremetal.FromTable(clusterTable)
 }
@@ -48,6 +54,15 @@ type EtcdStorageInfo struct {
 func (esi *EtcdStorageInfo) ToTable(clusterTable *ClusterTable) {
 	esi.Etcd.ToTable(clusterTable)
 	esi.StorageClass.ToTable(clusterTable)
+}
+
+// FromTable - 테이블 정보를 ETCD/Storage 정보 설정
+func (esi *EtcdStorageInfo) FromTable(clusterTable *ClusterTable) {
+	esi.Etcd = &EtcdInfo{}
+	esi.StorageClass = &StorageClassInfo{}
+
+	esi.Etcd.FromTable(clusterTable)
+	esi.StorageClass.FromTable(clusterTable)
 }
 
 // type K8s struct {

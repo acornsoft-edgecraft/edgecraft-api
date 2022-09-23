@@ -43,13 +43,6 @@ func (a *API) SelectCloudHandler(c echo.Context) error {
 	}
 
 	cloudSet := &model.CloudSet{}
-	// var cloudSet *model.CloudSet = &model.CloudSet{
-	// 	Cloud:   &model.CloudInfo{},
-	// 	Cluster: &model.ClusterInfo{},
-	// 	Nodes:   &model.NodesInfo{},
-	// 	EtcdStorage:  &model.EtcdStorageInfo{}
-	// 	OpenStack:   &model.OpenstackInfo{}
-	// }
 
 	// Cloud 조회
 	cloudTable, err := a.Db.GetCloud(cloudUid)
@@ -58,20 +51,28 @@ func (a *API) SelectCloudHandler(c echo.Context) error {
 	} else if cloudTable == nil {
 		return response.ErrorfReqRes(c, cloudTable, common.DatabaseFalseData, err)
 	}
-
 	cloudTable.ToSet(cloudSet)
 
-	// // Cluster 조회
-	// clusterTable, err := a.Db.GetCloudCluster(cloudUid)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if cloudTable == nil {
-	// 	return response.ErrorfReqRes(c, cloudTable, common.DatabaseFalseData, err)
-	// }
+	// Cluster 조회
+	clusters, err := a.Db.SelectClusters(cloudUid)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if len(clusters) == 0 {
+		return response.ErrorfReqRes(c, clusters, common.DatabaseFalseData, err)
+	}
 
-	// clusterTable.ToSet(cloudSet)
+	clusters[0].ToSet(cloudSet)
 
 	// Node 조회
+	nodes, err := a.Db.SelectNodes(cloudUid, clusters[0].ClusterUid)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if nodes == nil {
+		return response.ErrorfReqRes(c, nodes, common.DatabaseFalseData, err)
+	}
+
+	cloudSet.Nodes = &model.NodesInfo{}
+	cloudSet.Nodes.FromTable(clusters[0], nodes)
 
 	// 	resCloud, err := a.Db.GetCloud(cloudUid)
 

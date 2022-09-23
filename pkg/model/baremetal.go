@@ -7,8 +7,6 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
-
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 )
 
 // BaremetalInfo - Data for Baremetal
@@ -46,6 +44,10 @@ func (bi *BaremetalInfo) FromTable(clusterTable *ClusterTable) {
 	bi.ImageChecksum = clusterTable.ImageChecksum
 	bi.ImageChecksumType = clusterTable.ImageChecksumType
 	bi.ImageFormat = clusterTable.ImageFormat
+
+	bi.MasterExtraConfig = &ExtraConfig{}
+	bi.WorkerExtraConfig = &ExtraConfig{}
+
 	bi.MasterExtraConfig.FromTable(clusterTable.MasterExtraConfig)
 	bi.WorkerExtraConfig.FromTable(clusterTable.WorkerExtraConfig)
 }
@@ -62,7 +64,22 @@ type BaremetalHostInfo struct {
 
 // ToTable - Baremetal Host 정보를 테이블로 설정
 func (bhi *BaremetalHostInfo) ToTable(nodeTable *NodeTable) {
-	utils.CopyTo(&nodeTable, &bhi)
+	nodeTable.HostName = bhi.HostName
+	nodeTable.BmcAddress = bhi.BmcAddress
+	nodeTable.MacAddress = bhi.BootMacAddress
+	nodeTable.BootMode = bhi.BootMode
+	nodeTable.OnlinePower = bhi.OnlinePower
+	nodeTable.ExternalProvisioning = bhi.ExternalProvisioning
+}
+
+// FromTable - 테이블 정보를 Baremetal Host 정보로 설정
+func (bhi *BaremetalHostInfo) FromTable(nodeTable *NodeTable) {
+	bhi.HostName = nodeTable.HostName
+	bhi.BmcAddress = nodeTable.BmcAddress
+	bhi.BootMacAddress = nodeTable.MacAddress
+	bhi.BootMode = nodeTable.BootMode
+	bhi.OnlinePower = nodeTable.OnlinePower
+	bhi.ExternalProvisioning = nodeTable.ExternalProvisioning
 }
 
 // ExtraConfig - Extra configuration for kubeadm

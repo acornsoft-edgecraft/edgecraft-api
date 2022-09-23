@@ -1,9 +1,5 @@
 -- 클라우드 클러스터
 ALTER TABLE "edgecraft"."tbl_cloud_cluster"
-	DROP CONSTRAINT IF EXISTS "FK_tbl_cloud_TO_tbl_cloud_cluster"; -- 클라우드 -> 클라우드 클러스터
-
--- 클라우드 클러스터
-ALTER TABLE "edgecraft"."tbl_cloud_cluster"
 	DROP CONSTRAINT IF EXISTS "PK_tbl_cloud_cluster"; -- 클라우드 클러스터 기본키
 
 -- 클라우드 클러스터 기본키
@@ -76,16 +72,3 @@ ALTER TABLE "edgecraft"."tbl_cloud_cluster"
 	PRIMARY KEY
 	USING INDEX "PK_tbl_cloud_cluster"
 	NOT DEFERRABLE;
-
--- 클라우드 클러스터
-ALTER TABLE "edgecraft"."tbl_cloud_cluster"
-	ADD CONSTRAINT "FK_tbl_cloud_TO_tbl_cloud_cluster"
-	 -- 클라우드 -> 클라우드 클러스터
-		FOREIGN KEY (
-			"cloud_uid" -- 클라우드식별자
-		)
-		REFERENCES "edgecraft"."tbl_cloud" ( -- 클라우드
-			"cloud_uid" -- 클라우드식별자
-		)
-		ON UPDATE NO ACTION ON DELETE NO ACTION
-		NOT VALID;

@@ -53,23 +53,17 @@ type ClusterTable struct {
 	Updated time.Time `json:"updated_at" db:"updated_at"`
 }
 
-// MapToSet - Mapping cluster data to CloudSet
-func (ct *ClusterTable) MapToSet(cloudSet *CloudSet) {
-	// Cloud Info
-	//cloudSet.Cluster = &ClusterInfo{}.MapToSet()
-	// // Cluster Info
-	// var clusterInfo *ClusterInfo = &ClusterInfo{}
+// ToSet - Cluster 테이블 정보를 CloudSet 정보로 설정
+func (ct *ClusterTable) ToSet(cloudSet *CloudSet) {
+	// Cluster 정보 설정
+	var cluster *ClusterInfo = &ClusterInfo{}
+	cluster.FromTable(ct)
 
-	// // K8s Info
-	// var k8sInfo *KubernetesInfo = &KubernetesInfo{}
+	// Etcd/Storage 정보 설정
+	var etcdStorage *EtcdStorageInfo = &EtcdStorageInfo{}
+	etcdStorage.FromTable(ct)
 
-	// // Bearmetal Info
-	// var baremetalInfo *BaremetalInfo = &BaremetalInfo{}
-
-	// // Etcd/Storage Info
-	// var EtcdStorageInfo *EtcdStorageInfo = &EtcdStorageInfo{}
-
-	// // Node Info
-	// ClusterInfo.
-	// utils.CopyTo(&cloudSet.Cluster, &ct)
+	cloudSet.Cluster = cluster
+	cloudSet.EtcdStorage = etcdStorage
+	cloudSet.OpenStack = &OpenstackInfo{}
 }
