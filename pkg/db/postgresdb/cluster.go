@@ -14,9 +14,25 @@ WHERE
 	A.cloud_uid = $1
 `
 
+const deleteCloudClusters = `
+DELETE
+FROM "edgecraft"."tbl_cloud_cluster" A
+WHERE
+	A.cloud_uid = $1
+`
+
 // InsertCluster - Insert a new Baremetal Cluster
 func (db *DB) InsertCluster(cluster *model.ClusterTable) error {
 	return db.GetClient().Insert(cluster)
+}
+
+// UpdateCluster - Update a Cluster
+func (db *DB) UpdateCluster(cluster *model.ClusterTable) (int64, error) {
+	count, err := db.GetClient().Update(cluster)
+	if err != nil {
+		return -1, err
+	}
+	return count, nil
 }
 
 // GetCluster - 단일 클러스터 조회
@@ -45,4 +61,13 @@ func (db *DB) SelectClusters(cloudUid string) ([]*model.ClusterTable, error) {
 	}
 
 	return clusterTables, nil
+}
+
+// DeleteCloudClusters - Delete clusters on cloud
+func (db *DB) DeleteCloudClusters(cloudUid string) (int64, error) {
+	result, err := db.GetClient().Exec(deleteCloudClusters, cloudUid)
+	if err != nil {
+		return -1, err
+	}
+	return result.RowsAffected()
 }

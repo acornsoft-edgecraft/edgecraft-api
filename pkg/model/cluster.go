@@ -4,7 +4,8 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 package model
 
 import (
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
+	"time"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -24,18 +25,27 @@ func (ci *ClusterInfo) NewKey() {
 }
 
 // ToTable - Cluster 정보를 테이블로 설정
-func (ci *ClusterInfo) ToTable(clusterTable *ClusterTable) {
-	ci.NewKey()
-	utils.CopyTo(&clusterTable, ci.K8s)
-	utils.CopyTo(&clusterTable, ci.Baremetal)
+func (ci *ClusterInfo) ToTable(clusterTable *ClusterTable, isUpdate bool, user string, at time.Time) {
+	if isUpdate {
+		*clusterTable.ClusterUid = ci.ClusterUid
+		*clusterTable.Updater = user
+		*clusterTable.Updated = at
+	} else {
+		ci.NewKey()
+		*clusterTable.ClusterUid = ci.ClusterUid
+		*clusterTable.Creator = user
+		*clusterTable.Created = at
+	}
 
-	clusterTable.ClusterUid = ci.ClusterUid
+	ci.K8s.ToTable(clusterTable)
+	ci.Baremetal.ToTable(clusterTable)
+
 }
 
 // FromTable - 테이블에서 Cluster로 정보 설정
 func (ci *ClusterInfo) FromTable(clusterTable *ClusterTable) {
-	ci.ClusterUid = clusterTable.ClusterUid
-	ci.Status = clusterTable.Status
+	ci.ClusterUid = *clusterTable.ClusterUid
+	ci.Status = *clusterTable.Status
 
 	ci.K8s = &KubernetesInfo{}
 	ci.Baremetal = &BaremetalInfo{}

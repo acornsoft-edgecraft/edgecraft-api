@@ -2,7 +2,6 @@ package db
 
 import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
-	"github.com/gofrs/uuid"
 	"gopkg.in/gorp.v2"
 )
 
@@ -28,21 +27,19 @@ type DB interface {
 	GetClient() SQLExecutor
 
 	// tbl_cloud
-	GetAllCloud() ([]model.CloudList, error)
+	GetCloudList() ([]model.CloudList, error)
 	GetCloud(string) (*model.CloudTable, error)
 	InsertCloud(*model.CloudTable) error
-
-	// GetSearchCloud(u model.Cloud) ([]model.Cloud, error)
-	// GetCloud(uuid.UUID) (*model.Cloud, error)
-	// UpdateCloud(*model.Cloud) (int64, error)
-	// CreateCloud(*model.Cloud) error
-	// DeleteCloud(uuid.UUID) (int64, error)
+	UpdateCloud(*model.CloudTable) (int64, error)
+	DeleteCloud(string) (int64, error)
 
 	// tbl_cloud_cluster
 	// GetAllCloudCluster() ([]model.CloudCluster, error)
 	GetCluster(string, string) (*model.ClusterTable, error)
 	SelectClusters(string) ([]*model.ClusterTable, error)
 	InsertCluster(*model.ClusterTable) error
+	UpdateCluster(*model.ClusterTable) (int64, error)
+	DeleteCloudClusters(string) (int64, error)
 
 	// SelectCloudCluster(uuid.UUID) (*model.CloudCluster, error)
 	// SelectEtcdCloudCluster(uuid.UUID) (*model.Etcd, error)
@@ -58,6 +55,8 @@ type DB interface {
 	GetNode(string, string, string) (*model.NodeTable, error)
 	SelectNodes(string, string) ([]*model.NodeTable, error)
 	InsertNode(*model.NodeTable) error
+	DeleteNodes(string, string) (int64, error)
+	DeleteCloudNodes(string) (int64, error)
 
 	// GetAllCloudNode() ([]model.CloudNode, error)
 	// GetCloudNode(uuid.UUID, uuid.UUID) (*model.CloudNode, error)
@@ -72,17 +71,20 @@ type DB interface {
 	// DeleteAllCloudNode(uuid.UUID) (int64, error)
 
 	// tbl_code_group
-	CreateCodeGroup(*model.CodeGroup) error
-	GetAllCodeGroup() ([]model.CodeGroup, error)
-	GetCodeGroup(uuid.UUID) (*model.CodeGroup, error)
-	SelectCodeGroup(uuid.UUID) ([]model.CodeGroup, error)
-	SearchCodeGroup(model.CodeGroup) ([]model.CodeGroup, error)
+	GetCodeGroupList() ([]*model.CodeGroupTable, error)
+	GetCodeGroup(string) (*model.CodeGroupTable, error)
+	InsertCodeGroup(*model.CodeGroupTable) error
+	UpdateCodeGroup(*model.CodeGroupTable) (int64, error)
+	DeleteCodeGroup(string) (int64, error)
 
 	// tbl_code
-	GetAllCode() ([]model.Code, error)
-	GetCode(uuid.UUID) (*model.Code, error)
-	SelectCode(uuid.UUID) ([]model.Code, error)
-	SearchCode(model.Code) ([]model.Code, error)
+	GetCodeList() ([]*model.CodeTable, error)
+	GetCodeListByGroup(string) ([]*model.CodeTable, error)
+	GetCode(string, int) (*model.CodeTable, error)
+	InsertCode(*model.CodeTable) error
+	UpdateCode(*model.CodeTable) (int64, error)
+	DeleteCode(string, int) (int64, error)
+	DeleteCodeByGroup(string) (int64, error)
 
 	// tbl_user
 	GetUserByEmail(email string) (*model.User, error)
