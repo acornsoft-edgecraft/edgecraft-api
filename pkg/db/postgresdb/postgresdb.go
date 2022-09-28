@@ -102,6 +102,10 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.Db.SetMaxIdleConns(conf.MaxIdleConns)
 	dbmap.Db.SetMaxOpenConns(conf.MaxOpenConns)
 
+	// For Code
+	dbmap.AddTableWithName(model.CodeGroupTable{}, "tbl_code_group").SetKeys(false, "group_id")
+	dbmap.AddTableWithName(model.CodeTable{}, "tbl_code").SetKeys(false, "group_id", "code")
+
 	// For Cloud (manual key)
 	dbmap.AddTableWithName(model.CloudTable{}, "tbl_cloud").SetKeys(false, "cloud_uid")
 	dbmap.AddTableWithName(model.ClusterTable{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid", "cluster_uid")

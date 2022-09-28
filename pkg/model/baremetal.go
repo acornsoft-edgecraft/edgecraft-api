@@ -24,26 +24,30 @@ type BaremetalInfo struct {
 
 // ToTable - Baremetal 정보를 테이블로 설정
 func (bi *BaremetalInfo) ToTable(clusterTable *ClusterTable) {
-	clusterTable.BmcCredentialSecret = bi.BmcCredentialSecret
-	clusterTable.BmcCredentialUser = bi.BmcCredentialUser
-	clusterTable.BmcCredentialPassword = bi.BmcCredentialPassword
-	clusterTable.ImageUrl = bi.ImageUrl
-	clusterTable.ImageChecksum = bi.ImageChecksum
-	clusterTable.ImageChecksumType = bi.ImageChecksumType
-	clusterTable.ImageFormat = bi.ImageFormat
+	clusterTable.BmcCredentialSecret = &bi.BmcCredentialSecret
+	clusterTable.BmcCredentialUser = &bi.BmcCredentialUser
+	clusterTable.BmcCredentialPassword = &bi.BmcCredentialPassword
+	clusterTable.ImageUrl = &bi.ImageUrl
+	clusterTable.ImageChecksum = &bi.ImageChecksum
+	clusterTable.ImageChecksumType = &bi.ImageChecksumType
+	clusterTable.ImageFormat = &bi.ImageFormat
+
+	clusterTable.MasterExtraConfig = &ExtraConfig{}
+	clusterTable.WorkerExtraConfig = &ExtraConfig{}
+
 	bi.MasterExtraConfig.ToTable(clusterTable.MasterExtraConfig)
 	bi.WorkerExtraConfig.ToTable(clusterTable.WorkerExtraConfig)
 }
 
 // FromTable - 테이블의 정보를 Baremetal 정보로 설정
 func (bi *BaremetalInfo) FromTable(clusterTable *ClusterTable) {
-	bi.BmcCredentialSecret = clusterTable.BmcCredentialSecret
-	bi.BmcCredentialUser = clusterTable.BmcCredentialUser
-	bi.BmcCredentialPassword = clusterTable.BmcCredentialPassword
-	bi.ImageUrl = clusterTable.ImageUrl
-	bi.ImageChecksum = clusterTable.ImageChecksum
-	bi.ImageChecksumType = clusterTable.ImageChecksumType
-	bi.ImageFormat = clusterTable.ImageFormat
+	bi.BmcCredentialSecret = *clusterTable.BmcCredentialSecret
+	bi.BmcCredentialUser = *clusterTable.BmcCredentialUser
+	bi.BmcCredentialPassword = *clusterTable.BmcCredentialPassword
+	bi.ImageUrl = *clusterTable.ImageUrl
+	bi.ImageChecksum = *clusterTable.ImageChecksum
+	bi.ImageChecksumType = *clusterTable.ImageChecksumType
+	bi.ImageFormat = *clusterTable.ImageFormat
 
 	bi.MasterExtraConfig = &ExtraConfig{}
 	bi.WorkerExtraConfig = &ExtraConfig{}
@@ -64,22 +68,22 @@ type BaremetalHostInfo struct {
 
 // ToTable - Baremetal Host 정보를 테이블로 설정
 func (bhi *BaremetalHostInfo) ToTable(nodeTable *NodeTable) {
-	nodeTable.HostName = bhi.HostName
-	nodeTable.BmcAddress = bhi.BmcAddress
-	nodeTable.MacAddress = bhi.BootMacAddress
-	nodeTable.BootMode = bhi.BootMode
-	nodeTable.OnlinePower = bhi.OnlinePower
-	nodeTable.ExternalProvisioning = bhi.ExternalProvisioning
+	nodeTable.HostName = &bhi.HostName
+	nodeTable.BmcAddress = &bhi.BmcAddress
+	nodeTable.MacAddress = &bhi.BootMacAddress
+	nodeTable.BootMode = &bhi.BootMode
+	nodeTable.OnlinePower = &bhi.OnlinePower
+	nodeTable.ExternalProvisioning = &bhi.ExternalProvisioning
 }
 
 // FromTable - 테이블 정보를 Baremetal Host 정보로 설정
 func (bhi *BaremetalHostInfo) FromTable(nodeTable *NodeTable) {
-	bhi.HostName = nodeTable.HostName
-	bhi.BmcAddress = nodeTable.BmcAddress
-	bhi.BootMacAddress = nodeTable.MacAddress
-	bhi.BootMode = nodeTable.BootMode
-	bhi.OnlinePower = nodeTable.OnlinePower
-	bhi.ExternalProvisioning = nodeTable.ExternalProvisioning
+	bhi.HostName = *nodeTable.HostName
+	bhi.BmcAddress = *nodeTable.BmcAddress
+	bhi.BootMacAddress = *nodeTable.MacAddress
+	bhi.BootMode = *nodeTable.BootMode
+	bhi.OnlinePower = *nodeTable.OnlinePower
+	bhi.ExternalProvisioning = *nodeTable.ExternalProvisioning
 }
 
 // ExtraConfig - Extra configuration for kubeadm

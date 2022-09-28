@@ -15,17 +15,22 @@ VALUES
 -- Code Group
 INSERT INTO "edgecraft"."tbl_code_group"
 (
-	"group_id"
+	"group_id", "description"
 )
 VALUES 
-('CloudTypes'),
-('CloudStatus'),
-('K8sVersions'),
-('ImageChecksumTypes'),
-('ImageFormats'),
-('BootMode'),
-('NodeTypes'),
-('UserRoles')
+('CloudTypes',          'Types of Cloud'),
+('CloudStatus',         'Status of cloud'),
+('K8sVersions',         'Version of kubernetes for cloud'),
+('ImageChecksumTypes',  'Types of checkSum for image'),
+('ImageFormats',        'Types of formats for image'),
+('BootMode',            'Modes of boot'),
+('NodeTypes',           'Types of Node'),
+('UserRoles',           'Tyeps of Role for user'),
+('ImageTypes',          'Types of image'),
+('ImageOsTypes',        'Types of image for OS'),
+('SecurityStatus',      'Status of security'),
+('SecurityItemStatus',  'Status of items for security')
+
 
 -- Code
 INSERT INTO "edgecraft"."tbl_code"
@@ -33,35 +38,45 @@ INSERT INTO "edgecraft"."tbl_code"
 	"group_id",
 	"code",
 	"name",
-	"display_order"
+	"display_order",
+    "description"
 )
 VALUES
-('CloudTypes', 			'1', 		'Baremetal', 		0),
-('CloudTypes', 			'2', 		'Openstack', 		1),
-('CloudStatus', 		'1', 		'Saved', 			0),
-('CloudStatus', 		'2', 		'Provisioning',		1),
-('CloudStatus', 		'3', 		'Provisioned', 		2),
-('CloudStatus', 		'4', 		'Failed',			3),
-('CloudStatus', 		'5', 		'Deleting', 		4),
-('CloudStatus', 		'6', 		'Deleted', 			5),
-('K8sVersions', 		'1', 		'1.22.0',			0),
-('K8sVersions', 		'2', 		'1.22.3',			0),
-('ImageChecksumTypes',	'1',		'md5',				0),
-('ImageChecksumTypes',	'2',		'sha256',			1),
-('ImageChecksumTypes',	'3',		'sha512',			2),
-('ImageFormats',		'1',		'raw',				0),
-('ImageFormats',		'2',		'qcow2',			1),
-('ImageFormats',		'3',		'vdi',				2),
-('ImageFormats',		'4',		'vmdk',				3),
-('ImageFormats',		'5',		'live-iso',			4),
-('BootMode',			'1',		'UEFI',				0),
-('BootMode',			'2',		'legacy',			1),
-('BootMode',			'3',		'UEFISecureBoot',	2),
-('NodeTypes',			'1',		'MASTER',			0),
-('NodeTypes',			'2',		'WORKER',			1),
-('UserRoles',			'1',		'Admin',			0),
-('UserRoles',			'2',		'Manager',			0),
-('UserRoles',			'3',		'User',				0)
+('CloudTypes', 			1, 		'Baremetal', 		0,  'Baremetal Cloud'),
+('CloudTypes', 			2, 		'Openstack', 		1,  'Openstsack Cloud'),
+('CloudStatus', 		1, 		'Saved', 			0,  'Saved status'),
+('CloudStatus', 		2, 		'Provisioning',		1,  'Provisioning status'),
+('CloudStatus', 		3, 		'Provisioned', 		2,  'Provisioned status'),
+('CloudStatus', 		4, 		'Failed',			3,  'Failed status'),
+('CloudStatus', 		5, 		'Deleting', 		4,  'Deleting status'),
+('CloudStatus', 		6, 		'Deleted', 			5,  'Deleted status'),
+('K8sVersions', 		1, 		'1.22.0',			0,  'K8s version 1.22.0'),
+('K8sVersions', 		2, 		'1.22.3',			0,  'K8s version 1.22.3'),
+('ImageChecksumTypes',	1,		'md5',				0,  'MD5 checking for image'),
+('ImageChecksumTypes',	2,		'sha256',			1,  'SHA256 checking for image'),
+('ImageChecksumTypes',	3,		'sha512',			2,  'SHA512 checking for image'),
+('ImageFormats',		1,		'raw',				0,  'RAW format for image'),
+('ImageFormats',		2,		'qcow2',			1,  'QCOW2 format for image'),
+('ImageFormats',		3,		'vdi',				2,  'VDI format for image'),
+('ImageFormats',		4,		'vmdk',				3,  'VMDK format for image'),
+('ImageFormats',		5,		'live-iso',			4,  'LIVE-ISO format for image'),
+('BootMode',			1,		'UEFI',				0,  'UEFI boot'),
+('BootMode',			2,		'legacy',			1,  'LEGACY boot'),
+('BootMode',			3,		'UEFISecureBoot',	2,  'UEFI Security boot'),
+('NodeTypes',			1,		'Master',			0,  'Master Node'),
+('NodeTypes',			2,		'Worker',			1,  'Worker Node'),
+('UserRoles',			1,		'Admin',			0,  'Admin user'),
+('UserRoles',			2,		'Manager',			1,  'Manage user'),
+('UserRoles',			3,		'User',				2,  'Normal user'),
+('ImageTypes',          1,      'Baremetal Cloud',  0,  'Baremetal cloud image'),
+('ImageTypes',          2,      'Openstack Cloud',  1,  'Openstack cloud image'),
+('ImageOsTypes',        1,      'Ubuntu 20.04',     0,  'Ubuntu v20.04'),
+('ImageOsTypes',        2,      'Ubuntu 18.04',     1,  'Ubuntu v18.04'),
+('SecurityStatus',      1,      'In Progress',      0,  'In-Progress status for security check'),
+('SecurityStatus',      2,      'Completed',        1,  'Completed status for security check'),
+('SecurityStatus',      3,      'Failed',           2,  'Failed status for security check'),
+('SecurityItemStatus',  1,      'Pass',             0,  'Passed status for security check item'),
+('SecurityItemStatus',  2,      'Failed',           1,  'Failed status for security check item')
 
 -- -- Cloud
 

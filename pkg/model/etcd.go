@@ -37,19 +37,19 @@ type EtcdInfo struct {
 
 // ToTable - ETCD 정보를 테이블로 설정
 func (ei *EtcdInfo) ToTable(clusterTable *ClusterTable) {
-	clusterTable.ExternalEtcdUse = ei.UseExternalEtcd
-	clusterTable.ExternalEtcdCertificateCa = ei.CAFile
-	clusterTable.ExternalEtcdCertificateCert = ei.CertFile
-	clusterTable.ExternalEtcdCertificateKey = ei.KeyFile
+	clusterTable.ExternalEtcdUse = &ei.UseExternalEtcd
+	clusterTable.ExternalEtcdCertificateCa = &ei.CAFile
+	clusterTable.ExternalEtcdCertificateCert = &ei.CertFile
+	clusterTable.ExternalEtcdCertificateKey = &ei.KeyFile
 	clusterTable.ExternalEtcdEndPoints = ei.Endpoints
 }
 
 // FromTable - 테이블 정보를 ETCD 정보로 설정
 func (ei *EtcdInfo) FromTable(clusterTable *ClusterTable) {
-	ei.UseExternalEtcd = clusterTable.ExternalEtcdUse
-	ei.CAFile = clusterTable.ExternalEtcdCertificateCa
-	ei.CertFile = clusterTable.ExternalEtcdCertificateCert
-	ei.KeyFile = clusterTable.ExternalEtcdCertificateKey
+	ei.UseExternalEtcd = *clusterTable.ExternalEtcdUse
+	ei.CAFile = *clusterTable.ExternalEtcdCertificateCa
+	ei.CertFile = *clusterTable.ExternalEtcdCertificateCert
+	ei.KeyFile = *clusterTable.ExternalEtcdCertificateKey
 	ei.Endpoints = clusterTable.ExternalEtcdEndPoints
 }
 

@@ -12,14 +12,14 @@ type KubernetesInfo struct {
 
 // ToTable - K8S 정보르 테이블로 설정
 func (ki *KubernetesInfo) ToTable(clusterTable *ClusterTable) {
-	clusterTable.Version = ki.Version
-	clusterTable.PodCidr = ki.PodCidr
-	clusterTable.SvcCidr = ki.SvcCidr
+	*clusterTable.Version = ki.Version
+	*clusterTable.PodCidr = ki.PodCidr
+	*clusterTable.SvcCidr = ki.SvcCidr
 }
 
 // FromTable - 테이블 정보를 K8S로 설정
 func (ki *KubernetesInfo) FromTable(clusterTable *ClusterTable) {
-	ki.Version = clusterTable.Version
-	ki.PodCidr = clusterTable.PodCidr
-	ki.SvcCidr = clusterTable.SvcCidr
+	ki.Version = *clusterTable.Version
+	ki.PodCidr = *clusterTable.PodCidr
+	ki.SvcCidr = *clusterTable.SvcCidr
 }

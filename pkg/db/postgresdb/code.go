@@ -2,139 +2,118 @@ package postgresdb
 
 import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
-	"github.com/gofrs/uuid"
 )
 
-const getAllCodeSQL = `
-SELECT *
-FROM tbl_code c 
-`
-
-const searchCodeSQL = `
-SELECT *
-FROM tbl_code tc
-WHERE 1=1
-{{- if ne (isNull .CodeUid) false }}
- AND code_uid = :code_uid
-{{- end}}
-{{- if ne (isNull .CodeGroupUID) false }}
- AND code_group_uid = :code_group_uid
-{{- end}}
-{{- if ne (isNull .CodeID) false }}
- AND code_id = :code_id
-{{- end}}
-{{- if ne (isNull .CodeName) false }}
- AND code_name = :code_name
-{{- end}}
-{{- if ne (isNull .CodeDescription) false }}
- AND code_description = :code_description
-{{- end}}
-{{- if ne (isNull .CodeDisplayOrder) false }}
- AND code_display_order = :code_display_order
-{{- end}}
-{{- if ne (isNull  .UseYn) false}}
- AND use_yn = :use_yn
-{{- end}}
-{{- if ne (isNull  .Creator) false}}
- AND creator = :creator
-{{- end}}
-{{- if ne (isNull  .Updater) false}}
- AND updater = :updater
-{{- end}}
- ORDER BY ode_display_order
-`
-
-const deleteCodeByGroupUIDSQL = `
-DELETE
-FROM tbl_code
-WHERE code_uid = :code_uid
-`
-
-// RegisterCloud - Registration a new Cloud
-func (db *DB) CreateCode(create *model.Code) error {
-	return db.GetClient().Insert(create)
-}
-
-// GetCode - Returns a GetCode
-func (db *DB) GetCode(uid uuid.UUID) (*model.Code, error) {
-	obj, err := db.GetClient().Get(&model.Code{}, uid)
+// GetCodeGroupList - 전체 코드 그룹 조회
+func (db *DB) GetCodeGroupList() ([]*model.CodeGroupTable, error) {
+	var list []*model.CodeGroupTable
+	_, err := db.GetClient().Select(&list, getCodeGroupListSQL)
 	if err != nil {
 		return nil, err
 	}
-	if obj != nil {
-		res := obj.(*model.Code)
-		return res, nil
+	return list, nil
+}
+
+// GetCodeGroup - 코드 그룹 상세 조회
+func (db *DB) GetCodeGroup(groupId string) (*model.CodeGroupTable, error) {
+	data, err := db.GetClient().Get(&model.CodeGroupTable{}, groupId)
+	if err != nil {
+		return nil, err
+	}
+	if data != nil {
+		return data.(*model.CodeGroupTable), nil
 	}
 	return nil, nil
 }
 
-// GetAllCode - Returns all Code list
-func (db *DB) GetAllCode() ([]model.Code, error) {
-	var res []model.Code
-	_, err := db.GetClient().Select(&res, getAllCodeSQL)
-	if err != nil {
-		return nil, err
-	}
-	return res, nil
+// InsertCodeGroup - 코드 그룹 등록
+func (db *DB) InsertCodeGroup(cgt *model.CodeGroupTable) error {
+	return db.GetClient().Insert(cgt)
 }
 
-// UpdateCloud - saves the given RegisterCloud struct
-func (db *DB) UpdateCode(req *model.Code) (int64, error) {
-	// Find and Update
-	// fmt.Println("-- UpdateCloud --")
-	// utils.Print(req)
-	count, err := db.GetClient().Update(req)
+// UpdateCodeGroup - 코드 그룹 갱신
+func (db *DB) UpdateCodeGroup(cgt *model.CodeGroupTable) (int64, error) {
+	count, err := db.GetClient().Update(cgt)
 	if err != nil {
 		return -1, err
 	}
 	return count, nil
 }
 
-// SelectCode - Returns a SelectCode
-func (db *DB) SelectCode(uid uuid.UUID) ([]model.Code, error) {
-	obj, err := db.GetClient().Get(&model.Code{}, uid)
-	if err != nil {
-		return nil, err
-	}
-	if obj != nil {
-		res := obj.([]model.Code)
-		return res, nil
-	}
-	return nil, nil
-}
-
-// DeleteCode - deletes the RegisterCloud with the given id
-func (db *DB) DeleteCode(uid uuid.UUID) (int64, error) {
-	count, err := db.GetClient().Delete(&model.Code{CodeUID: &uid})
+// DeleteCodeGroup - 코드 그룹 삭제
+func (db *DB) DeleteCodeGroup(groupId string) (int64, error) {
+	count, err := db.GetClient().Delete(&model.CodeGroupTable{GroupID: &groupId})
 	if err != nil {
 		return -1, err
 	}
 	return count, nil
 }
 
-// DeleteCodeByGroupID - GroupUID 로 다중건 삭제
-func (db *DB) DeleteCodeByGroupUID(uid uuid.UUID) (int64, error) {
-	m := map[string]interface{}{"eventSetUid": uid}
-	result, err := db.GetClient().Exec(deleteCodeByGroupUIDSQL, m)
+// GetCodeList - 모든 코드 조회
+func (db *DB) GetCodeList() ([]*model.CodeTable, error) {
+	var list []*model.CodeTable
+	_, err := db.GetClient().Select(&list, getCodeListSQL)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+// GetCodeListByGroup - 지정한 코드 그룹의 모든 코드 조회
+func (db *DB) GetCodeListByGroup(groupId string) ([]*model.CodeTable, error) {
+	var list []*model.CodeTable
+	_, err := db.GetClient().Select(&list, getCodeByGroupSQL, groupId)
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
+
+// GetCode - 코드 상세 조회
+func (db *DB) GetCode(groupId string, code int) (*model.CodeTable, error) {
+	data, err := db.GetClient().Get(&model.CodeTable{}, groupId, code)
+	if err != nil {
+		return nil, err
+	}
+	if data != nil {
+		return data.(*model.CodeTable), nil
+	}
+	return nil, nil
+}
+
+// InsertCode - 코드 등록
+func (db *DB) InsertCode(ct *model.CodeTable) error {
+	return db.GetClient().Insert(ct)
+}
+
+// UpdateCode - 코드 갱신
+func (db *DB) UpdateCode(ct *model.CodeTable) (int64, error) {
+	count, err := db.GetClient().Update(ct)
 	if err != nil {
 		return -1, err
 	}
-	count, err := result.RowsAffected()
-	return count, err
+	return count, nil
 }
 
-// SearchCode - Returns Search Code list
-func (db *DB) SearchCode(u model.Code) ([]model.Code, error) {
-	var res []model.Code
-	sql, err := utils.RenderTmpl("queryTemplate", searchCodeSQL, u)
+// DeleteCode - 지정한 코드 삭제
+func (db *DB) DeleteCode(groupId string, code int) (int64, error) {
+	count, err := db.GetClient().Delete(&model.CodeTable{GroupID: &groupId, Code: &code})
 	if err != nil {
-		return nil, err
+		return -1, err
 	}
-	m, _ := utils.StructToMap(u)
-	_, err = db.GetClient().Select(&res, sql, m)
+	return count, nil
+}
+
+// DeleteCodeByGroup - 지정한 코드 그룹의 모든 코드 삭제
+func (db *DB) DeleteCodeByGroup(groupId string) (int64, error) {
+	count, err := db.GetClient().Delete(&model.CodeTable{GroupID: &groupId})
 	if err != nil {
-		return nil, err
+		return -1, err
 	}
-	return res, nil
+	return count, nil
+	// result, err := db.GetClient().Exec(deleteCodeByGroupSQL, groupId)
+	// if err != nil {
+	// 	return -1, err
+	// }
+	// return result.RowsAffected()
 }

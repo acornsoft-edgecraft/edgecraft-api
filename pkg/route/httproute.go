@@ -38,27 +38,33 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	v1.GET("/health", middleware.HealthCheck)
 
 	// Common - CodeGroup
-	// v1.GET("/codegroups", api.AllCodeGroupListHandler)
-	// v1.POST("/codegroups", api.RegisterCodeGroupHandler)
-	// v1.POST("/codegroups/search", api.CodeGroupSearchHandler)
-	// // v1.PUT("/cgroups/:cgroupUid", api.UpdateCloudHandler)
-	// // v1.DELETE("/cgroups/:cgroupsUid", api.DeleteCloudHandler)
+	v1.GET("/codes/groups", api.GetCodeGroupListHandler)
+	v1.GET("/codes/groups/:groupId", api.GetCodeGroupHandler)
+	v1.POST("/codes/groups", api.SetCodeGroupHandler)
+	v1.PUT("/codes/groups", api.UpdateCodeGroupHandler)
+	v1.DELETE("/codes/groups/:groupId", api.DeleteCodeGroupHandler)
 
 	// Common - Code
-	v1.GET("/codes", api.AllCloudListHandler)
+	v1.GET("/codes", api.GetCodeListHandler)
+	v1.GET("/codes/:groupId", api.GetCodeListByGroupHandler)
+	v1.GET("/codes/:groupId/:code", api.GetCodeHandler)
+	v1.POST("/codes", api.SetCodeHandler)
+	v1.PUT("/codes", api.UpdateCodeHandler)
+	v1.DELETE("/codes/:groupId/:code", api.DeleteCodeHandler)
 
 	// Cloud
-	v1.GET("/clouds", api.AllCloudListHandler)
-	v1.GET("/clouds/:cloudUid", api.SelectCloudHandler)
-	v1.POST("/clouds", api.RegisterCloudHandler)
-	// v1.PUT("/clouds/:cloudUid", api.UpdateCloudHandler)
-	// v1.DELETE("/clouds/:cloudUid", api.DeleteCloudHandler)
+	v1.GET("/clouds", api.GetCloudListHandler)
+	v1.GET("/clouds/:cloudUid", api.GetCloudHandler)
+	v1.POST("/clouds", api.SetCloudHandler)
+	v1.PUT("/clouds/:cloudUid", api.UpdateCloudHandler)
+	v1.DELETE("/clouds/:cloudUid", api.DeleteCloudHandler)
 
 	// Cloud - Node
-	// v1.GET("/clouds/:cloudID/nodes", api.GetCloudNodesHandler)
-	// v1.POST("/clouds/:cloudID/nodes", api.AddCloudNodeHandler)
-	// v1.PUT("/clouds/:cloudID/nodes/:nodeID", api.UpdateCloudNodeHandler)
-	// v1.DELETE("/clouds/:cloudID/nodes/:nodeID", api.DeleteCloudNodeHandler)
+	// v1.GET("/clouds/:cloudId/nodes", api.GetCloudNodesHandler)
+	// v1.GET("/clouds/:cloudId/nodes/:nodeId", api.GetCloudNodeHandler)
+	// v1.POST("/clouds/:cloudId/nodes", api.SetCloudNodeHandler)
+	// v1.PUT("/clouds/:cloudId/nodes/:nodeId", api.UpdateCloudNodeHandler)
+	// v1.DELETE("/clouds/:cloudId/nodes/:nodeId", api.DeleteCloudNodeHandler)
 
 	// Cloud - App
 	// v1.GET("/clouds/:cloudID/apps", api.GetCloudAppHandler)

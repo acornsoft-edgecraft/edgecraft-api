@@ -57,8 +57,8 @@ const docTemplate = `{
                 "tags": [
                     "Cloud"
                 ],
-                "summary": "AllClooudList",
-                "operationId": "AllCloudList",
+                "summary": "GetCloudList",
+                "operationId": "GetCloudList",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -76,8 +76,8 @@ const docTemplate = `{
                 "tags": [
                     "Cloud"
                 ],
-                "summary": "RegisterCloud",
-                "operationId": "RegisterCloud",
+                "summary": "SetCloud",
+                "operationId": "SetCloud",
                 "parameters": [
                     {
                         "description": "Cloud Set",
@@ -108,13 +108,400 @@ const docTemplate = `{
                 "tags": [
                     "Cloud"
                 ],
-                "summary": "SelectCloud",
-                "operationId": "SelectCloud",
+                "summary": "GetCloud",
+                "operationId": "GetCloud",
                 "parameters": [
                     {
                         "type": "string",
                         "description": "cloudUid",
                         "name": "cloudUid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update cloud",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "UpdateCloud",
+                "operationId": "UpdateCloud",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CloudUid",
+                        "name": "cloudUid",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Cloud Set",
+                        "name": "cloudSet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CloudSet"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete cloud",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Cloud"
+                ],
+                "summary": "DeleteCloud",
+                "operationId": "DeleteCloud",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "CloudUid",
+                        "name": "cloudUid",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/codes": {
+            "get": {
+                "description": "Get all code list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Code"
+                ],
+                "summary": "GetCodeList",
+                "operationId": "GetCodeList",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Code"
+                ],
+                "summary": "UpdateCode",
+                "operationId": "UpdateCode",
+                "parameters": [
+                    {
+                        "description": "Code",
+                        "name": "code",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Code"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Register code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Code"
+                ],
+                "summary": "SetCode",
+                "operationId": "SetCode",
+                "parameters": [
+                    {
+                        "description": "Code",
+                        "name": "code",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.Code"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/codes/groups": {
+            "get": {
+                "description": "Get all code-group list",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CodeGroup"
+                ],
+                "summary": "GetCodeGroupList",
+                "operationId": "GetCodeGroupList",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "Update code group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CodeGroup"
+                ],
+                "summary": "UpdateCodeGroup",
+                "operationId": "UpdateCodeGroup",
+                "parameters": [
+                    {
+                        "description": "Code Group",
+                        "name": "codeGroup",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CodeGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "Register code group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CodeGroup"
+                ],
+                "summary": "SetCodeGroup",
+                "operationId": "SetCodeGroup",
+                "parameters": [
+                    {
+                        "description": "Code Group",
+                        "name": "codeGroup",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.CodeGroup"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/codes/groups/{groupId}": {
+            "get": {
+                "description": "Get code group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CodeGroup"
+                ],
+                "summary": "GetCodeGroup",
+                "operationId": "GetCodeGroup",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Code Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete code group and codes belong to",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CodeGroup"
+                ],
+                "summary": "DeleteCodeGroup",
+                "operationId": "DeleteCodeGroup",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Code Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/codes/{groupId}": {
+            "get": {
+                "description": "Get codes by group",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Code"
+                ],
+                "summary": "GetCodeListByGroup",
+                "operationId": "GetCodeListByGroup",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Code Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/codes/{groupId}/{code}": {
+            "get": {
+                "description": "Get code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Code"
+                ],
+                "summary": "GetCode",
+                "operationId": "GetCode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Code Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Code",
+                        "name": "code",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete code",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Code"
+                ],
+                "summary": "DeleteCode",
+                "operationId": "DeleteCode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Code Group ID",
+                        "name": "groupId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Code",
+                        "name": "code",
                         "in": "path",
                         "required": true
                     }
@@ -273,6 +660,55 @@ const docTemplate = `{
                 },
                 "k8s": {
                     "$ref": "#/definitions/model.KubernetesInfo"
+                },
+                "status": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Code": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "desc": {
+                    "type": "string",
+                    "example": "Test Code for Testing"
+                },
+                "display_order": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "group_id": {
+                    "type": "string",
+                    "example": "TestGroup"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "TestCode #1"
+                },
+                "use_yn": {
+                    "type": "boolean",
+                    "example": true
+                }
+            }
+        },
+        "model.CodeGroup": {
+            "type": "object",
+            "properties": {
+                "desc": {
+                    "type": "string",
+                    "example": "Code Group Testing"
+                },
+                "group_id": {
+                    "type": "string",
+                    "example": "TestGroup"
+                },
+                "use_yn": {
+                    "type": "boolean",
+                    "example": true
                 }
             }
         },

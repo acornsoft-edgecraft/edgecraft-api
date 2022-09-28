@@ -86,6 +86,41 @@ definitions:
         type: string
       k8s:
         $ref: '#/definitions/model.KubernetesInfo'
+      status:
+        type: string
+    type: object
+  model.Code:
+    properties:
+      code:
+        example: 1
+        type: integer
+      desc:
+        example: Test Code for Testing
+        type: string
+      display_order:
+        example: 0
+        type: integer
+      group_id:
+        example: TestGroup
+        type: string
+      name:
+        example: 'TestCode #1'
+        type: string
+      use_yn:
+        example: true
+        type: boolean
+    type: object
+  model.CodeGroup:
+    properties:
+      desc:
+        example: Code Group Testing
+        type: string
+      group_id:
+        example: TestGroup
+        type: string
+      use_yn:
+        example: true
+        type: boolean
     type: object
   model.EtcdInfo:
     properties:
@@ -264,7 +299,7 @@ paths:
   /clouds:
     get:
       description: Get all cloud list
-      operationId: AllCloudList
+      operationId: GetCloudList
       produces:
       - application/json
       responses:
@@ -272,12 +307,12 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.ReturnData'
-      summary: AllClooudList
+      summary: GetCloudList
       tags:
       - Cloud
     post:
       description: Register cloud
-      operationId: RegisterCloud
+      operationId: SetCloud
       parameters:
       - description: Cloud Set
         in: body
@@ -292,13 +327,32 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.ReturnData'
-      summary: RegisterCloud
+      summary: SetCloud
       tags:
       - Cloud
   /clouds/{cloudUid}:
+    delete:
+      description: Delete cloud
+      operationId: DeleteCloud
+      parameters:
+      - description: CloudUid
+        in: path
+        name: cloudUid
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteCloud
+      tags:
+      - Cloud
     get:
       description: Get specific cloud
-      operationId: SelectCloud
+      operationId: GetCloud
       parameters:
       - description: cloudUid
         in: path
@@ -312,9 +366,250 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/response.ReturnData'
-      summary: SelectCloud
+      summary: GetCloud
       tags:
       - Cloud
+    put:
+      description: Update cloud
+      operationId: UpdateCloud
+      parameters:
+      - description: CloudUid
+        in: path
+        name: cloudUid
+        required: true
+        type: string
+      - description: Cloud Set
+        in: body
+        name: cloudSet
+        required: true
+        schema:
+          $ref: '#/definitions/model.CloudSet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateCloud
+      tags:
+      - Cloud
+  /codes:
+    get:
+      description: Get all code list
+      operationId: GetCodeList
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCodeList
+      tags:
+      - Code
+    post:
+      description: Register code
+      operationId: SetCode
+      parameters:
+      - description: Code
+        in: body
+        name: code
+        required: true
+        schema:
+          $ref: '#/definitions/model.Code'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetCode
+      tags:
+      - Code
+    put:
+      description: Update code
+      operationId: UpdateCode
+      parameters:
+      - description: Code
+        in: body
+        name: code
+        required: true
+        schema:
+          $ref: '#/definitions/model.Code'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateCode
+      tags:
+      - Code
+  /codes/{groupId}:
+    get:
+      description: Get codes by group
+      operationId: GetCodeListByGroup
+      parameters:
+      - description: Code Group ID
+        in: path
+        name: groupId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCodeListByGroup
+      tags:
+      - Code
+  /codes/{groupId}/{code}:
+    delete:
+      description: Delete code
+      operationId: DeleteCode
+      parameters:
+      - description: Code Group ID
+        in: path
+        name: groupId
+        required: true
+        type: string
+      - description: Code
+        in: path
+        name: code
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteCode
+      tags:
+      - Code
+    get:
+      description: Get code
+      operationId: GetCode
+      parameters:
+      - description: Code Group ID
+        in: path
+        name: groupId
+        required: true
+        type: string
+      - description: Code
+        in: path
+        name: code
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCode
+      tags:
+      - Code
+  /codes/groups:
+    get:
+      description: Get all code-group list
+      operationId: GetCodeGroupList
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCodeGroupList
+      tags:
+      - CodeGroup
+    post:
+      description: Register code group
+      operationId: SetCodeGroup
+      parameters:
+      - description: Code Group
+        in: body
+        name: codeGroup
+        required: true
+        schema:
+          $ref: '#/definitions/model.CodeGroup'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetCodeGroup
+      tags:
+      - CodeGroup
+    put:
+      description: Update code group
+      operationId: UpdateCodeGroup
+      parameters:
+      - description: Code Group
+        in: body
+        name: codeGroup
+        required: true
+        schema:
+          $ref: '#/definitions/model.CodeGroup'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateCodeGroup
+      tags:
+      - CodeGroup
+  /codes/groups/{groupId}:
+    delete:
+      description: Delete code group and codes belong to
+      operationId: DeleteCodeGroup
+      parameters:
+      - description: Code Group ID
+        in: path
+        name: groupId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteCodeGroup
+      tags:
+      - CodeGroup
+    get:
+      description: Get code group
+      operationId: GetCodeGroup
+      parameters:
+      - description: Code Group ID
+        in: path
+        name: groupId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCodeGroup
+      tags:
+      - CodeGroup
   /health:
     get:
       description: for health check

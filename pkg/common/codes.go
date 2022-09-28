@@ -41,6 +41,8 @@ const (
 	DatabaseEmptyData = 24200
 	// DatabaseFalseData -
 	DatabaseFalseData = 24201
+	// DatabaseExistData -
+	DatabaseExistData = 24202
 
 	//############################################################
 	// 인증/계정 관련 메시지

@@ -4,7 +4,8 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 package model
 
 import (
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
+	"time"
+
 	"github.com/gofrs/uuid"
 )
 
@@ -17,15 +18,15 @@ type NodeInfo struct {
 
 // ToTable - Node 정보를 테이블로 설정
 func (ni *NodeInfo) ToTable(nodeTable *NodeTable) {
-	nodeTable.Name = ni.Name
-	nodeTable.Ipaddress = ni.IpAddress
+	*nodeTable.Name = ni.Name
+	*nodeTable.Ipaddress = ni.IpAddress
 	nodeTable.Labels = ni.Labels
 }
 
 // FromTable - 테이블 정보를 Node 정보로 설정
 func (ni *NodeInfo) FromTable(nodeTable *NodeTable) {
-	ni.Name = nodeTable.Name
-	ni.IpAddress = nodeTable.Ipaddress
+	ni.Name = *nodeTable.Name
+	ni.IpAddress = *nodeTable.Ipaddress
 	ni.Labels = nodeTable.Labels
 }
 
@@ -44,18 +45,25 @@ func (nsi *NodeSpecificInfo) NewKey() {
 }
 
 // ToTable - Node Specific 정보를 테이블로 설정
-func (nsi *NodeSpecificInfo) ToTable(nodeTable *NodeTable) {
-	nsi.NewKey()
+func (nsi *NodeSpecificInfo) ToTable(nodeTable *NodeTable, isUpdate bool, user string, at time.Time) {
+	if isUpdate {
+		*nodeTable.NodeUid = nsi.NodeUid
+		*nodeTable.Updater = user
+		*nodeTable.Updated = at
+	} else {
+		nsi.NewKey()
+		*nodeTable.NodeUid = nsi.NodeUid
+		*nodeTable.Creator = user
+		*nodeTable.Created = at
+	}
 
 	nsi.BaremetalHost.ToTable(nodeTable)
 	nsi.Node.ToTable(nodeTable)
-
-	nodeTable.NodeUid = nsi.NodeUid
 }
 
 // FromTable - 테이블 정보를 Node Specific 정보로 설정
 func (nsi *NodeSpecificInfo) FromTable(nodeTable *NodeTable) {
-	nsi.NodeUid = nodeTable.NodeUid
+	nsi.NodeUid = *nodeTable.NodeUid
 
 	nsi.BaremetalHost = &BaremetalHostInfo{}
 	nsi.Node = &NodeInfo{}
@@ -74,24 +82,26 @@ type NodesInfo struct {
 }
 
 // ToTable - Nodes 정보를 테이블로 설정
-func (ni *NodesInfo) ToTable(clusterTable *ClusterTable) (nodeTables []*NodeTable) {
-	utils.CopyTo(&clusterTable, ni)
+func (ni *NodesInfo) ToTable(clusterTable *ClusterTable, isUpdate bool, user string, at time.Time) (nodeTables []*NodeTable) {
+	*clusterTable.LoadbalancerUse = ni.UseLoadBalancer
+	*clusterTable.LoadbalancerAddress = ni.LoadBalancerAddress
+	*clusterTable.LoadbalancerPort = ni.LoadbalancerPort
 
 	// Master Table 구성
 	for _, node := range ni.MasterNodes {
 		nodeTable := &NodeTable{}
-		node.ToTable(nodeTable)
-		nodeTable.Type = "1"
-		nodeTable.Status = "1"
+		node.ToTable(nodeTable, isUpdate, user, at)
+		*nodeTable.Type = "1"
+		*nodeTable.Status = "1"
 		nodeTables = append(nodeTables, nodeTable)
 	}
 
 	// Worker Table 구성
 	for _, node := range ni.WorkerNodes {
 		nodeTable := &NodeTable{}
-		node.ToTable(nodeTable)
-		nodeTable.Type = "2"
-		nodeTable.Status = "1"
+		node.ToTable(nodeTable, isUpdate, user, at)
+		*nodeTable.Type = "2"
+		*nodeTable.Status = "1"
 		nodeTables = append(nodeTables, nodeTable)
 	}
 
@@ -100,9 +110,9 @@ func (ni *NodesInfo) ToTable(clusterTable *ClusterTable) (nodeTables []*NodeTabl
 
 // FromTable - 테이블 정보를 Nodes 정보로 설정
 func (ni *NodesInfo) FromTable(clusterTable *ClusterTable, nodes []*NodeTable) {
-	ni.UseLoadBalancer = clusterTable.LoadbalancerUse
-	ni.LoadBalancerAddress = clusterTable.LoadbalancerAddress
-	ni.LoadbalancerPort = clusterTable.LoadbalancerPort
+	ni.UseLoadBalancer = *clusterTable.LoadbalancerUse
+	ni.LoadBalancerAddress = *clusterTable.LoadbalancerAddress
+	ni.LoadbalancerPort = *clusterTable.LoadbalancerPort
 
 	ni.MasterNodes = []*NodeSpecificInfo{}
 	ni.WorkerNodes = []*NodeSpecificInfo{}
@@ -111,7 +121,7 @@ func (ni *NodesInfo) FromTable(clusterTable *ClusterTable, nodes []*NodeTable) {
 		var nsi *NodeSpecificInfo = &NodeSpecificInfo{}
 		nsi.FromTable(node)
 
-		if node.Type == "1" {
+		if *node.Type == "1" {
 			ni.MasterNodes = append(ni.MasterNodes, nsi)
 		} else {
 			ni.WorkerNodes = append(ni.WorkerNodes, nsi)
