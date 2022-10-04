@@ -15,10 +15,10 @@ const (
 	// 일반 오류 메시지
 	//############################################################
 
-	// CodeInvalidData -
-	CodeInvalidData = 21000
 	// CodeProcessingError -
-	CodeProcessingError = 21001
+	CodeProcessingError = 21000
+	// CodeInvalidData -
+	CodeInvalidData = 21001
 	// CodeFailedSaveData -
 	CodeFailedSaveData = 21002
 	// CodeDuplicatedData -
@@ -84,27 +84,11 @@ const (
 	//############################################################
 
 	//############################################################
-	// CONNECT, DEVICE 관련 오류 메시지
+	// Cloud 관련 메시지
 	//############################################################
 
-	// CONNECT fail -
-	CodeFailedConnect    = 25100
-	CodeFailedDupConnect = 25101
-
-	// DEVICE fail -
-	CodeFailedDevice    = 25200
-	CodeFailedDupDevice = 25201
-
-	//############################################################
-	// OPCUA, MODBUS 관련 메시지
-	//############################################################
-
-	// OPCUA fail -
-	CodeFailedOPCUA = 26100
-
-	// MODBUS fail -
-	CodeFailedMODBUS         = 26200
-	CodeFailedMODBUSRegister = 26201
+	// CloudCreated_CantUpdate -
+	CloudCreated_CantUpdate = 25001
 
 	//############################################################
 	// K8S 관련 메시지

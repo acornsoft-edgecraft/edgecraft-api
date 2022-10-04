@@ -7,6 +7,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 )
 
 type Endpoints []UrlInfo
@@ -27,20 +29,19 @@ func (a *Endpoints) Scan(value interface{}) error {
 
 // EtcdInfo - Data for ETCD
 type EtcdInfo struct {
-	UseExternalEtcd bool `json:"use_external_etcd" example:"false"`
-	//Endpoints       []UrlInfo `json:"endpoints"`
-	Endpoints *Endpoints `json:"endpoints"`
-	CAFile    string     `json:"ca_file" example:""`
-	CertFile  string     `json:"cert_file" example:""`
-	KeyFile   string     `json:"key_file" example:""`
+	UseExternalEtcd bool       `json:"use_external_etcd" example:"false"`
+	Endpoints       *Endpoints `json:"endpoints"`
+	CAFile          string     `json:"ca_file" example:""`
+	CertFile        string     `json:"cert_file" example:""`
+	KeyFile         string     `json:"key_file" example:""`
 }
 
 // ToTable - ETCD 정보를 테이블로 설정
 func (ei *EtcdInfo) ToTable(clusterTable *ClusterTable) {
-	clusterTable.ExternalEtcdUse = &ei.UseExternalEtcd
-	clusterTable.ExternalEtcdCertificateCa = &ei.CAFile
-	clusterTable.ExternalEtcdCertificateCert = &ei.CertFile
-	clusterTable.ExternalEtcdCertificateKey = &ei.KeyFile
+	clusterTable.ExternalEtcdUse = utils.BoolPtr(ei.UseExternalEtcd)
+	clusterTable.ExternalEtcdCertificateCa = utils.StringPtr(ei.CAFile)
+	clusterTable.ExternalEtcdCertificateCert = utils.StringPtr(ei.CertFile)
+	clusterTable.ExternalEtcdCertificateKey = utils.StringPtr(ei.KeyFile)
 	clusterTable.ExternalEtcdEndPoints = ei.Endpoints
 }
 

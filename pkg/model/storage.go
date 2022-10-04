@@ -60,19 +60,9 @@ func (sci *StorageClassInfo) FromTable(clusterTable *ClusterTable) {
 
 // StorageClass - Data for Storage Class
 type StorageClass struct {
-	UseCeph bool     `json:"use_ceph" db:"-, default:false"`
+	UseCeph bool     `json:"use_ceph"`
 	Labels  []*Label `json:"labels"`
 }
-
-// // ToTable - Storage Class 정보를 테이블로 설정
-// func (sci *StorageClass) ToTable(clusterTable *ClusterTable) {
-
-// }
-
-// // FromTable - 테이블 정보를 Storage Class 정보로 설정
-// func (sci *StorageClass) FromTable(clusterTable *ClusterTable) {
-
-// }
 
 // Value Marshal
 func (a StorageClass) Value() (driver.Value, error) {

@@ -16,7 +16,7 @@ CREATE TABLE "edgecraft"."tbl_code"
 	"code"				INTEGER								NOT NULL, 	-- 코드식별자
 	"name"          	VARCHAR(50)   						NOT NULL,   -- 코드이름
 	"display_order" 	INTEGER       						NULL,     	-- 코드표시순서
-	"description"   	VARCHAR(1000) 						NULL,     	-- 코드설명
+	"description"   	VARCHAR(300) 						NULL,     	-- 코드설명
 	"use_yn"            BOOLEAN       	DEFAULT TRUE		NOT NULL,   -- 사용여부
 	"creator"           VARCHAR(30)   	DEFAULT 'system'	NOT NULL, 	-- 생성자
 	"created_at"        TIMESTAMP     	DEFAULT NOW()		NOT NULL,   -- 생성일시

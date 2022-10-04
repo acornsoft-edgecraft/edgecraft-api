@@ -5,22 +5,6 @@ package postgresdb
 
 import "github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 
-const getClustersSQL = `
-SELECT 
-	A.*
-FROM 
-	"edgecraft"."tbl_cloud_cluster" A
-WHERE
-	A.cloud_uid = $1
-`
-
-const deleteCloudClusters = `
-DELETE
-FROM "edgecraft"."tbl_cloud_cluster" A
-WHERE
-	A.cloud_uid = $1
-`
-
 // InsertCluster - Insert a new Baremetal Cluster
 func (db *DB) InsertCluster(cluster *model.ClusterTable) error {
 	return db.GetClient().Insert(cluster)
@@ -36,8 +20,8 @@ func (db *DB) UpdateCluster(cluster *model.ClusterTable) (int64, error) {
 }
 
 // GetCluster - 단일 클러스터 조회
-func (db *DB) GetCluster(cloudUid, clusterUid string) (*model.ClusterTable, error) {
-	obj, err := db.GetClient().Get(&model.ClusterTable{}, cloudUid, clusterUid)
+func (db *DB) GetCluster(cloudId, clusterId string) (*model.ClusterTable, error) {
+	obj, err := db.GetClient().Get(&model.ClusterTable{}, cloudId, clusterId)
 	if err != nil {
 		return nil, err
 	}
@@ -48,9 +32,9 @@ func (db *DB) GetCluster(cloudUid, clusterUid string) (*model.ClusterTable, erro
 	return nil, nil
 }
 
-// SelectClusters - 클러스터들 조회
-func (db *DB) SelectClusters(cloudUid string) ([]*model.ClusterTable, error) {
-	clusters, err := db.GetClient().Select(&model.ClusterTable{}, getClustersSQL, cloudUid)
+// GetClusters - 클러스터들 조회
+func (db *DB) GetClusters(cloudId string) ([]*model.ClusterTable, error) {
+	clusters, err := db.GetClient().Select(&model.ClusterTable{}, getClustersSQL, cloudId)
 	if err != nil {
 		return nil, err
 	}
@@ -64,8 +48,8 @@ func (db *DB) SelectClusters(cloudUid string) ([]*model.ClusterTable, error) {
 }
 
 // DeleteCloudClusters - Delete clusters on cloud
-func (db *DB) DeleteCloudClusters(cloudUid string) (int64, error) {
-	result, err := db.GetClient().Exec(deleteCloudClusters, cloudUid)
+func (db *DB) DeleteCloudClusters(cloudId string) (int64, error) {
+	result, err := db.GetClient().Exec(deleteClusters, cloudId)
 	if err != nil {
 		return -1, err
 	}

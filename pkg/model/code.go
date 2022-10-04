@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
+)
 
 type CodeGroup struct {
 	GroupID     string `json:"group_id" example:"TestGroup"`
@@ -10,15 +14,15 @@ type CodeGroup struct {
 
 // ToTable - CodeGroup 정보를 테이블 정보로 설정
 func (cg *CodeGroup) ToTable(cgt *CodeGroupTable, isUpdate bool, user string, at time.Time) {
-	cgt.GroupID = &cg.GroupID
-	cgt.Description = &cg.Description
-	cgt.UseYn = &cg.UseYn
+	cgt.GroupID = utils.StringPtr(cg.GroupID)
+	cgt.Description = utils.StringPtr(cg.Description)
+	cgt.UseYn = utils.BoolPtr(cg.UseYn)
 	if isUpdate {
-		cgt.Updater = &user
-		cgt.Updated = &at
+		cgt.Updater = utils.StringPtr(user)
+		cgt.Updated = utils.TimePtr(at)
 	} else {
-		cgt.Creator = &user
-		cgt.Created = &at
+		cgt.Creator = utils.StringPtr(user)
+		cgt.Created = utils.TimePtr(at)
 	}
 }
 
@@ -40,18 +44,18 @@ type Code struct {
 
 // ToTable - CodeGroup 정보를 테이블 정보로 설정
 func (c *Code) ToTable(ct *CodeTable, isUpdate bool, user string, at time.Time) {
-	ct.GroupID = &c.GroupID
-	ct.Code = &c.Code
-	ct.Name = &c.Name
-	ct.DisplayOrder = &c.DisplayOrder
-	ct.Description = &c.Description
-	ct.UseYn = &c.UseYn
+	ct.GroupID = utils.StringPtr(c.GroupID)
+	ct.Code = utils.IntPrt(c.Code)
+	ct.Name = utils.StringPtr(c.Name)
+	ct.DisplayOrder = utils.IntPrt(c.DisplayOrder)
+	ct.Description = utils.StringPtr(c.Description)
+	ct.UseYn = utils.BoolPtr(c.UseYn)
 	if isUpdate {
-		ct.Updater = &user
-		ct.Updated = &at
+		ct.Updater = utils.StringPtr(user)
+		ct.Updated = utils.TimePtr(at)
 	} else {
-		ct.Creator = &user
-		ct.Created = &at
+		ct.Creator = utils.StringPtr(user)
+		ct.Created = utils.TimePtr(at)
 	}
 }
 

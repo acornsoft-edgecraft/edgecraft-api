@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"log"
+	"os"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
@@ -46,6 +48,8 @@ type DB struct {
 
 // CloseConnection - Closes the database connection
 func (db *DB) CloseConnection() error {
+	db.client.TraceOff()
+
 	return db.client.Db.Close()
 }
 
@@ -151,6 +155,9 @@ func NewConnection(conf *Config) (db.DB, error) {
 
 	// create a PostgreSQL DbMap
 	client := newDbMap(conf)
+
+	// Loggin Enabling
+	client.TraceOn("[GORP]", log.New(os.Stdout, "PostgreSQL", log.Lmicroseconds))
 
 	// Checking the connection
 	err := client.Db.PingContext(context.Background())

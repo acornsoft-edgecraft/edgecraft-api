@@ -8,6 +8,8 @@ import (
 )
 
 // NodeTable - Baremetal Node Table 정보
+// Type: Common Code NodeTypes 참조
+// Status: Common Code Status 참조
 type NodeTable struct {
 	CloudUid   *string `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid *string `json:"cluster_uid" db:"cluster_uid"`
@@ -30,8 +32,8 @@ type NodeTable struct {
 	// TODO: (? - 화면에 없음, 향후 조정 필요)
 	OsdPath *string `json:"osd_path" db:"osd_path"`
 
-	Type    *string    `json:"type" db:"type"`
-	Status  *string    `json:"status" db:"state"`
+	Type    *int       `json:"type" db:"type"`
+	Status  *int       `json:"status" db:"state"`
 	Creator *string    `json:"creator" db:"creator"`
 	Created *time.Time `json:"created" db:"created_at"`
 	Updater *string    `json:"updater" db:"updater"`

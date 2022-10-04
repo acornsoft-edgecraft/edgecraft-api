@@ -28,7 +28,7 @@ func (ci *CloudSet) ToTable(isUpdate bool, user string, at time.Time) (cloudTabl
 	ci.Cluster.ToTable(clusterTable, isUpdate, user, at)
 	ci.EtcdStorage.ToTable(clusterTable)
 
-	// Node는 Delete & Insert 방식이므로 Update 개념 없음.
+	// Node Table는 Delete & Insert 방식이므로 Update 개념 없음.
 	nodeTables = ci.Nodes.ToTable(clusterTable, false, user, at)
 	for _, node := range nodeTables {
 		node.CloudUid = cloudTable.CloudUID
@@ -42,9 +42,9 @@ func (ci *CloudSet) ToTable(isUpdate bool, user string, at time.Time) (cloudTabl
 
 // CloudInfo - Data of Cloud
 type CloudInfo struct {
-	CloudUID string `json:"cloud_uid" db:"-" example:""`
+	CloudUID string `json:"cloud_uid" example:""`
 	Name     string `json:"name" example:"test cloud"`
-	Type     string `json:"type" example:"1"`
+	Type     int    `json:"type" example:"1"`
 	Desc     string `json:"desc" example:"Baremtal cloud"`
 }
 
@@ -58,16 +58,22 @@ func (ci *CloudInfo) NewKey() {
 // ToTable - CloudInfo정보를 Table 정보로 설정
 func (ci *CloudInfo) ToTable(cloudTable *CloudTable, isUpdate bool, user string, at time.Time) {
 	if isUpdate {
-		*cloudTable.Updater = user
-		*cloudTable.Updated = at
+		if cloudTable.CloudUID == nil {
+			cloudTable.CloudUID = utils.StringPtr(ci.CloudUID)
+		}
+		cloudTable.Updater = utils.StringPtr(user)
+		cloudTable.Updated = utils.TimePtr(at)
 	} else {
 		ci.NewKey()
-		*cloudTable.Creator = user
-		*cloudTable.Created = at
+		cloudTable.CloudUID = utils.StringPtr(ci.CloudUID)
+		cloudTable.Creator = utils.StringPtr(user)
+		cloudTable.Created = utils.TimePtr(at)
 	}
 
-	utils.CopyTo(&cloudTable, ci)
-	*cloudTable.Status = "1"
+	cloudTable.Name = utils.StringPtr(ci.Name)
+	cloudTable.Type = utils.IntPrt(ci.Type)
+	cloudTable.Desc = utils.StringPtr(ci.Desc)
+	cloudTable.Status = utils.IntPrt(1)
 }
 
 // FromTable - 테이블의 정보를 CluoudInfo 정보로 설정
@@ -82,10 +88,10 @@ func (ci *CloudInfo) FromTable(cloudTable *CloudTable) {
 type CloudList struct {
 	CloudUID  string    `json:"cloud_uid" db:"cloud_uid"`
 	Name      string    `json:"name" db:"name"`
-	Type      string    `json:"type" db:"type"`
+	Type      int       `json:"type" db:"type"`
 	Desc      string    `json:"desc" db:"description"`
-	Status    string    `json:"status" db:"state"`
-	NodeCount int       `json:"nodeCount" db:"nodecount"`
-	Version   string    `json:"version" db:"version"`
+	Status    int       `json:"status" db:"state"`
+	NodeCount int       `json:"nodeCount"`
+	Version   string    `json:"version"`
 	Created   time.Time `json:"created" db:"created_at"`
 }

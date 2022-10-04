@@ -54,17 +54,17 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 
 	// Cloud
 	v1.GET("/clouds", api.GetCloudListHandler)
-	v1.GET("/clouds/:cloudUid", api.GetCloudHandler)
+	v1.GET("/clouds/:cloudId", api.GetCloudHandler)
 	v1.POST("/clouds", api.SetCloudHandler)
-	v1.PUT("/clouds/:cloudUid", api.UpdateCloudHandler)
-	v1.DELETE("/clouds/:cloudUid", api.DeleteCloudHandler)
+	v1.PUT("/clouds/:cloudId", api.UpdateCloudHandler)
+	v1.DELETE("/clouds/:cloudId", api.DeleteCloudHandler)
 
 	// Cloud - Node
-	// v1.GET("/clouds/:cloudId/nodes", api.GetCloudNodesHandler)
-	// v1.GET("/clouds/:cloudId/nodes/:nodeId", api.GetCloudNodeHandler)
-	// v1.POST("/clouds/:cloudId/nodes", api.SetCloudNodeHandler)
-	// v1.PUT("/clouds/:cloudId/nodes/:nodeId", api.UpdateCloudNodeHandler)
-	// v1.DELETE("/clouds/:cloudId/nodes/:nodeId", api.DeleteCloudNodeHandler)
+	v1.GET("/clouds/:cloudId/nodes", api.GetCloudNodeListHandler)
+	v1.GET("/clouds/:cloudId/nodes/:nodeId", api.GetCloudNodeHandler)
+	v1.POST("/clouds/:cloudId/nodes", api.SetCloudNodeHandler)
+	v1.PUT("/clouds/:cloudId/nodes/:nodeId", api.UpdateCloudNodeHandler)
+	v1.DELETE("/clouds/:cloudId/nodes/:nodeId", api.DeleteCloudNodeHandler)
 
 	// Cloud - App
 	// v1.GET("/clouds/:cloudID/apps", api.GetCloudAppHandler)

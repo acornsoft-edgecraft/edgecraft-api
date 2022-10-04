@@ -8,12 +8,13 @@ import (
 )
 
 // ClusterTable - Baremetal Cluster Table 정보
+// Status: Common Code Status 참조
 type ClusterTable struct {
 	CloudUid   *string `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid *string `json:"cluster" db:"cluster_uid"`
 
 	// K8S 정보
-	Version *string `json:"version" db:"k8s_version"`
+	Version *int    `json:"version" db:"k8s_version"`
 	PodCidr *string `json:"pod_cidr" db:"pod_cidr"`
 	SvcCidr *string `json:"svc_cidr" db:"service_cidr"`
 
@@ -44,7 +45,7 @@ type ClusterTable struct {
 	StorageClass *StorageClass `json:"storage_class" db:"storage_class"`
 
 	// 기본 정보
-	Status  *string    `json:"status" db:"state"`
+	Status  *int       `json:"status" db:"state"`
 	Creator *string    `json:"creator" db:"creator"`
 	Created *time.Time `json:"created_at" db:"created_at"`
 	Updater *string    `json:"updater" db:"updater"`

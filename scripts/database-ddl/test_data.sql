@@ -1,21 +1,31 @@
 -- User
 INSERT INTO "edgecraft"."tbl_user"
 (
-    user_role,
-    user_name,
-    user_id,
+    user_uid,
+    role,
+    name,
+    id,
     password,
     email,
-    
+    password_expiration_begin_time,
+    password_expiration_end_time
 )
-VALUES
-( 1, 'morris', 'ccambo', '662edc7bc97f9425be9b3abd61f9eea63fbff1cf144a9a572bab168145fc8838ac2f9f92e284f22a974e3820f947a909190d686e4fe9476316ca7d36fd9965d7', 'ccambo@acornsoft.io' )
+SELECT 
+	uuid_generate_v4(), 
+	1,
+	'morris', 
+	'ccambo', 
+	'662edc7bc97f9425be9b3abd61f9eea63fbff1cf144a9a572bab168145fc8838ac2f9f92e284f22a974e3820f947a909190d686e4fe9476316ca7d36fd9965d7', 
+	'ccambo@acornsoft.io',
+	NOW(),
+	NOW()
 -- pwd >> 1234abcd@Acorn
 
 -- Code Group
 INSERT INTO "edgecraft"."tbl_code_group"
 (
-	"group_id", "description"
+	"group_id", 
+    "description"
 )
 VALUES 
 ('CloudTypes',          'Types of Cloud'),
@@ -23,14 +33,16 @@ VALUES
 ('K8sVersions',         'Version of kubernetes for cloud'),
 ('ImageChecksumTypes',  'Types of checkSum for image'),
 ('ImageFormats',        'Types of formats for image'),
-('BootMode',            'Modes of boot'),
+('BootModes',           'Modes of boot'),
 ('NodeTypes',           'Types of Node'),
 ('UserRoles',           'Tyeps of Role for user'),
 ('ImageTypes',          'Types of image'),
 ('ImageOsTypes',        'Types of image for OS'),
 ('SecurityStatus',      'Status of security'),
-('SecurityItemStatus',  'Status of items for security')
-
+('SecurityItemStatus',  'Status of items for security'),
+('UserStatus',          'Status of user'),
+('ClusterStatus',       'Status of cluster'),
+('NodeState',           'Status of node')
 
 -- Code
 INSERT INTO "edgecraft"."tbl_code"
@@ -60,9 +72,9 @@ VALUES
 ('ImageFormats',		3,		'vdi',				2,  'VDI format for image'),
 ('ImageFormats',		4,		'vmdk',				3,  'VMDK format for image'),
 ('ImageFormats',		5,		'live-iso',			4,  'LIVE-ISO format for image'),
-('BootMode',			1,		'UEFI',				0,  'UEFI boot'),
-('BootMode',			2,		'legacy',			1,  'LEGACY boot'),
-('BootMode',			3,		'UEFISecureBoot',	2,  'UEFI Security boot'),
+('BootModes',			1,		'UEFI',				0,  'UEFI boot'),
+('BootModes',			2,		'legacy',			1,  'LEGACY boot'),
+('BootModes',			3,		'UEFISecureBoot',	2,  'UEFI Security boot'),
 ('NodeTypes',			1,		'Master',			0,  'Master Node'),
 ('NodeTypes',			2,		'Worker',			1,  'Worker Node'),
 ('UserRoles',			1,		'Admin',			0,  'Admin user'),
@@ -76,7 +88,13 @@ VALUES
 ('SecurityStatus',      2,      'Completed',        1,  'Completed status for security check'),
 ('SecurityStatus',      3,      'Failed',           2,  'Failed status for security check'),
 ('SecurityItemStatus',  1,      'Pass',             0,  'Passed status for security check item'),
-('SecurityItemStatus',  2,      'Failed',           1,  'Failed status for security check item')
+('SecurityItemStatus',  2,      'Failed',           1,  'Failed status for security check item'),
+('UserStatus',          1,      'Activated',        0,  'Activated status of user'),
+('UserStatus',          2,      'Deactivated',    	1,  'Deactivated status of user'),
+('ClusterStatus',       1,      'Activated',        0,  'Activated status of cluster'),
+('NodeStatus',          1,      'Activated',        0,  'Activated status of node')
+
+
 
 -- -- Cloud
 

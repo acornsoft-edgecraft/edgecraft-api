@@ -6,6 +6,7 @@ package model
 import (
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 )
 
@@ -18,8 +19,8 @@ type NodeInfo struct {
 
 // ToTable - Node 정보를 테이블로 설정
 func (ni *NodeInfo) ToTable(nodeTable *NodeTable) {
-	*nodeTable.Name = ni.Name
-	*nodeTable.Ipaddress = ni.IpAddress
+	nodeTable.Name = utils.StringPtr(ni.Name)
+	nodeTable.Ipaddress = utils.StringPtr(ni.IpAddress)
 	nodeTable.Labels = ni.Labels
 }
 
@@ -33,6 +34,7 @@ func (ni *NodeInfo) FromTable(nodeTable *NodeTable) {
 // NodeSpecificInfo - Data for Node Spec
 type NodeSpecificInfo struct {
 	NodeUid       string `json:"node_uid" example:""`
+	Type          int    `json:"type" example:"1"`
 	BaremetalHost *BaremetalHostInfo
 	Node          *NodeInfo
 }
@@ -47,15 +49,19 @@ func (nsi *NodeSpecificInfo) NewKey() {
 // ToTable - Node Specific 정보를 테이블로 설정
 func (nsi *NodeSpecificInfo) ToTable(nodeTable *NodeTable, isUpdate bool, user string, at time.Time) {
 	if isUpdate {
-		*nodeTable.NodeUid = nsi.NodeUid
-		*nodeTable.Updater = user
-		*nodeTable.Updated = at
+		if nodeTable.NodeUid == nil {
+			nodeTable.NodeUid = utils.StringPtr(nsi.NodeUid)
+		}
+		nodeTable.Updater = utils.StringPtr(user)
+		nodeTable.Updated = utils.TimePtr(at)
 	} else {
 		nsi.NewKey()
-		*nodeTable.NodeUid = nsi.NodeUid
-		*nodeTable.Creator = user
-		*nodeTable.Created = at
+		nodeTable.NodeUid = utils.StringPtr(nsi.NodeUid)
+		nodeTable.Creator = utils.StringPtr(user)
+		nodeTable.Created = utils.TimePtr(at)
 	}
+
+	nodeTable.Type = utils.IntPrt(nsi.Type)
 
 	nsi.BaremetalHost.ToTable(nodeTable)
 	nsi.Node.ToTable(nodeTable)
@@ -64,6 +70,7 @@ func (nsi *NodeSpecificInfo) ToTable(nodeTable *NodeTable, isUpdate bool, user s
 // FromTable - 테이블 정보를 Node Specific 정보로 설정
 func (nsi *NodeSpecificInfo) FromTable(nodeTable *NodeTable) {
 	nsi.NodeUid = *nodeTable.NodeUid
+	nsi.Type = *nodeTable.Type
 
 	nsi.BaremetalHost = &BaremetalHostInfo{}
 	nsi.Node = &NodeInfo{}
@@ -83,16 +90,16 @@ type NodesInfo struct {
 
 // ToTable - Nodes 정보를 테이블로 설정
 func (ni *NodesInfo) ToTable(clusterTable *ClusterTable, isUpdate bool, user string, at time.Time) (nodeTables []*NodeTable) {
-	*clusterTable.LoadbalancerUse = ni.UseLoadBalancer
-	*clusterTable.LoadbalancerAddress = ni.LoadBalancerAddress
-	*clusterTable.LoadbalancerPort = ni.LoadbalancerPort
+	clusterTable.LoadbalancerUse = utils.BoolPtr(ni.UseLoadBalancer)
+	clusterTable.LoadbalancerAddress = utils.StringPtr(ni.LoadBalancerAddress)
+	clusterTable.LoadbalancerPort = utils.StringPtr(ni.LoadbalancerPort)
 
 	// Master Table 구성
 	for _, node := range ni.MasterNodes {
 		nodeTable := &NodeTable{}
 		node.ToTable(nodeTable, isUpdate, user, at)
-		*nodeTable.Type = "1"
-		*nodeTable.Status = "1"
+		nodeTable.Type = utils.IntPrt(1)
+		nodeTable.Status = utils.IntPrt(1)
 		nodeTables = append(nodeTables, nodeTable)
 	}
 
@@ -100,8 +107,8 @@ func (ni *NodesInfo) ToTable(clusterTable *ClusterTable, isUpdate bool, user str
 	for _, node := range ni.WorkerNodes {
 		nodeTable := &NodeTable{}
 		node.ToTable(nodeTable, isUpdate, user, at)
-		*nodeTable.Type = "2"
-		*nodeTable.Status = "1"
+		nodeTable.Type = utils.IntPrt(2)
+		nodeTable.Status = utils.IntPrt(1)
 		nodeTables = append(nodeTables, nodeTable)
 	}
 
@@ -121,7 +128,7 @@ func (ni *NodesInfo) FromTable(clusterTable *ClusterTable, nodes []*NodeTable) {
 		var nsi *NodeSpecificInfo = &NodeSpecificInfo{}
 		nsi.FromTable(node)
 
-		if *node.Type == "1" {
+		if *node.Type == 1 {
 			ni.MasterNodes = append(ni.MasterNodes, nsi)
 		} else {
 			ni.WorkerNodes = append(ni.WorkerNodes, nsi)

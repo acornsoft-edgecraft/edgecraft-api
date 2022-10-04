@@ -27,16 +27,15 @@ type DB interface {
 	GetClient() SQLExecutor
 
 	// tbl_cloud
-	GetCloudList() ([]model.CloudList, error)
+	GetClouds() ([]model.CloudList, error)
 	GetCloud(string) (*model.CloudTable, error)
 	InsertCloud(*model.CloudTable) error
 	UpdateCloud(*model.CloudTable) (int64, error)
 	DeleteCloud(string) (int64, error)
 
 	// tbl_cloud_cluster
-	// GetAllCloudCluster() ([]model.CloudCluster, error)
+	GetClusters(string) ([]*model.ClusterTable, error)
 	GetCluster(string, string) (*model.ClusterTable, error)
-	SelectClusters(string) ([]*model.ClusterTable, error)
 	InsertCluster(*model.ClusterTable) error
 	UpdateCluster(*model.ClusterTable) (int64, error)
 	DeleteCloudClusters(string) (int64, error)
@@ -52,9 +51,14 @@ type DB interface {
 	// DeleteAllCloudCluster(uuid.UUID) (int64, error)
 
 	// tbl_cloud_node
+	GetNodes(string, string) ([]*model.NodeTable, error)
+	GetNodesByCloud(string) ([]*model.NodeTable, error)
 	GetNode(string, string, string) (*model.NodeTable, error)
-	SelectNodes(string, string) ([]*model.NodeTable, error)
+	GetNodeByCloud(string, string) (*model.NodeTable, error)
+
 	InsertNode(*model.NodeTable) error
+	UpdateNode(*model.NodeTable) (int64, error)
+	DeleteNode(string) (int64, error)
 	DeleteNodes(string, string) (int64, error)
 	DeleteCloudNodes(string) (int64, error)
 
