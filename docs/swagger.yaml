@@ -271,7 +271,6 @@ definitions:
       message:
         type: string
     type: object
-host: localhost:8100
 info:
   contact: {}
   title: EdgeCraft Swagger API
