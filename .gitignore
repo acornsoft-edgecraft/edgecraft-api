@@ -90,7 +90,8 @@ Temporary Items
 # End of https://www.toptal.com/developers/gitignore/api/go,macos,visualstudiocode
 .gitignore
 __debug_bin
-log.log
+*.log
 
 edgecraft.env.md
 build/*
+log.log
