@@ -61,8 +61,8 @@ definitions:
         example: test cloud
         type: string
       type:
-        example: "1"
-        type: string
+        example: 1
+        type: integer
     type: object
   model.CloudSet:
     properties:
@@ -87,7 +87,7 @@ definitions:
       k8s:
         $ref: '#/definitions/model.KubernetesInfo'
       status:
-        type: string
+        type: integer
     type: object
   model.Code:
     properties:
@@ -131,7 +131,6 @@ definitions:
         example: ""
         type: string
       endpoints:
-        description: Endpoints       []UrlInfo `json:"endpoints"`
         items:
           $ref: '#/definitions/model.UrlInfo'
         type: array
@@ -179,8 +178,8 @@ definitions:
         example: 10.244.0.0/16
         type: string
       version:
-        example: "1"
-        type: string
+        example: 1
+        type: integer
     type: object
   model.Login:
     properties:
@@ -212,6 +211,9 @@ definitions:
       node_uid:
         example: ""
         type: string
+      type:
+        example: 1
+        type: integer
     type: object
   model.NodesInfo:
     properties:
@@ -330,14 +332,14 @@ paths:
       summary: SetCloud
       tags:
       - Cloud
-  /clouds/{cloudUid}:
+  /clouds/{cloudId}:
     delete:
       description: Delete cloud
       operationId: DeleteCloud
       parameters:
-      - description: CloudUid
+      - description: cloudId
         in: path
-        name: cloudUid
+        name: cloudId
         required: true
         type: string
       produces:
@@ -354,9 +356,9 @@ paths:
       description: Get specific cloud
       operationId: GetCloud
       parameters:
-      - description: cloudUid
+      - description: cloudId
         in: path
-        name: cloudUid
+        name: cloudId
         required: true
         type: string
       produces:
@@ -373,9 +375,9 @@ paths:
       description: Update cloud
       operationId: UpdateCloud
       parameters:
-      - description: CloudUid
+      - description: cloudId
         in: path
-        name: cloudUid
+        name: cloudId
         required: true
         type: string
       - description: Cloud Set
@@ -394,6 +396,130 @@ paths:
       summary: UpdateCloud
       tags:
       - Cloud
+  /clouds/{cloudId}/nodes:
+    get:
+      description: 클라우드에 속한 노드 리스트 조회
+      operationId: GetCloudNodeList
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCloudNodeList
+      tags:
+      - CloudNode
+    post:
+      description: 클라우드에 노드 등록
+      operationId: SetCloudNode
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Node Specific Info
+        in: body
+        name: node
+        required: true
+        schema:
+          $ref: '#/definitions/model.NodeSpecificInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetCloudNode
+      tags:
+      - CloudNode
+  /clouds/{cloudId}/nodes/{nodeId}:
+    delete:
+      description: 클라우드의 노드 삭제
+      operationId: DeleteCloudNode
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Node ID
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteCloudNode
+      tags:
+      - CloudNode
+    get:
+      description: 클라우드에 속한 노드 상세정보 조회
+      operationId: GetCloudNode
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Node ID
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCloudNode
+      tags:
+      - CloudNode
+    put:
+      description: 클라우드의 노드 수정
+      operationId: UpdateCloudNode
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Node ID
+        in: path
+        name: nodeId
+        required: true
+        type: string
+      - description: Nodes Info
+        in: body
+        name: node
+        required: true
+        schema:
+          $ref: '#/definitions/model.NodeSpecificInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateCloudNode
+      tags:
+      - CloudNode
   /codes:
     get:
       description: Get all code list

@@ -8,12 +8,14 @@ import (
 )
 
 // CloudTable - Cloud Table 정보
+// Type: Common Code CloudTypes 참조
+// Status: Common Code Status 참조
 type CloudTable struct {
 	CloudUID *string    `json:"cloud_uid" db:"cloud_uid"`
 	Name     *string    `json:"name" db:"name"`
-	Type     *string    `json:"type" db:"type"`
+	Type     *int       `json:"type" db:"type"`
 	Desc     *string    `json:"desc" db:"description"`
-	Status   *string    `json:"status" db:"state"`
+	Status   *int       `json:"status" db:"state"`
 	Creator  *string    `json:"creator" db:"creator"`
 	Created  *time.Time `json:"created" db:"created_at"`
 	Updater  *string    `json:"updater" db:"updater"`

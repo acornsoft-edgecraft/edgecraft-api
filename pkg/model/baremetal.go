@@ -7,6 +7,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 )
 
 // BaremetalInfo - Data for Baremetal
@@ -24,13 +26,13 @@ type BaremetalInfo struct {
 
 // ToTable - Baremetal 정보를 테이블로 설정
 func (bi *BaremetalInfo) ToTable(clusterTable *ClusterTable) {
-	clusterTable.BmcCredentialSecret = &bi.BmcCredentialSecret
-	clusterTable.BmcCredentialUser = &bi.BmcCredentialUser
-	clusterTable.BmcCredentialPassword = &bi.BmcCredentialPassword
-	clusterTable.ImageUrl = &bi.ImageUrl
-	clusterTable.ImageChecksum = &bi.ImageChecksum
-	clusterTable.ImageChecksumType = &bi.ImageChecksumType
-	clusterTable.ImageFormat = &bi.ImageFormat
+	clusterTable.BmcCredentialSecret = utils.StringPtr(bi.BmcCredentialSecret)
+	clusterTable.BmcCredentialUser = utils.StringPtr(bi.BmcCredentialUser)
+	clusterTable.BmcCredentialPassword = utils.StringPtr(bi.BmcCredentialPassword)
+	clusterTable.ImageUrl = utils.StringPtr(bi.ImageUrl)
+	clusterTable.ImageChecksum = utils.StringPtr(bi.ImageChecksum)
+	clusterTable.ImageChecksumType = utils.StringPtr(bi.ImageChecksumType)
+	clusterTable.ImageFormat = utils.StringPtr(bi.ImageFormat)
 
 	clusterTable.MasterExtraConfig = &ExtraConfig{}
 	clusterTable.WorkerExtraConfig = &ExtraConfig{}
@@ -68,12 +70,12 @@ type BaremetalHostInfo struct {
 
 // ToTable - Baremetal Host 정보를 테이블로 설정
 func (bhi *BaremetalHostInfo) ToTable(nodeTable *NodeTable) {
-	nodeTable.HostName = &bhi.HostName
-	nodeTable.BmcAddress = &bhi.BmcAddress
-	nodeTable.MacAddress = &bhi.BootMacAddress
-	nodeTable.BootMode = &bhi.BootMode
-	nodeTable.OnlinePower = &bhi.OnlinePower
-	nodeTable.ExternalProvisioning = &bhi.ExternalProvisioning
+	nodeTable.HostName = utils.StringPtr(bhi.HostName)
+	nodeTable.BmcAddress = utils.StringPtr(bhi.BmcAddress)
+	nodeTable.MacAddress = utils.StringPtr(bhi.BootMacAddress)
+	nodeTable.BootMode = utils.StringPtr(bhi.BootMode)
+	nodeTable.OnlinePower = utils.BoolPtr(bhi.OnlinePower)
+	nodeTable.ExternalProvisioning = utils.BoolPtr(bhi.ExternalProvisioning)
 }
 
 // FromTable - 테이블 정보를 Baremetal Host 정보로 설정

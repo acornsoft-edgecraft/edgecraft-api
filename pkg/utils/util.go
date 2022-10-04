@@ -220,3 +220,23 @@ func Print(data interface{}) {
 func GenerateUUID() uuid.UUID {
 	return uuid.Must(uuid.NewV4())
 }
+
+// StringPtr - 지정한 문자열을 포인터로 반환
+func StringPtr(val string) *string {
+	return &val
+}
+
+// TimePtr - 지정한 Time정보를 포인터로 반환
+func TimePtr(val time.Time) *time.Time {
+	return &val
+}
+
+// IntPrt - 지정한 int 정보를 포인터로 반환
+func IntPrt(val int) *int {
+	return &val
+}
+
+// BoolPtr - 지정한 Bool 정보를 포인터로 반환
+func BoolPtr(val bool) *bool {
+	return &val
+}

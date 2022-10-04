@@ -99,7 +99,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/clouds/{cloudUid}": {
+        "/clouds/{cloudId}": {
             "get": {
                 "description": "Get specific cloud",
                 "produces": [
@@ -113,8 +113,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "cloudUid",
-                        "name": "cloudUid",
+                        "description": "cloudId",
+                        "name": "cloudId",
                         "in": "path",
                         "required": true
                     }
@@ -141,8 +141,8 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "CloudUid",
-                        "name": "cloudUid",
+                        "description": "cloudId",
+                        "name": "cloudId",
                         "in": "path",
                         "required": true
                     },
@@ -178,8 +178,191 @@ const docTemplate = `{
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "CloudUid",
-                        "name": "cloudUid",
+                        "description": "cloudId",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds/{cloudId}/nodes": {
+            "get": {
+                "description": "클라우드에 속한 노드 리스트 조회",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CloudNode"
+                ],
+                "summary": "GetCloudNodeList",
+                "operationId": "GetCloudNodeList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "클라우드에 노드 등록",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CloudNode"
+                ],
+                "summary": "SetCloudNode",
+                "operationId": "SetCloudNode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Node Specific Info",
+                        "name": "node",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.NodeSpecificInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds/{cloudId}/nodes/{nodeId}": {
+            "get": {
+                "description": "클라우드에 속한 노드 상세정보 조회",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CloudNode"
+                ],
+                "summary": "GetCloudNode",
+                "operationId": "GetCloudNode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Node ID",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "클라우드의 노드 수정",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CloudNode"
+                ],
+                "summary": "UpdateCloudNode",
+                "operationId": "UpdateCloudNode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Node ID",
+                        "name": "nodeId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Nodes Info",
+                        "name": "node",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.NodeSpecificInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "클라우드의 노드 삭제",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "CloudNode"
+                ],
+                "summary": "DeleteCloudNode",
+                "operationId": "DeleteCloudNode",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Node ID",
+                        "name": "nodeId",
                         "in": "path",
                         "required": true
                     }
@@ -623,8 +806,8 @@ const docTemplate = `{
                     "example": "test cloud"
                 },
                 "type": {
-                    "type": "string",
-                    "example": "1"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -662,7 +845,7 @@ const docTemplate = `{
                     "$ref": "#/definitions/model.KubernetesInfo"
                 },
                 "status": {
-                    "type": "string"
+                    "type": "integer"
                 }
             }
         },
@@ -724,7 +907,6 @@ const docTemplate = `{
                     "example": ""
                 },
                 "endpoints": {
-                    "description": "Endpoints       []UrlInfo ` + "`" + `json:\"endpoints\"` + "`" + `",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/model.UrlInfo"
@@ -792,8 +974,8 @@ const docTemplate = `{
                     "example": "10.244.0.0/16"
                 },
                 "version": {
-                    "type": "string",
-                    "example": "1"
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },
@@ -839,6 +1021,10 @@ const docTemplate = `{
                 "node_uid": {
                     "type": "string",
                     "example": ""
+                },
+                "type": {
+                    "type": "integer",
+                    "example": 1
                 }
             }
         },

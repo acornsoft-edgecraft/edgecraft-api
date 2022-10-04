@@ -10,11 +10,11 @@ type (
 	}
 
 	LoginInfo struct {
-		UserID   *string `json:"userId" db:"user_id"`
-		UserRole *string `json:"userRole" db:"user_role"`
-		Name     *string `json:"name" db:"user_name"`
-		Email    *string `json:"email" db:"email"`
-		Status   *string `json:"status" db:"user_state"`
+		UserID   *string `json:"userId"`
+		UserRole *string `json:"userRole"`
+		Name     *string `json:"name"`
+		Email    *string `json:"email"`
+		Status   *string `json:"status"`
 		// TODO: Auth-Menu 연결 필요
 	}
 

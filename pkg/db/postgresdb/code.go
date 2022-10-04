@@ -2,6 +2,7 @@ package postgresdb
 
 import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 )
 
 // GetCodeGroupList - 전체 코드 그룹 조회
@@ -106,14 +107,22 @@ func (db *DB) DeleteCode(groupId string, code int) (int64, error) {
 
 // DeleteCodeByGroup - 지정한 코드 그룹의 모든 코드 삭제
 func (db *DB) DeleteCodeByGroup(groupId string) (int64, error) {
-	count, err := db.GetClient().Delete(&model.CodeTable{GroupID: &groupId})
+	var codeTable *model.Code = &model.Code{}
+
+	if groupId != "" {
+		codeTable.GroupID = groupId
+	}
+
+	sql, err := utils.RenderTmpl("deleteCodeByGroup", deleteCodeByGroupSQL, codeTable)
 	if err != nil {
 		return -1, err
 	}
-	return count, nil
-	// result, err := db.GetClient().Exec(deleteCodeByGroupSQL, groupId)
-	// if err != nil {
-	// 	return -1, err
-	// }
-	// return result.RowsAffected()
+
+	args, _ := utils.StructToMap(codeTable)
+	result, err := db.GetClient().Exec(sql, args)
+	if err != nil {
+		return -1, err
+	}
+
+	return result.RowsAffected()
 }

@@ -45,7 +45,6 @@ func (a *API) GetCodeGroupListHandler(c echo.Context) error {
 // @Router /codes/groups/{groupId} [get]
 func (a *API) GetCodeGroupHandler(c echo.Context) error {
 	groupId := c.Param("groupId")
-	logger.Info(groupId)
 	if groupId == "" {
 		return response.ErrorfReqRes(c, groupId, common.CodeInvalidParm, nil)
 	}
@@ -53,6 +52,9 @@ func (a *API) GetCodeGroupHandler(c echo.Context) error {
 	data, err := a.Db.GetCodeGroup(groupId)
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
+	}
+	if data == nil {
+		return response.Errorf(c, common.DatabaseFalseData, err)
 	}
 	return response.Write(c, nil, data)
 }
@@ -243,6 +245,10 @@ func (a *API) GetCodeListHandler(c echo.Context) error {
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
+	if len(list) == 0 {
+		return response.Errorf(c, common.DatabaseFalseData, err)
+	}
+
 	return response.Write(c, nil, list)
 }
 
@@ -265,6 +271,10 @@ func (a *API) GetCodeListByGroupHandler(c echo.Context) error {
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
+	if len(list) == 0 {
+		return response.Errorf(c, common.DatabaseFalseData, err)
+	}
+
 	return response.Write(c, nil, list)
 }
 
@@ -293,6 +303,10 @@ func (a *API) GetCodeHandler(c echo.Context) error {
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
+	if data == nil {
+		return response.Errorf(c, common.DatabaseFalseData, err)
+	}
+
 	return response.Write(c, nil, data)
 }
 
