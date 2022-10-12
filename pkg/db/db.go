@@ -38,17 +38,8 @@ type DB interface {
 	GetCluster(string, string) (*model.ClusterTable, error)
 	InsertCluster(*model.ClusterTable) error
 	UpdateCluster(*model.ClusterTable) (int64, error)
-	DeleteCloudClusters(string) (int64, error)
-
-	// SelectCloudCluster(uuid.UUID) (*model.CloudCluster, error)
-	// SelectEtcdCloudCluster(uuid.UUID) (*model.Etcd, error)
-	// SelectK8sCloudCluster(uuid.UUID) (*model.K8s, error)
-	// SelectBaremetalCloudCluster(uuid.UUID) (*model.Baremetal, error)
-	// SelectNodeCloudCluster(uuid.UUID) (*model.ClusterNodes, error)
-	// UpdateCloudCluster(*model.CloudCluster) (int64, error)
-	// CreateCloudCluster(*model.CloudCluster) error
-	// DeleteCloudCluster(uuid.UUID) (int64, error)
-	// DeleteAllCloudCluster(uuid.UUID) (int64, error)
+	DeleteCluster(string, string) (int64, error)
+	DeleteClusters(string) (int64, error)
 
 	// tbl_cloud_node
 	GetNodes(string, string) ([]*model.NodeTable, error)
@@ -62,17 +53,19 @@ type DB interface {
 	DeleteNodes(string, string) (int64, error)
 	DeleteCloudNodes(string) (int64, error)
 
-	// GetAllCloudNode() ([]model.CloudNode, error)
-	// GetCloudNode(uuid.UUID, uuid.UUID) (*model.CloudNode, error)
+	// tbl_cluster (Openstack)
+	GetOpenstackClusters(string) ([]*model.OpenstackClusterTable, error)
+	GetOpenstackCluster(string, string) (*model.OpenstackClusterTable, error)
+	InsertOpenstackCluster(*model.OpenstackClusterTable) error
+	UpdateOpenstackCluster(*model.OpenstackClusterTable) (int64, error)
+	DeleteOpenstackCluster(string, string) (int64, error)
 
-	// SelectCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
-	// SelectMasterCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
-	// SelectWorkerCloudNode(uuid.UUID, uuid.UUID) ([]model.CloudNode, error)
-	// UpdateCloudNode(*model.CloudNode) (int64, error)
-	// UpdateCloudNodes([]*model.CloudNode) (int64, error)
-	// CreateCloudNode(*model.CloudNode) error
-	// DeleteCloudNode(uuid.UUID) (int64, error)
-	// DeleteAllCloudNode(uuid.UUID) (int64, error)
+	// tbl_nodeset (Openstack)
+	// GetNodesets(string, string) ([]*model.NodesetTable, error)
+	// GetNodeset(string, string, string) (*model.NodesetTable, error)
+	// InsertNodeset(*model.NodesetTable) error
+	// UpdateNodeset(*model.NodesetTable) (int64, error)
+	// DeleteNodeset(string) (int64, error)
 
 	// tbl_code_group
 	GetCodeGroupList() ([]*model.CodeGroupTable, error)

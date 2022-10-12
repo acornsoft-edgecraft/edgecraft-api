@@ -235,6 +235,8 @@ definitions:
           $ref: '#/definitions/model.NodeSpecificInfo'
         type: array
     type: object
+  model.OSClusterInfo:
+    type: object
   model.OpenstackInfo:
     type: object
   model.StorageClassInfo:
@@ -395,6 +397,130 @@ paths:
       summary: UpdateCloud
       tags:
       - Cloud
+  /clouds/{cloudId}/clusters:
+    get:
+      description: 전체 클러스터 리스트 (Openstack)
+      operationId: GetClusterList
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetClusterList
+      tags:
+      - Openstack-Cluster
+    post:
+      description: 클러스터 추가 (Openstack)
+      operationId: SetCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: Openstack Cluster Info
+        in: body
+        name: OSClusterInfo
+        required: true
+        schema:
+          $ref: '#/definitions/model.OSClusterInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetCluster
+      tags:
+      - Openstack-Cluster
+  /clouds/{cloudId}/clusters/{clusterId}:
+    delete:
+      description: 클러스터 삭제 (Openstack)
+      operationId: DeleteCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteCluster
+      tags:
+      - Openstack-Cluster
+    get:
+      description: 클러스터 상세 조회 (Openstack)
+      operationId: GetCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCluster
+      tags:
+      - Openstack-Cluster
+    put:
+      description: 클러스터 수정 (Openstack)
+      operationId: UpdateCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: Openstack Cluster Info
+        in: body
+        name: OSClusterInfo
+        required: true
+        schema:
+          $ref: '#/definitions/model.OSClusterInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateCluster
+      tags:
+      - Openstack-Cluster
   /clouds/{cloudId}/nodes:
     get:
       description: 클라우드에 속한 노드 리스트 조회

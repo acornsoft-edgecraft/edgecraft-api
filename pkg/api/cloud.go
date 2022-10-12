@@ -9,8 +9,6 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 
-	//mr "github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/response"
-
 	"github.com/labstack/echo/v4"
 )
 
@@ -27,11 +25,11 @@ import (
 // @Success 200 {object} response.ReturnData
 // @Router /clouds [get]
 func (a *API) GetCloudListHandler(c echo.Context) error {
-	res, err := a.Db.GetClouds()
+	result, err := a.Db.GetClouds()
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
-	return response.Write(c, nil, res)
+	return response.Write(c, nil, result)
 }
 
 // GetCloudHandler - 클라우드 상세 정보
@@ -346,7 +344,7 @@ func (a *API) DeleteCloudHandler(c echo.Context) error {
 	}
 
 	// Cluster 삭제
-	cnt, err = txdb.DeleteCloudClusters(cloudId)
+	cnt, err = txdb.DeleteClusters(cloudId)
 	if err != nil {
 		txErr := txdb.Rollback()
 		if txErr != nil {

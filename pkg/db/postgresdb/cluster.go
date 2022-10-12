@@ -47,8 +47,17 @@ func (db *DB) GetClusters(cloudId string) ([]*model.ClusterTable, error) {
 	return clusterTables, nil
 }
 
+// DeleteCluster - Delete a cluster
+func (db *DB) DeleteCluster(cloudId string, clusterId string) (int64, error) {
+	cnt, err := db.GetClient().Delete(&model.ClusterTable{CloudUid: &cloudId, ClusterUid: &clusterId})
+	if err != nil {
+		return -1, err
+	}
+	return cnt, nil
+}
+
 // DeleteCloudClusters - Delete clusters on cloud
-func (db *DB) DeleteCloudClusters(cloudId string) (int64, error) {
+func (db *DB) DeleteClusters(cloudId string) (int64, error) {
 	result, err := db.GetClient().Exec(deleteClusters, cloudId)
 	if err != nil {
 		return -1, err

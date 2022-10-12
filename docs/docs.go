@@ -194,6 +194,189 @@ const docTemplate = `{
                 }
             }
         },
+        "/clouds/{cloudId}/clusters": {
+            "get": {
+                "description": "전체 클러스터 리스트 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster"
+                ],
+                "summary": "GetClusterList",
+                "operationId": "GetClusterList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "클러스터 추가 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster"
+                ],
+                "summary": "SetCluster",
+                "operationId": "SetCluster",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Openstack Cluster Info",
+                        "name": "OSClusterInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.OSClusterInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds/{cloudId}/clusters/{clusterId}": {
+            "get": {
+                "description": "클러스터 상세 조회 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster"
+                ],
+                "summary": "GetCluster",
+                "operationId": "GetCluster",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "put": {
+                "description": "클러스터 수정 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster"
+                ],
+                "summary": "UpdateCluster",
+                "operationId": "UpdateCluster",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Openstack Cluster Info",
+                        "name": "OSClusterInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.OSClusterInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "클러스터 삭제 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster"
+                ],
+                "summary": "DeleteCluster",
+                "operationId": "DeleteCluster",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
         "/clouds/{cloudId}/nodes": {
             "get": {
                 "description": "클라우드에 속한 노드 리스트 조회",
@@ -1056,6 +1239,9 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "model.OSClusterInfo": {
+            "type": "object"
         },
         "model.OpenstackInfo": {
             "type": "object"
