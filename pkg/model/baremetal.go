@@ -18,8 +18,8 @@ type BaremetalInfo struct {
 	BmcCredentialPassword string       `json:"password" example:"asdf"`
 	ImageUrl              string       `json:"image_url" example:"http://192.168.0.1/ubuntu.qcow2"`
 	ImageChecksum         string       `json:"image_checksum" example:"http://192.168.0.1/ubuntu.qcow2.md5sum"`
-	ImageChecksumType     string       `json:"image_checksum_type" example:"1"`
-	ImageFormat           string       `json:"image_format" example:"2"`
+	ImageChecksumType     int          `json:"image_checksum_type" example:"1"`
+	ImageFormat           int          `json:"image_format" example:"2"`
 	MasterExtraConfig     *ExtraConfig `json:"cp_kubeadm_extra_config"`
 	WorkerExtraConfig     *ExtraConfig `json:"worker_kubeadm_extra_config"`
 }
@@ -31,8 +31,8 @@ func (bi *BaremetalInfo) ToTable(clusterTable *ClusterTable) {
 	clusterTable.BmcCredentialPassword = utils.StringPtr(bi.BmcCredentialPassword)
 	clusterTable.ImageUrl = utils.StringPtr(bi.ImageUrl)
 	clusterTable.ImageChecksum = utils.StringPtr(bi.ImageChecksum)
-	clusterTable.ImageChecksumType = utils.StringPtr(bi.ImageChecksumType)
-	clusterTable.ImageFormat = utils.StringPtr(bi.ImageFormat)
+	clusterTable.ImageChecksumType = utils.IntPrt(bi.ImageChecksumType)
+	clusterTable.ImageFormat = utils.IntPrt(bi.ImageFormat)
 
 	clusterTable.MasterExtraConfig = &ExtraConfig{}
 	clusterTable.WorkerExtraConfig = &ExtraConfig{}

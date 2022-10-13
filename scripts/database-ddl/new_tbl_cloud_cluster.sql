@@ -25,8 +25,8 @@ CREATE TABLE "edgecraft"."tbl_cloud_cluster"
 	"bmc_credential_password" 			VARCHAR(100) 						NULL,     	-- 클라우드클러스터BMC자격증명비밀번호
 	"image_url"               			VARCHAR(255) 						NULL,     	-- 클라우드클러스터이미지URL
 	"image_checksum"          			VARCHAR(255) 						NULL,     	-- 클라우드클러스터이미지CHECKSUM
-	"image_checksum_type"     			VARCHAR(30)  						NULL,     	-- 클라우드클러스터이미지CHECKSUM종류
-	"image_format"            			VARCHAR(30)  						NULL,     	-- 클라우드클러스터이미지포맷
+	"image_checksum_type"     			INTEGER  							NULL,     	-- 클라우드클러스터이미지CHECKSUM종류 (Code - ImageChecksumTypes)
+	"image_format"            			INTEGER  							NULL,     	-- 클라우드클러스터이미지포맷 (Code - ImageFormats)
 	"master_extra_config"     			JSON         						NULL,     	-- 클라우드클러스터마스터엑스트라구성
 	"worker_extra_config"     			JSON         						NULL,     	-- 클라우드클러스터워커엑스트라구성
 		

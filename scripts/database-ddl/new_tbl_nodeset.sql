@@ -18,7 +18,7 @@ CREATE TABLE "edgecraft"."tbl_nodeset"
 	"name"          VARCHAR(50)                         NULL,     -- 노드셋이름
 	"node_count"    INTEGER         DEFAULT 0           NULL,     -- 노드셋노드개수
 	"flavor"        VARCHAR(50)                         NULL,     -- 노드셋FLAVOR
-	"label"         TEXT                                NULL,     -- 노드셋라벨
+	"labels"        JSON                                NULL,     -- 노드셋라벨
 	"creator"       VARCHAR(30)     DEFAULT 'system'    NOT NULL,     -- 생성자
 	"created_at"    TIMESTAMP       DEFAULT NOW()       NOT NULL,     -- 생성일시
 	"updater"       VARCHAR(30)                         NULL,     -- 수정자

@@ -54,6 +54,24 @@ func (ei *EtcdInfo) FromTable(clusterTable *ClusterTable) {
 	ei.Endpoints = clusterTable.ExternalEtcdEndPoints
 }
 
+// ToOpenstackTable - ETCD 정보를 Openstack 테이블로 설정
+func (ei *EtcdInfo) ToOpenstackTable(clusterTable *OpenstackClusterTable) {
+	clusterTable.ExternalEtcdUse = utils.BoolPtr(ei.UseExternalEtcd)
+	clusterTable.ExternalEtcdCertificateCa = utils.StringPtr(ei.CAFile)
+	clusterTable.ExternalEtcdCertificateCert = utils.StringPtr(ei.CertFile)
+	clusterTable.ExternalEtcdCertificateKey = utils.StringPtr(ei.KeyFile)
+	clusterTable.ExternalEtcdEndPoints = ei.Endpoints
+}
+
+// FromOpenstackTable - Openstack 테이블 정보를 ETCD 정보로 설정
+func (ei *EtcdInfo) FromOpenstackTable(clusterTable *OpenstackClusterTable) {
+	ei.UseExternalEtcd = *clusterTable.ExternalEtcdUse
+	ei.CAFile = *clusterTable.ExternalEtcdCertificateCa
+	ei.CertFile = *clusterTable.ExternalEtcdCertificateCert
+	ei.KeyFile = *clusterTable.ExternalEtcdCertificateKey
+	ei.Endpoints = clusterTable.ExternalEtcdEndPoints
+}
+
 // ExternalEtcdEndPoints - Data from ETCD Endpoints
 type ExternalEtcdEndPoints []interface{}
 

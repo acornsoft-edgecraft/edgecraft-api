@@ -11,23 +11,34 @@ DROP TABLE IF EXISTS "edgecraft"."tbl_cluster";
 -- 오픈스택 클러스터
 CREATE TABLE "edgecraft"."tbl_cluster"
 (
-    "cloud_uid"             CHAR(36)                            NOT NULL,   -- 클라우드식별자
-	"cluster_uid"           CHAR(36)                            NOT NULL,   -- 클러스터식별자
-	"project_name"          VARCHAR(50)                         NULL,       -- 오픈스택프로젝트이름
-	"name"                  VARCHAR(50)                         NULL,       -- 클러스터이름
-	"version"               INTEGER         DEFAULT 1           NOT NULL,   -- 클러스터버전 (Kubernetes)
-	"description"           VARCHAR(100)                        NULL,       -- 클러스터설명
-	"credential"            TEXT                                NULL,       -- 클러스터자격증명
-	"pod_cidr"              VARCHAR(100)                        NULL,       -- 클러스터포드CIDR
-	"service_cidr"          VARCHAR(100)                        NULL,       -- 클러스터서비스CIDR
-	"openstack_info"        JSON                                NULL,       -- 클러스터오픈스택정보
-	"storage_user_id"       VARCHAR(50)                         NULL,       -- 스토리지사용자ID
-	"storage_user_secret"   VARCHAR(100)                        NULL,       -- 스토리지사용자비밀
-	"state"                 INTEGER         DEFAULT 1           NOT NULL,   -- 클러스터상태 (Code - ClusterStatus)
-	"creator"               VARCHAR(30)     DEFAULT 'system'    NOT NULL,   -- 생성자
-	"created_at"            TIMESTAMP       DEFAULT NOW()       NOT NULL,   -- 생성일시
-	"updater"               VARCHAR(30)                         NULL,       -- 수정자
-	"updated_at"            TIMESTAMP                           NULL        -- 수정일시
+    "cloud_uid"             			CHAR(36)                            NOT NULL,   -- 클라우드식별자
+	"cluster_uid"           			CHAR(36)                            NOT NULL,   -- 클러스터식별자
+	"project_name"          			VARCHAR(50)                         NULL,       -- 오픈스택프로젝트이름
+	"name"                  			VARCHAR(50)                         NULL,       -- 클러스터이름
+	"version"               			INTEGER         DEFAULT 1           NOT NULL,   -- 클러스터버전 (Kubernetes)
+	"description"           			VARCHAR(100)                        NULL,       -- 클러스터설명
+	"credential"            			TEXT                                NULL,       -- 클러스터자격증명
+	"pod_cidr"              			VARCHAR(100)                        NULL,       -- 클러스터포드CIDR
+	"service_cidr"          			VARCHAR(100)                        NULL,       -- 클러스터서비스CIDR
+	"openstack_info"        			JSON                                NULL,       -- 클러스터오픈스택정보
+
+	-- ETCD 정보	
+	"external_etcd_use"       			BOOLEAN      	DEFAULT FALSE		NULL, 		-- 클라우드클러스터외부ETCD사용
+	"external_etcd_endpoints"       	JSON         						NULL,     	-- 외부ETCD엔드포인츠
+	"external_etcd_certificate_ca"  	TEXT         						NULL,     	-- 외부ETCD인증서CA
+	"external_etcd_certificate_cert"	TEXT         						NULL,     	-- 외부ETCD인증서CERT
+	"external_etcd_certificate_key" 	TEXT         						NULL,     	-- 외부ETCD인증서KEY
+
+	-- Storage 정보	
+	"storage_class"   					JSON         						NULL,     	-- 클라우드클러스터스토리지클래스
+
+	-- "storage_user_id"       			VARCHAR(50)                         NULL,       -- 스토리지사용자ID
+	-- "storage_user_secret"   			VARCHAR(100)                        NULL,       -- 스토리지사용자비밀
+	"state"                 			INTEGER         DEFAULT 1           NOT NULL,   -- 클러스터상태 (Code - ClusterStatus)
+	"creator"               			VARCHAR(30)     DEFAULT 'system'    NOT NULL,   -- 생성자
+	"created_at"            			TIMESTAMP       DEFAULT NOW()       NOT NULL,   -- 생성일시
+	"updater"               			VARCHAR(30)                         NULL,       -- 수정자
+	"updated_at"            			TIMESTAMP                           NULL        -- 수정일시
 )
 WITH (
 OIDS=false

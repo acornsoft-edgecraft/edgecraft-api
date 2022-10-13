@@ -233,19 +233,12 @@
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "Cluster ID",
-                        "name": "clusterId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
                         "description": "Openstack Cluster Info",
-                        "name": "OSClusterInfo",
+                        "name": "OpenstackClusterSet",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.OSClusterInfo"
+                            "$ref": "#/definitions/model.OpenstackClusterSet"
                         }
                     }
                 ],
@@ -322,11 +315,11 @@
                     },
                     {
                         "description": "Openstack Cluster Info",
-                        "name": "OSClusterInfo",
+                        "name": "OpenstackClusterSet",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.OSClusterInfo"
+                            "$ref": "#/definitions/model.OpenstackClusterSet"
                         }
                     }
                 ],
@@ -936,12 +929,12 @@
                     "example": "http://192.168.0.1/ubuntu.qcow2.md5sum"
                 },
                 "image_checksum_type": {
-                    "type": "string",
-                    "example": "1"
+                    "type": "integer",
+                    "example": 1
                 },
                 "image_format": {
-                    "type": "string",
-                    "example": "2"
+                    "type": "integer",
+                    "example": 2
                 },
                 "image_url": {
                     "type": "string",
@@ -1183,6 +1176,27 @@
                 }
             }
         },
+        "model.NodeSetInfo": {
+            "type": "object",
+            "properties": {
+                "flavor": {
+                    "type": "string"
+                },
+                "labels": {
+                    "type": "array",
+                    "items": {}
+                },
+                "name": {
+                    "type": "string"
+                },
+                "namespace": {
+                    "type": "string"
+                },
+                "node_count": {
+                    "type": "integer"
+                }
+            }
+        },
         "model.NodeSpecificInfo": {
             "type": "object",
             "properties": {
@@ -1231,11 +1245,109 @@
                 }
             }
         },
-        "model.OSClusterInfo": {
-            "type": "object"
+        "model.OpenstackClusterInfo": {
+            "type": "object",
+            "properties": {
+                "cluster_uid": {
+                    "type": "string"
+                },
+                "desc": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.OpenstackClusterSet": {
+            "type": "object",
+            "properties": {
+                "cluster": {
+                    "$ref": "#/definitions/model.OpenstackClusterInfo"
+                },
+                "etcd_storage": {
+                    "$ref": "#/definitions/model.EtcdStorageInfo"
+                },
+                "k8s": {
+                    "$ref": "#/definitions/model.KubernetesInfo"
+                },
+                "nodes": {
+                    "$ref": "#/definitions/model.OpenstackNodeSetInfo"
+                },
+                "openstack": {
+                    "$ref": "#/definitions/model.OpenstackInfo"
+                }
+            }
         },
         "model.OpenstackInfo": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "api_server_floating_ip": {
+                    "type": "string"
+                },
+                "bastion_flavor": {
+                    "type": "string"
+                },
+                "bastion_image_name": {
+                    "type": "string"
+                },
+                "bastion_ssh_key_name": {
+                    "type": "string"
+                },
+                "cluster_uid": {
+                    "type": "string"
+                },
+                "dns_nameservers": {
+                    "type": "string"
+                },
+                "external_network_id": {
+                    "type": "string"
+                },
+                "failure_domain": {
+                    "type": "string"
+                },
+                "image_name": {
+                    "type": "string"
+                },
+                "openstack_cloud": {
+                    "type": "string"
+                },
+                "openstack_cloud_cacert_b64": {
+                    "type": "string"
+                },
+                "openstack_cloud_provider_conf_b64": {
+                    "type": "string"
+                },
+                "openstack_cloud_yaml_b64": {
+                    "type": "string"
+                },
+                "ssh_key_name": {
+                    "type": "string"
+                },
+                "use_bastion_host": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "model.OpenstackNodeSetInfo": {
+            "type": "object",
+            "properties": {
+                "master_sets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.NodeSetInfo"
+                    }
+                },
+                "use_loadbalancer": {
+                    "type": "boolean"
+                },
+                "worker_sets": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.NodeSetInfo"
+                    }
+                }
+            }
         },
         "model.StorageClassInfo": {
             "type": "object",

@@ -102,13 +102,27 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 // @ID SetCluster
 // @Produce json
 // @Param cloudId path string true "Cloud ID"
-// @Param clusterId path string true "Cluster ID"
-// @Param OSClusterInfo body model.OSClusterInfo true "Openstack Cluster Info"
+// @Param OpenstackClusterSet body model.OpenstackClusterSet true "Openstack Cluster Info"
 // @Success 200 {object} response.ReturnData
 // @Router /clouds/{cloudId}/clusters [post]
 func (a *API) SetClusterHandler(c echo.Context) error {
-	return nil
+	// TODO: 로그인 사용자 정보 활용 방법은?
+	cloudId := c.Param("cloudId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
+	}
 
+	var clusterSet model.OpenstackClusterSet
+	err := getRequestData(c.Request(), &clusterSet)
+	if err != nil {
+		return response.ErrorfReqRes(c, clusterSet, common.CodeInvalidData, err)
+	}
+
+	// Openstack Cluster 정보 저장
+
+	// Openstack Cluster 생성
+
+	return nil
 }
 
 // UpdateClusterHandler - 클러스터 수정 (Openstack)
@@ -119,7 +133,7 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 // @Produce json
 // @Param cloudId path string true "Cloud ID"
 // @Param clusterId path string true "Cluster ID"
-// @Param OSClusterInfo body model.OSClusterInfo true "Openstack Cluster Info"
+// @Param OpenstackClusterSet body model.OpenstackClusterSet true "Openstack Cluster Info"
 // @Success 200 {object} response.ReturnData
 // @Router /clouds/{cloudId}/clusters/{clusterId} [put]
 func (a *API) UpdateClusterHandler(c echo.Context) error {

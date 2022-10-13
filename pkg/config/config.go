@@ -8,7 +8,6 @@ import (
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db/postgresdb"
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/k8sclient"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/mitchellh/mapstructure"
 	"github.com/spf13/viper"
@@ -24,9 +23,8 @@ const (
 
 // Config - Represents the configuration
 type Config struct {
-	API        *api.Config        `yaml:"api"`
-	DB         *postgresdb.Config `yaml:"database"`
-	K8sGateway *k8sclient.Config  `yaml:"k8sgateway"`
+	API *api.Config        `yaml:"api"`
+	DB  *postgresdb.Config `yaml:"database"`
 }
 
 // ===== [ Implementations ] =====
@@ -63,6 +61,8 @@ func Load() (*Config, error) {
 			os.Exit(0)
 		} else {
 			// Config file was found but another error was produced
+			logger.Errorf("configuration file founded, but could not load configuration file: %s", err.Error())
+			os.Exit(0)
 		}
 	}
 
