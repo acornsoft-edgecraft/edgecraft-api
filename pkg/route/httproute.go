@@ -85,12 +85,12 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	// v1.POST("/clouds/:cloudID/k8s/:Version", api.UpgradeCloudK8sVersionHandler)
 	// v1.GET("/clouds/:cloudID/kore-board", api.GetCloudKoreBoardHandler)
 
-	// Cloud/Cluster
-	// v1.GET("/clouds/:cloudID/clusters", api.GetCloudClustersHandler)           // 클러스터 목록 조회
-	// v1.GET("/clouds/:cloudID/clusters/:clusterID", api.GetCloudClusterHandler) // 클러스터 상세 기본 정보 조회
-	// // v1.POST("/clouds/:cloudID/clusters", api.AddCloudClusterHandler)                 // 클러스터 등록/생성
-	// v1.PUT("/clouds/:cloudID/clusters/:clusterID", api.UpdateCloudClusterHandler)    // 클러스터 등록 정보 수정
-	// v1.DELETE("/clouds/:cloudID/clusters/:clusterID", api.DeleteCloudClusterHandler) // 클러스터 삭제
+	// Openstack Cluster
+	v1.GET("/clouds/:cloudID/clusters", api.GetClusterListHandler)              // 클러스터 목록 조회
+	v1.GET("/clouds/:cloudID/clusters/:clusterID", api.GetClusterHandler)       // 클러스터 상세 기본 정보 조회
+	v1.POST("/clouds/:cloudID/clusters", api.SetClusterHandler)                 // 클러스터 등록/생성
+	v1.PUT("/clouds/:cloudID/clusters/:clusterID", api.UpdateClusterHandler)    // 클러스터 등록 정보 수정
+	v1.DELETE("/clouds/:cloudID/clusters/:clusterID", api.DeleteClusterHandler) // 클러스터 삭제
 
 	// Cloud/Cluster - NodeSet
 	// v1.GET("/clouds/:cloudID/clusters/:clusterID/nodesets", api.GetCloudClusterNodeSetHandler)                  // 클러스터 상세 노드셋 정보 조회

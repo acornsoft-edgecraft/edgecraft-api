@@ -29,11 +29,11 @@ definitions:
         example: http://192.168.0.1/ubuntu.qcow2.md5sum
         type: string
       image_checksum_type:
-        example: "1"
-        type: string
+        example: 1
+        type: integer
       image_format:
-        example: "2"
-        type: string
+        example: 2
+        type: integer
       image_url:
         example: http://192.168.0.1/ubuntu.qcow2
         type: string
@@ -202,6 +202,20 @@ definitions:
         example: sadf
         type: string
     type: object
+  model.NodeSetInfo:
+    properties:
+      flavor:
+        type: string
+      labels:
+        items: {}
+        type: array
+      name:
+        type: string
+      namespace:
+        type: string
+      node_count:
+        type: integer
+    type: object
   model.NodeSpecificInfo:
     properties:
       baremetalHost:
@@ -235,7 +249,73 @@ definitions:
           $ref: '#/definitions/model.NodeSpecificInfo'
         type: array
     type: object
+  model.OpenstackClusterInfo:
+    properties:
+      cluster_uid:
+        type: string
+      desc:
+        type: string
+      name:
+        type: string
+    type: object
+  model.OpenstackClusterSet:
+    properties:
+      cluster:
+        $ref: '#/definitions/model.OpenstackClusterInfo'
+      etcd_storage:
+        $ref: '#/definitions/model.EtcdStorageInfo'
+      k8s:
+        $ref: '#/definitions/model.KubernetesInfo'
+      nodes:
+        $ref: '#/definitions/model.OpenstackNodeSetInfo'
+      openstack:
+        $ref: '#/definitions/model.OpenstackInfo'
+    type: object
   model.OpenstackInfo:
+    properties:
+      api_server_floating_ip:
+        type: string
+      bastion_flavor:
+        type: string
+      bastion_image_name:
+        type: string
+      bastion_ssh_key_name:
+        type: string
+      cluster_uid:
+        type: string
+      dns_nameservers:
+        type: string
+      external_network_id:
+        type: string
+      failure_domain:
+        type: string
+      image_name:
+        type: string
+      openstack_cloud:
+        type: string
+      openstack_cloud_cacert_b64:
+        type: string
+      openstack_cloud_provider_conf_b64:
+        type: string
+      openstack_cloud_yaml_b64:
+        type: string
+      ssh_key_name:
+        type: string
+      use_bastion_host:
+        type: boolean
+    type: object
+  model.OpenstackNodeSetInfo:
+    properties:
+      master_sets:
+        items:
+          $ref: '#/definitions/model.NodeSetInfo'
+        type: array
+      use_loadbalancer:
+        type: boolean
+      worker_sets:
+        items:
+          $ref: '#/definitions/model.NodeSetInfo'
+        type: array
     type: object
   model.StorageClassInfo:
     properties:
@@ -395,6 +475,125 @@ paths:
       summary: UpdateCloud
       tags:
       - Cloud
+  /clouds/{cloudId}/clusters:
+    get:
+      description: 전체 클러스터 리스트 (Openstack)
+      operationId: GetClusterList
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetClusterList
+      tags:
+      - Openstack-Cluster
+    post:
+      description: 클러스터 추가 (Openstack)
+      operationId: SetCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Openstack Cluster Info
+        in: body
+        name: OpenstackClusterSet
+        required: true
+        schema:
+          $ref: '#/definitions/model.OpenstackClusterSet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetCluster
+      tags:
+      - Openstack-Cluster
+  /clouds/{cloudId}/clusters/{clusterId}:
+    delete:
+      description: 클러스터 삭제 (Openstack)
+      operationId: DeleteCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteCluster
+      tags:
+      - Openstack-Cluster
+    get:
+      description: 클러스터 상세 조회 (Openstack)
+      operationId: GetCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetCluster
+      tags:
+      - Openstack-Cluster
+    put:
+      description: 클러스터 수정 (Openstack)
+      operationId: UpdateCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: Openstack Cluster Info
+        in: body
+        name: OpenstackClusterSet
+        required: true
+        schema:
+          $ref: '#/definitions/model.OpenstackClusterSet'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateCluster
+      tags:
+      - Openstack-Cluster
   /clouds/{cloudId}/nodes:
     get:
       description: 클라우드에 속한 노드 리스트 조회

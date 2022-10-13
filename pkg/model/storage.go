@@ -58,6 +58,46 @@ func (sci *StorageClassInfo) FromTable(clusterTable *ClusterTable) {
 	}
 }
 
+// ToOpenstackTable - Storage Class 정보를 테이블로 설정
+func (sci *StorageClassInfo) ToOpenstackTable(clusterTable *OpenstackClusterTable) {
+	// change to StorageClass
+	var storageClass *StorageClass = &StorageClass{}
+	storageClass.UseCeph = sci.UseCeph
+	if sci.Label1 != "" {
+		keyVal := strings.Split(sci.Label1, "=")
+		var label *Label = &Label{Key: keyVal[0], Value: keyVal[1]}
+		storageClass.Labels = append(storageClass.Labels, label)
+	}
+	if sci.Label2 != "" {
+		keyVal := strings.Split(sci.Label2, "=")
+		var label *Label = &Label{Key: keyVal[0], Value: keyVal[1]}
+		storageClass.Labels = append(storageClass.Labels, label)
+	}
+	if sci.Label3 != "" {
+		keyVal := strings.Split(sci.Label3, "=")
+		var label *Label = &Label{Key: keyVal[0], Value: keyVal[1]}
+		storageClass.Labels = append(storageClass.Labels, label)
+	}
+
+	clusterTable.StorageClass = storageClass
+}
+
+// FromOpenstackTable - 테이블 정보를 Storage Class 정보로 설정
+func (sci *StorageClassInfo) FromOpenstackTable(clusterTable *OpenstackClusterTable) {
+	if clusterTable.StorageClass != nil {
+		sci.UseCeph = clusterTable.StorageClass.UseCeph
+		for i, label := range clusterTable.StorageClass.Labels {
+			if i == 0 {
+				sci.Label1 = label.Key + "=" + label.Value
+			} else if i == 1 {
+				sci.Label2 = label.Key + "=" + label.Value
+			} else if i == 2 {
+				sci.Label3 = label.Key + "=" + label.Value
+			}
+		}
+	}
+}
+
 // StorageClass - Data for Storage Class
 type StorageClass struct {
 	UseCeph bool     `json:"use_ceph"`

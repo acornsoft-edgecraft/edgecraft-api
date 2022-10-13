@@ -79,3 +79,18 @@ func (esi *EtcdStorageInfo) FromTable(clusterTable *ClusterTable) {
 	esi.Etcd.FromTable(clusterTable)
 	esi.StorageClass.FromTable(clusterTable)
 }
+
+// ToTable - ETCD/Storage 정보를 Openstack 테이블로 설정
+func (esi *EtcdStorageInfo) ToOpenstackTable(clusterTable *OpenstackClusterTable) {
+	esi.Etcd.ToOpenstackTable(clusterTable)
+	esi.StorageClass.ToOpenstackTable(clusterTable)
+}
+
+// FromTable - Openstack 테이블 정보를 ETCD/Storage 정보 설정
+func (esi *EtcdStorageInfo) FromOpenstackTable(clusterTable *OpenstackClusterTable) {
+	esi.Etcd = &EtcdInfo{}
+	esi.StorageClass = &StorageClassInfo{}
+
+	esi.Etcd.FromOpenstackTable(clusterTable)
+	esi.StorageClass.FromOpenstackTable(clusterTable)
+}

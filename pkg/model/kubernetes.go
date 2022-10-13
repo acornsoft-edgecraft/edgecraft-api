@@ -25,3 +25,17 @@ func (ki *KubernetesInfo) FromTable(clusterTable *ClusterTable) {
 	ki.PodCidr = *clusterTable.PodCidr
 	ki.SvcCidr = *clusterTable.SvcCidr
 }
+
+// ToOpenstackTable - K8S 정보르 Openstack 테이블로 설정
+func (ki *KubernetesInfo) ToOpenstackTable(clusterTable *OpenstackClusterTable) {
+	clusterTable.Version = utils.IntPrt(ki.Version)
+	clusterTable.PodCidr = utils.StringPtr(ki.PodCidr)
+	clusterTable.SvcCidr = utils.StringPtr(ki.SvcCidr)
+}
+
+// FromOpenstackTable - Openstack 테이블 정보를 K8S로 설정
+func (ki *KubernetesInfo) FromOpenstackTable(clusterTable *OpenstackClusterTable) {
+	ki.Version = *clusterTable.Version
+	ki.PodCidr = *clusterTable.PodCidr
+	ki.SvcCidr = *clusterTable.SvcCidr
+}

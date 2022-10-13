@@ -24,8 +24,8 @@ type ClusterTable struct {
 	BmcCredentialPassword *string      `json:"password" db:"bmc_credential_password"`
 	ImageUrl              *string      `json:"image_url" db:"image_url"`
 	ImageChecksum         *string      `json:"image_checksum" db:"image_checksum"`
-	ImageChecksumType     *string      `json:"image_checksum_type" db:"image_checksum_type"`
-	ImageFormat           *string      `json:"image_format" db:"image_format"`
+	ImageChecksumType     *int         `json:"image_checksum_type" db:"image_checksum_type"`
+	ImageFormat           *int         `json:"image_format" db:"image_format"`
 	MasterExtraConfig     *ExtraConfig `json:"cp_kubeadm_extra_config" db:"master_extra_config"`
 	WorkerExtraConfig     *ExtraConfig `json:"worker_kubeadm_extra_config" db:"worker_extra_config"`
 

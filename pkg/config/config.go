@@ -25,8 +25,6 @@ const (
 type Config struct {
 	API *api.Config        `yaml:"api"`
 	DB  *postgresdb.Config `yaml:"database"`
-	// Mail       *mail.Config       `yaml:"mail"`
-	// K8sGateway *k8sclient.Config  `yaml:"k8sgateway"`
 }
 
 // ===== [ Implementations ] =====
@@ -63,6 +61,8 @@ func Load() (*Config, error) {
 			os.Exit(0)
 		} else {
 			// Config file was found but another error was produced
+			logger.Errorf("configuration file founded, but could not load configuration file: %s", err.Error())
+			os.Exit(0)
 		}
 	}
 

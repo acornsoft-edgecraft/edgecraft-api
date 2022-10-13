@@ -123,3 +123,23 @@ AND cluster_uid = :cluster_uid
 AND node_uid =:node_uid
 {{- end }}
 `
+
+/***************************
+ * Cloud - Cluster (Openstack)
+ ***************************/
+
+const getOpenstackClustersSQL = `
+ SELECT 
+	 A.*
+ FROM 
+	 "edgecraft"."tbl_cluster" A
+ WHERE
+	 A.cloud_uid = $1
+ `
+
+const deleteOpenstackClusters = `
+ DELETE
+ FROM "edgecraft"."tbl_cluster" A
+ WHERE
+	 A.cloud_uid = $1
+ `
