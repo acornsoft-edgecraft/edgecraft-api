@@ -10,6 +10,7 @@ import (
 // NodeTable - Baremetal Node Table 정보
 // Type: Common Code NodeTypes 참조
 // Status: Common Code Status 참조
+// BootMode: Common Code BootModes 참조
 type NodeTable struct {
 	CloudUid   *string `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid *string `json:"cluster_uid" db:"cluster_uid"`
@@ -19,7 +20,7 @@ type NodeTable struct {
 	HostName             *string `json:"host_name" db:"host_name"`
 	BmcAddress           *string `json:"bmc_address" db:"bmc_address"`
 	MacAddress           *string `json:"boot_mac_address" db:"mac_address"`
-	BootMode             *string `json:"boot_mode" db:"boot_mode"`
+	BootMode             *int    `json:"boot_mode" db:"boot_mode"`
 	OnlinePower          *bool   `json:"online_power" db:"online_power"`
 	ExternalProvisioning *bool   `json:"external_provisioning" db:"external_provisioning"`
 

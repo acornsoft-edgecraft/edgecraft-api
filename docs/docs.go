@@ -910,8 +910,8 @@ const docTemplate = `{
                     "example": "00:b2:8c:ee:22:98"
                 },
                 "boot_mode": {
-                    "type": "string",
-                    "example": "1"
+                    "type": "integer",
+                    "example": 1
                 },
                 "external_provisioning": {
                     "type": "boolean",
@@ -1189,20 +1189,28 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "flavor": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "labels": {
                     "type": "array",
                     "items": {}
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "namespace": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "node_count": {
-                    "type": "integer"
+                    "type": "integer",
+                    "example": 1
+                },
+                "nodeset_uid": {
+                    "type": "string",
+                    "example": ""
                 }
             }
         },
@@ -1258,13 +1266,16 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "cluster_uid": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "desc": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Openstack Test Cluster #1"
                 },
                 "name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Test #1"
                 }
             }
         },
@@ -1292,49 +1303,60 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "api_server_floating_ip": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "bastion_flavor": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "bastion_image_name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "bastion_ssh_key_name": {
-                    "type": "string"
-                },
-                "cluster_uid": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "dns_nameservers": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "external_network_id": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "failure_domain": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "image_name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "openstack_cloud": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "openstack_cloud_cacert_b64": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "openstack_cloud_provider_conf_b64": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "openstack_cloud_yaml_b64": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "ssh_key_name": {
-                    "type": "string"
+                    "type": "string",
+                    "example": ""
                 },
                 "use_bastion_host": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 }
             }
         },
@@ -1348,7 +1370,8 @@ const docTemplate = `{
                     }
                 },
                 "use_loadbalancer": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "example": false
                 },
                 "worker_sets": {
                     "type": "array",

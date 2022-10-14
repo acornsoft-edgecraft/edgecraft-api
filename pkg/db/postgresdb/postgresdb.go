@@ -106,7 +106,7 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.Db.SetMaxIdleConns(conf.MaxIdleConns)
 	dbmap.Db.SetMaxOpenConns(conf.MaxOpenConns)
 
-	// For Code
+	// For Code (manual key)
 	dbmap.AddTableWithName(model.CodeGroupTable{}, "tbl_code_group").SetKeys(false, "group_id")
 	dbmap.AddTableWithName(model.CodeTable{}, "tbl_code").SetKeys(false, "group_id", "code")
 
@@ -114,6 +114,10 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.AddTableWithName(model.CloudTable{}, "tbl_cloud").SetKeys(false, "cloud_uid")
 	dbmap.AddTableWithName(model.ClusterTable{}, "tbl_cloud_cluster").SetKeys(false, "cloud_uid", "cluster_uid")
 	dbmap.AddTableWithName(model.NodeTable{}, "tbl_cloud_node").SetKeys(false, "cloud_uid", "cluster_uid", "node_uid")
+
+	// For Openstack (manual key)
+	dbmap.AddTableWithName(model.OpenstackClusterTable{}, "tbl_cluster").SetKeys(false, "cloud_uid", "cluster_uid")
+	dbmap.AddTableWithName(model.NodeSetTable{}, "tbl_nodeset").SetKeys(false, "cluster_uid", "nodeset_uid")
 
 	// // SetKeys(isAutoIncr bool, fieldNames ...string)
 	// // SetKeys(true) means we have a auto increment primary key, which

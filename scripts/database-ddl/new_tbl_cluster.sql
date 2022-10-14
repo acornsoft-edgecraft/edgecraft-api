@@ -22,6 +22,9 @@ CREATE TABLE "edgecraft"."tbl_cluster"
 	"service_cidr"          			VARCHAR(100)                        NULL,       -- 클러스터서비스CIDR
 	"openstack_info"        			JSON                                NULL,       -- 클러스터오픈스택정보
 
+	-- nodeset 정보
+	"loadbalancer_use_yn"     			BOOLEAN      	DEFAULT FALSE		NULL,     	-- 클러스터로드밸런서사용여부
+
 	-- ETCD 정보	
 	"external_etcd_use"       			BOOLEAN      	DEFAULT FALSE		NULL, 		-- 클라우드클러스터외부ETCD사용
 	"external_etcd_endpoints"       	JSON         						NULL,     	-- 외부ETCD엔드포인츠

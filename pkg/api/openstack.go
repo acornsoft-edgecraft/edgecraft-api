@@ -4,8 +4,11 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 package api
 
 import (
+	"time"
+
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	"github.com/labstack/echo/v4"
 )
@@ -118,9 +121,44 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterSet, common.CodeInvalidData, err)
 	}
 
+	clusterTable, nodeSetTables := clusterSet.ToTable(false, "system", time.Now())
+
 	// Openstack Cluster 정보 저장
 
-	// Openstack Cluster 생성
+	// Start. Transaction 얻어옴
+	txdb, err := a.Db.BeginTransaction()
+	if err != nil {
+		return response.ErrorfReqRes(c, clusterSet, common.CodeFailedDatabase, err)
+	}
+
+	// Cluster 등록
+	err = txdb.InsertOpenstackCluster(clusterTable)
+	if err != nil {
+		txErr := txdb.Rollback()
+		if txErr != nil {
+			logger.Info("DB rollback Failed.", txErr)
+		}
+		return response.ErrorfReqRes(c, clusterTable, common.CodeFailedDatabase, err)
+	}
+
+	// NodeSet 등록
+	for _, nodeSetTable := range nodeSetTables {
+		err = txdb.InsertNodeSet(nodeSetTable)
+		if err != nil {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nodeSetTable, common.CodeFailedDatabase, err)
+		}
+	}
+
+	txErr := txdb.Commit()
+	if txErr != nil {
+		logger.Info("DB commit Failed.", txErr)
+	}
+
+	// Openstack Cluster 생성 (CAPI with Openstack provider)
 
 	return nil
 }

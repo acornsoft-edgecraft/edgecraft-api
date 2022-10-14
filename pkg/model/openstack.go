@@ -20,14 +20,14 @@ type OpenstackClusterSet struct {
 }
 
 // ToTable - Openstack Cluster Set을 대상 Table 정보로 매핑 처리
-func (ocs *OpenstackClusterSet) ToTable(isUpdate bool, user string, at time.Time) (clusterTable *OpenstackClusterTable, nodesetTables []*NodesetTable) {
+func (ocs *OpenstackClusterSet) ToTable(isUpdate bool, user string, at time.Time) (clusterTable *OpenstackClusterTable, nodesetTables []*NodeSetTable) {
 	clusterTable = &OpenstackClusterTable{}
 
 	ocs.Cluster.ToTable(clusterTable, isUpdate, user, at)
 	ocs.K8s.ToOpenstackTable(clusterTable)
 
 	// TODO: ETCD/STORAGE 정보에 대한 정의 필요함.
-	//ocs.EtcdStorage.ToOpenstackTable(clusterTable)
+	ocs.EtcdStorage.ToOpenstackTable(clusterTable)
 
 	// NodeSet Table은 Delete & Insert 방식이므로 Update 개념 없음.
 	nodesetTables = ocs.Nodes.ToTable(clusterTable, isUpdate, user, at)
@@ -37,28 +37,27 @@ func (ocs *OpenstackClusterSet) ToTable(isUpdate bool, user string, at time.Time
 
 // OpenstackInfo - Configuration for Openstack
 type OpenstackInfo struct {
-	ClusterUid          string `json:"cluster_uid"`
-	Cloud               string `json:"openstack_cloud"`
-	ProviderConfB64     string `json:"openstack_cloud_provider_conf_b64"`
-	YamlB64             string `json:"openstack_cloud_yaml_b64"`
-	CACertB64           string `json:"openstack_cloud_cacert_b64"`
-	NameServers         string `json:"dns_nameservers"`
-	FailureDomain       string `json:"failure_domain"`
-	ImageName           string `json:"image_name"`
-	SSHKeyName          string `json:"ssh_key_name"`
-	ExternalNetworkID   string `json:"external_network_id"`
-	APIServerFloatingIP string `json:"api_server_floating_ip"`
-	UseBastionHost      bool   `json:"use_bastion_host"`
-	BastionFlavor       string `json:"bastion_flavor"`
-	BastionImageName    string `json:"bastion_image_name"`
-	BastionSSHKeyName   string `json:"bastion_ssh_key_name"`
+	Cloud               string `json:"openstack_cloud" example:""`
+	ProviderConfB64     string `json:"openstack_cloud_provider_conf_b64" example:""`
+	YamlB64             string `json:"openstack_cloud_yaml_b64" example:""`
+	CACertB64           string `json:"openstack_cloud_cacert_b64" example:""`
+	NameServers         string `json:"dns_nameservers" example:""`
+	FailureDomain       string `json:"failure_domain" example:""`
+	ImageName           string `json:"image_name" example:""`
+	SSHKeyName          string `json:"ssh_key_name" example:""`
+	ExternalNetworkID   string `json:"external_network_id" example:""`
+	APIServerFloatingIP string `json:"api_server_floating_ip" example:""`
+	UseBastionHost      bool   `json:"use_bastion_host" example:"false"`
+	BastionFlavor       string `json:"bastion_flavor" example:""`
+	BastionImageName    string `json:"bastion_image_name" example:""`
+	BastionSSHKeyName   string `json:"bastion_ssh_key_name" example:""`
 }
 
 // OpenstackClusterInfo - Basic data for openstack cluster
 type OpenstackClusterInfo struct {
-	ClusterUid string `json:"cluster_uid"`
-	Name       string `json:"name"`
-	Desc       string `json:"desc"`
+	ClusterUid string `json:"cluster_uid" example:""`
+	Name       string `json:"name" example:"Test #1"`
+	Desc       string `json:"desc" example:"Openstack Test Cluster #1"`
 }
 
 // NewKey - Make new UUID V4
@@ -86,28 +85,99 @@ func (osc *OpenstackClusterInfo) ToTable(clusterTable *OpenstackClusterTable, is
 
 // NodeSetInfo - Data for Nodeset
 type NodeSetInfo struct {
-	Namespace string  `json:"namespace"`
-	Name      string  `json:"name"`
-	NodeCount int     `json:"node_count"`
-	Flavor    string  `json:"flavor"`
-	Labels    *Labels `json:"labels"`
+	NodeSetUid string  `json:"nodeset_uid" example:""`
+	Namespace  string  `json:"namespace" example:""`
+	Name       string  `json:"name" example:""`
+	NodeCount  int     `json:"node_count" example:"1"`
+	Flavor     string  `json:"flavor" example:""`
+	Labels     *Labels `json:"labels"`
+}
+
+// NewKey - Make new UUID V4
+func (nsi *NodeSetInfo) NewKey() {
+	if nsi.NodeSetUid == "" {
+		nsi.NodeSetUid = uuid.Must(uuid.NewV4()).String()
+	}
+}
+
+// ToTable - NodeSet 정보를 테이블 정보로 설정
+func (nsi *NodeSetInfo) ToTable(nodeSetTable *NodeSetTable, isUpdate bool, user string, at time.Time) {
+	if isUpdate {
+		if nodeSetTable.NodeSetUid == nil {
+			nodeSetTable.NodeSetUid = utils.StringPtr(nsi.NodeSetUid)
+		}
+		nodeSetTable.Updater = utils.StringPtr(user)
+		nodeSetTable.Updated = utils.TimePtr(at)
+	} else {
+		nsi.NewKey()
+		nodeSetTable.NodeSetUid = utils.StringPtr(nsi.NodeSetUid)
+		nodeSetTable.Creator = utils.StringPtr(user)
+		nodeSetTable.Created = utils.TimePtr(at)
+	}
+
+	nodeSetTable.Namespace = utils.StringPtr(nsi.Namespace)
+	nodeSetTable.Name = utils.StringPtr(nsi.Name)
+	nodeSetTable.NodeCount = utils.IntPrt(nsi.NodeCount)
+	nodeSetTable.Flavor = utils.StringPtr(nsi.Flavor)
+	nodeSetTable.Labels = nsi.Labels
+}
+
+// FromTable - 테이블 정보를 NodeSet 정보로 설정
+func (nsi *NodeSetInfo) FromTable(nodeSetTable *NodeSetTable) {
+	nsi.NodeSetUid = *nodeSetTable.NodeSetUid
+	nsi.Namespace = *nodeSetTable.Namespace
+	nsi.Name = *nodeSetTable.Name
+	nsi.NodeCount = *nodeSetTable.NodeCount
+	nsi.Flavor = *nodeSetTable.Flavor
+	nsi.Labels = nodeSetTable.Labels
 }
 
 // OpenstackNodeSetInfo - Data for Nodeset of openstack
 type OpenstackNodeSetInfo struct {
-	UseLoadbalancer bool           `json:"use_loadbalancer"`
+	UseLoadbalancer bool           `json:"use_loadbalancer" example:"false"`
 	MasterSets      []*NodeSetInfo `json:"master_sets"`
 	WorkerSets      []*NodeSetInfo `json:"worker_sets"`
 }
 
 // ToTable - NodeSet 정보를 Openstack 테이블 정보로 설정
-func (osnsi *OpenstackNodeSetInfo) ToTable(clusterTable *OpenstackClusterTable, isUpdate bool, user string, at time.Time) []*NodesetTable {
-	return nil
+func (osnsi *OpenstackNodeSetInfo) ToTable(clusterTable *OpenstackClusterTable, isUpdate bool, user string, at time.Time) (nodeSetTables []*NodeSetTable) {
+	clusterTable.LoadbalancerUse = utils.BoolPtr(osnsi.UseLoadbalancer)
+
+	// MasterSet 구성
+	for _, nodeSet := range osnsi.MasterSets {
+		nodeSetTable := &NodeSetTable{}
+		nodeSet.ToTable(nodeSetTable, isUpdate, user, at)
+		nodeSetTable.Type = utils.IntPrt(1)
+		nodeSetTables = append(nodeSetTables, nodeSetTable)
+	}
+
+	// WorkerSet 구성
+	for _, nodeSet := range osnsi.WorkerSets {
+		nodeSetTable := &NodeSetTable{}
+		nodeSet.ToTable(nodeSetTable, isUpdate, user, at)
+		nodeSetTable.Type = utils.IntPrt(2)
+		nodeSetTables = append(nodeSetTables, nodeSetTable)
+	}
+
+	return
 }
 
 // FromTable - Openstack 테이블 정보를 NodeSet 정보로 설정
-func (osnsi *OpenstackNodeSetInfo) FromTable(clusterTable *OpenstackClusterTable) {
+func (osnsi *OpenstackNodeSetInfo) FromTable(clusterTable *OpenstackClusterTable, nodeSetTables []*NodeSetTable) {
+	osnsi.UseLoadbalancer = *clusterTable.LoadbalancerUse
+	osnsi.MasterSets = []*NodeSetInfo{}
+	osnsi.WorkerSets = []*NodeSetInfo{}
 
+	for _, nodeSetTable := range nodeSetTables {
+		var nsi *NodeSetInfo = &NodeSetInfo{}
+		nsi.FromTable(nodeSetTable)
+
+		if *nodeSetTable.Type == 1 {
+			osnsi.MasterSets = append(osnsi.MasterSets, nsi)
+		} else {
+			osnsi.WorkerSets = append(osnsi.WorkerSets, nsi)
+		}
+	}
 }
 
 // OpenstackClusterList - Cluster list for openstack

@@ -18,6 +18,9 @@ type OpenstackClusterTable struct {
 	SvcCidr       *string        `json:"svc_cidr" db:"service_cidr"`
 	OpenstackInfo *OpenstackInfo `json:"openstack_info" db:"openstack_info"`
 
+	// nodes 정보
+	LoadbalancerUse *bool `json:"use_loadbalancer" db:"loadbalancer_use_yn, default:false"`
+
 	// ETCD 정보
 	ExternalEtcdUse             *bool      `json:"use_external_etcd" db:"external_etcd_use, default:false"`
 	ExternalEtcdEndPoints       *Endpoints `json:"endpoints" db:"external_etcd_endpoints"`

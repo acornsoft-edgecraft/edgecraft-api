@@ -63,7 +63,7 @@ type BaremetalHostInfo struct {
 	HostName             string `json:"host_name" example:"sadf"`
 	BmcAddress           string `json:"bmc_address" example:"98:03:9b:61:80:48"`
 	BootMacAddress       string `json:"boot_mac_address" example:"00:b2:8c:ee:22:98"`
-	BootMode             string `json:"boot_mode" example:"1"`
+	BootMode             int    `json:"boot_mode" example:"1"`
 	OnlinePower          bool   `json:"online_power" example:"false"`
 	ExternalProvisioning bool   `json:"external_provisioning" example:"false"`
 }
@@ -73,7 +73,7 @@ func (bhi *BaremetalHostInfo) ToTable(nodeTable *NodeTable) {
 	nodeTable.HostName = utils.StringPtr(bhi.HostName)
 	nodeTable.BmcAddress = utils.StringPtr(bhi.BmcAddress)
 	nodeTable.MacAddress = utils.StringPtr(bhi.BootMacAddress)
-	nodeTable.BootMode = utils.StringPtr(bhi.BootMode)
+	nodeTable.BootMode = utils.IntPrt(bhi.BootMode)
 	nodeTable.OnlinePower = utils.BoolPtr(bhi.OnlinePower)
 	nodeTable.ExternalProvisioning = utils.BoolPtr(bhi.ExternalProvisioning)
 }
