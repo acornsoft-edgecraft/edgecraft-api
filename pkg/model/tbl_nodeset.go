@@ -5,17 +5,17 @@ package model
 
 import "time"
 
-// NodesetTable - Openstack NodeSet Table 정보
+// NodeSetTable - Openstack NodeSet Table 정보
 // Type: Common Code NodeTypes 참조
-type NodesetTable struct {
+type NodeSetTable struct {
 	ClusterUid *string    `json:"cluster_uid" db:"cluster_uid"`
-	NodeUid    *string    `json:"nodeset_uid" db:"nodeset_uid"`
+	NodeSetUid *string    `json:"nodeset_uid" db:"nodeset_uid"`
 	Type       *int       `json:"type" db:"type"`
 	Namespace  *string    `json:"namespace" db:"namespace"`
 	Name       *string    `json:"name" db:"name"`
 	NodeCount  *int       `json:"node_count" db:"node_count"`
-	Flavor     string     `json:"flavor" db:"flavor"`
-	Labels     string     `json:"labels" db:"labels"`
+	Flavor     *string    `json:"flavor" db:"flavor"`
+	Labels     *Labels    `json:"labels" db:"labels"`
 	Creator    *string    `json:"creator" db:"creator"`
 	Created    *time.Time `json:"created" db:"created_at"`
 	Updater    *string    `json:"updater" db:"updater"`

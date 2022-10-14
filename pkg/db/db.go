@@ -61,11 +61,12 @@ type DB interface {
 	DeleteOpenstackCluster(string, string) (int64, error)
 
 	// tbl_nodeset (Openstack)
-	// GetNodesets(string, string) ([]*model.NodesetTable, error)
-	// GetNodeset(string, string, string) (*model.NodesetTable, error)
-	// InsertNodeset(*model.NodesetTable) error
-	// UpdateNodeset(*model.NodesetTable) (int64, error)
-	// DeleteNodeset(string) (int64, error)
+	GetNodeSets(string) ([]*model.NodeSetTable, error)
+	GetNodeSet(string, string) (*model.NodeSetTable, error)
+	InsertNodeSet(*model.NodeSetTable) error
+	UpdateNodeSet(*model.NodeSetTable) (int64, error)
+	DeleteNodeSet(string, string) (int64, error)
+	DeleteNodeSets(string) (int64, error)
 
 	// tbl_code_group
 	GetCodeGroupList() ([]*model.CodeGroupTable, error)

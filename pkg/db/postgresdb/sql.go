@@ -124,22 +124,42 @@ AND node_uid =:node_uid
 {{- end }}
 `
 
-/***************************
+/******************************
  * Cloud - Cluster (Openstack)
- ***************************/
+ ******************************/
 
 const getOpenstackClustersSQL = `
- SELECT 
-	 A.*
- FROM 
-	 "edgecraft"."tbl_cluster" A
- WHERE
-	 A.cloud_uid = $1
- `
+SELECT 
+	A.*
+FROM 
+	"edgecraft"."tbl_cluster" A
+WHERE
+	A.cloud_uid = $1
+`
 
-const deleteOpenstackClusters = `
- DELETE
- FROM "edgecraft"."tbl_cluster" A
- WHERE
-	 A.cloud_uid = $1
- `
+const deleteOpenstackClustersSQL = `
+DELETE
+FROM "edgecraft"."tbl_cluster" A
+WHERE
+	A.cloud_uid = $1
+`
+
+/***************************************
+ * Cloud - Cluster - NodeSet (Openstack)
+ ****************************************/
+
+const getNodeSetsSQL = `
+SELECT
+	A.*
+FROM
+	"edgecraft"."tbl_nodeset" A
+WHERE
+	A.cluster_uid = $1
+`
+
+const deleteNodeSetsSQL = `
+DELETE
+FROM "edgecraft"."tbl_nodeset" A
+WHERE
+	A.cluster_uid = $1
+`

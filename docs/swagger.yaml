@@ -9,8 +9,8 @@ definitions:
         example: 00:b2:8c:ee:22:98
         type: string
       boot_mode:
-        example: "1"
-        type: string
+        example: 1
+        type: integer
       external_provisioning:
         example: false
         type: boolean
@@ -205,16 +205,23 @@ definitions:
   model.NodeSetInfo:
     properties:
       flavor:
+        example: ""
         type: string
       labels:
         items: {}
         type: array
       name:
+        example: ""
         type: string
       namespace:
+        example: ""
         type: string
       node_count:
+        example: 1
         type: integer
+      nodeset_uid:
+        example: ""
+        type: string
     type: object
   model.NodeSpecificInfo:
     properties:
@@ -252,10 +259,13 @@ definitions:
   model.OpenstackClusterInfo:
     properties:
       cluster_uid:
+        example: ""
         type: string
       desc:
+        example: 'Openstack Test Cluster #1'
         type: string
       name:
+        example: 'Test #1'
         type: string
     type: object
   model.OpenstackClusterSet:
@@ -274,34 +284,46 @@ definitions:
   model.OpenstackInfo:
     properties:
       api_server_floating_ip:
+        example: ""
         type: string
       bastion_flavor:
+        example: ""
         type: string
       bastion_image_name:
+        example: ""
         type: string
       bastion_ssh_key_name:
-        type: string
-      cluster_uid:
+        example: ""
         type: string
       dns_nameservers:
+        example: ""
         type: string
       external_network_id:
+        example: ""
         type: string
       failure_domain:
+        example: ""
         type: string
       image_name:
+        example: ""
         type: string
       openstack_cloud:
+        example: ""
         type: string
       openstack_cloud_cacert_b64:
+        example: ""
         type: string
       openstack_cloud_provider_conf_b64:
+        example: ""
         type: string
       openstack_cloud_yaml_b64:
+        example: ""
         type: string
       ssh_key_name:
+        example: ""
         type: string
       use_bastion_host:
+        example: false
         type: boolean
     type: object
   model.OpenstackNodeSetInfo:
@@ -311,6 +333,7 @@ definitions:
           $ref: '#/definitions/model.NodeSetInfo'
         type: array
       use_loadbalancer:
+        example: false
         type: boolean
       worker_sets:
         items:
