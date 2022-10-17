@@ -21,6 +21,7 @@ FROM scratch
 # Copy binary and config files from /build to root folder of scratch container.
 COPY --from=builder ["/build/edgecraft-api", "/"]
 COPY --from=builder ["/build/conf", "/conf"]
+COPY --from=builder ["/build/templates", "/templates"]
 
 # Command to run when starting the container.
 ENTRYPOINT ["/edgecraft-api"]

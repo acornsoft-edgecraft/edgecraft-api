@@ -34,6 +34,9 @@ const (
 	// DB fail -
 	CodeFailedDatabase = 24000
 
+	// DatabaseCodeFalseData
+	DatabaseCodeFalseData = 24100
+
 	// DatabaseFailedRollback -
 	DatabaseFailedRollback = 24100
 

@@ -174,8 +174,8 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	}
 
 	// 공통 코드 조회
-	codeTable, err := a.Db.GetCode("CloudState", 1)
-	if err != nil {
+	codeTable, err := a.Db.GetCode("CloudStatus", 1)
+	if err != nil || codeTable == nil {
 		return response.ErrorfReqRes(c, cloudSet, common.CodeFailedDatabase, err)
 	}
 
@@ -195,7 +195,7 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if len(clusterTables) == 0 {
-		return response.ErrorfReqRes(c, clusterTables, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, clusterTables, common.DatabaseCodeFalseData, err)
 	}
 
 	// Node 조회
