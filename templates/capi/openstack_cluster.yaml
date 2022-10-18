@@ -1,0 +1,230 @@
+# External ETCD 처리 방식 : https://main.cluster-api.sigs.k8s.io/tasks/external-etcd.html
+# TODO: External ETCD는 사전에 구성한 경우만 가능
+# TODO: "{{ local_hostname }}" 자체 바인딩 변수처러면 go-template 처리할 떄 문제 발생 확인
+# CHECK: Namespace가 UI에는 NodeSet에 존재하는데 모두 동일?
+
+apiVersion: v1
+data:
+  cacert: {{.OpenstackCloudCACertB64}} # ${OPENSTACK_CLOUD_CACERT_B64} ###### apply cacert base64
+  clouds.yaml: {{.OpenstackCloudYamlB64}} # ${OPENSTACK_CLOUD_YAML_B64} ##### apply cloud.yaml base64
+kind: Secret
+metadata:
+  labels:
+    clusterctl.cluster.x-k8s.io/move: "true"
+  name: {{.ClusterName}}-cloud-config # ${CLUSTER_NAME}-cloud-config ##### apply cluster name
+  namespace: {{or .Namespace "default"}} # default ##### apply namespace
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KubeadmConfigTemplate
+metadata:
+  name: {{.ClusterName}}-md-0 # ${CLUSTER_NAME}-md-0 ##### apply cluster name
+  namespace: {{or .Namespace "default"}} # default ##### apply namespace
+spec:
+  template:
+    spec:
+      files:
+        - content: {{.OpenstackClusterConfB64}} # ${OPENSTACK_CLOUD_PROVIDER_CONF_B64} ##### apply openstack provider config base64
+          encoding: base64
+          owner: root
+          path: /etc/kubernetes/cloud.conf
+          permissions: "0600"
+        - content: {{.OpenstackCloudCACertB64}} # ${OPENSTACK_CLOUD_CACERT_B64} ##### apply cacert base64
+          encoding: base64
+          owner: root
+          path: /etc/certs/cacert
+          permissions: "0600"
+      joinConfiguration:
+        nodeRegistration:
+          kubeletExtraArgs:
+            cloud-config: /etc/kubernetes/cloud.conf
+            cloud-provider: openstack
+          name: {{.LocalHostName}} # "{{ local_hostname }}" ##### Self binding by CAPI???
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
+metadata:
+  name: {{.ClusterName}} # ${CLUSTER_NAME} ##### apply cluster name
+  namespace: {{or .Namespace "default"}} #default ##### apply namespace
+spec:
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+        - {{.PodCidr}} # 192.168.0.0/16 ##### apply pod cidr
+    {{if ne "" .ServiceCidr}}
+    services:
+      cidrBlocks:
+        - {{.ServiceCidr}} ##### if not specified, auth gen
+    {{end}}
+    serviceDomain: {{or .ServiceDomain "cluster.local"}} ##### apply service domain, "cluster.local"
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KubeadmControlPlane
+    name: {{.ClusterName}}-control-plane # ${CLUSTER_NAME}-control-plane ##### apply cluster name
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
+    kind: OpenStackCluster
+    name: {{.ClusterName}} # ${CLUSTER_NAME} ##### apply cluster name
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{.ClusterName}}-md-0 # ${CLUSTER_NAME}-md-0 ##### apply cluster name
+  namespace: {{or .Namespace "default"}} #default ##### apply namespace
+spec:
+  clusterName: {{.ClusterName}} # ${CLUSTER_NAME} ##### apply cluster name
+  replicas: {{.WorkerMachineCount} # ${WORKER_MACHINE_COUNT} ##### apply worker machine count
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{.ClusterName}}-md-0 # ${CLUSTER_NAME}-md-0 ##### apply cluster name
+      clusterName: {{.ClusterName}} # ${CLUSTER_NAME} ##### apply cluster name
+      failureDomain: {{or .OpenstackFailureDoman "nova"}} # ${OPENSTACK_FAILURE_DOMAIN} ##### apply failure doman, default 'nova'
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
+        kind: OpenStackMachineTemplate
+        name: {{.ClusterName}}-md-0 # ${CLUSTER_NAME}-md-0 ##### apply cluster name
+      version: {{.KubernetesVersion}} # ${KUBERNETES_VERSION} ##### apply kubernetes version
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: {{.ClusterName}}-control-plane # ${CLUSTER_NAME}-control-plane ##### apply cluster name
+spec:
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      {{ if eq true .UseExternalETCD }}
+      {{ $etcd := .Use..}}
+      etcd:
+        external:"defaul"
+          endpoints:
+          {{with ETCDEndpoints}}
+            {{ range . }}
+            - https://{{$}} # - https://10.0.0.230:2379
+            {{ end}}
+          caFile: {{.ETCDCAFile}} # /etc/kubernetes/pki/etcd/ca.crt
+          certFile: {{.ETCDCertFile}} # /etc/kubernetes/pki/apiserver-etcd-client.crt
+          keyFile: {{.ETCDKeyFile}} # /etc/kubernetes/pki/apiserver-etcd-client.key
+      {{ end }}  
+      apiServer:
+        extraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        extraVolumes:
+          - hostPath: /etc/kubernetes/cloud.conf
+            mountPath: /etc/kubernetes/cloud.conf
+            name: cloud
+            readOnly: true
+      controllerManager:
+        extraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        extraVolumes:
+          - hostPath: /etc/kubernetes/cloud.conf
+            mountPath: /etc/kubernetes/cloud.conf
+            name: cloud
+            readOnly: true
+          - hostPath: /etc/certs/cacert
+            mountPath: /etc/certs/cacert
+            name: cacerts
+            readOnly: true
+      imageRepository: k8s.gcr.io ##### notice v1alpha5에는 존재
+    files:
+      - content: {{.OpenstackCloudProviderConfB64}} # ${OPENSTACK_CLOUD_PROVIDER_CONF_B64} ##### apply openstack provider config base64
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/cloud.conf
+        permissions: "0600"
+      - content: {{.OpenstackCloudCACertB64}} # ${OPENSTACK_CLOUD_CACERT_B64} ##### apply cacert base64
+        encoding: base64
+        owner: root
+        path: /etc/certs/cacert
+        permissions: "0600"
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        name: "{{ local_hostname }}" ##### Self binding by CAPI???
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        name: "{{ local_hostname }}" ##### Self binding by CAPI???
+    # calico preinstall, notice if closed cloud environment
+    postKubeadmCommands:
+      - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
+      kind: OpenStackMachineTemplate
+      name: {{.ClusterName}}-control-plane # ${CLUSTER_NAME}-control-plane ##### apply cluster name
+  replicas: {{.ControlPlaneMachineCount}} # ${CONTROL_PLANE_MACHINE_COUNT} ##### apply master node count
+  version: {{.KubernetesVersion}} # ${KUBERNETES_VERSION} ##### apply kubernetes version
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
+kind: OpenStackCluster
+metadata:
+  name: {{.ClusterName}} # ${CLUSTER_NAME} ##### apply cluster name
+  namespace: {{or .Namespace "default"}} #default ##### apply namespace
+spec:
+  {{ if eq true .UseBastionHost }}
+  bastion:
+    enabled: true
+    instance:
+      flavor: {{.BastionFlavor }} # <Flavor name>
+      image:  {{.BastionImageName }} # <Image name>
+      sshKeyName: {{.BastionSSHKeyName }} # <Key pair name>
+      {{if ne "" .BastionFloatingIP}}
+      floatingIP: {{.BastionFloatingIP}}  # 입력된 경우만
+      {{end}}
+  {{ end }}
+  apiServerLoadBalancer:
+    enabled: true ##### apply loadbalancer, default true
+  cloudName: {{.OpenstackCloud}} # ${OPENSTACK_CLOUD} ##### apply cloud name
+  dnsNameservers:
+    - {{.OpenstackDNSNameServers}} # ${OPENSTACK_DNS_NAMESERVERS} ##### apply dns nameservers
+  externalNetworkId: {{or .OpenstackExternalNetwworkID "public"}} # ${OPENSTACK_EXTERNAL_NETWORK_ID} ##### apply external network id, default public
+  identityRef:
+    kind: Secret
+    name: {{.ClusterName}}-cloud-config # ${CLUSTER_NAME}-cloud-config ##### apply cluster name
+  managedSecurityGroups: true
+  nodeCidr: {{.NodeCidr}} # 10.6.0.0/24 ##### apply node cidr, notice 화면에 매칭되는 곳이 없음, 화면의 ServiceCIDR도 대상이 없음.
+  {{if ne "" .APIServerFloatingIP}}
+  apiServerFloatingIP: {{.APIServerFloatingIP}}
+  {{end}}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
+kind: OpenStackMachineTemplate
+metadata:
+  name: {{.ClusterName}}-control-plane # ${CLUSTER_NAME}-control-plane ##### apply cluster name, notice v1alpha5와 다름 (name: os-cluster-md-0)
+spec:
+  template:
+    spec:
+      cloudName: {{.OpenstackCloud}} # ${OPENSTACK_CLOUD} ##### apply cloud name
+      flavor: {{.OpenstackControlPlaneMachineFlavor} # ${OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR} ##### apply control plane machine flavor
+      identityRef:
+        kind: Secret
+        name: {{.ClusterName}}-cloud-config # ${CLUSTER_NAME}-cloud-config ##### apply cluster name
+      image: {{.OpenstackImageName}} # ${OPENSTACK_IMAGE_NAME} ##### apply host image name
+      sshKeyName: {{.OpenstackSSHKeyName} # ${OPENSTACK_SSH_KEY_NAME} ##### apply ssh key name
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
+kind: OpenStackMachineTemplate
+metadata:
+  name: {{.ClusterName}}-md-0 # ${CLUSTER_NAME}-md-0
+spec:
+  template:
+    spec:
+      cloudName: {{.OpenstackCloud}} # ${OPENSTACK_CLOUD}
+      flavor: {{.OpenstackNodeMachineFlavor}} # ${OPENSTACK_NODE_MACHINE_FLAVOR}
+      identityRef:
+        kind: Secret
+        name: {{.ClusterName}}-cloud-config # ${CLUSTER_NAME}-cloud-config
+      image: {{.OpenstackImageName}} # ${OPENSTACK_IMAGE_NAME}
+      sshKeyName: {{.OpenstackSSHKeyName}} # ${OPENSTACK_SSH_KEY_NAME}

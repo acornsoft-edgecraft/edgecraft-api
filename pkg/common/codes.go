@@ -87,11 +87,14 @@ const (
 	//############################################################
 
 	//############################################################
-	// Cloud 관련 메시지
+	// Cloud/Cluster 관련 메시지
 	//############################################################
 
 	// CloudCreated_CantUpdate -
 	CloudCreated_CantUpdate = 25001
+
+	// OpenstackClusterRegisteredAndProvisioning
+	OpenstackClusterRegisteredAndProvisioning = 26001
 
 	//############################################################
 	// K8S 관련 메시지

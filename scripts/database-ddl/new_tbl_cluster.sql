@@ -15,11 +15,17 @@ CREATE TABLE "edgecraft"."tbl_cluster"
 	"cluster_uid"           			CHAR(36)                            NOT NULL,   -- 클러스터식별자
 	"project_name"          			VARCHAR(50)                         NULL,       -- 오픈스택프로젝트이름
 	"name"                  			VARCHAR(50)                         NULL,       -- 클러스터이름
-	"version"               			INTEGER         DEFAULT 1           NOT NULL,   -- 클러스터버전 (Kubernetes)
 	"description"           			VARCHAR(100)                        NULL,       -- 클러스터설명
 	"credential"            			TEXT                                NULL,       -- 클러스터자격증명
-	"pod_cidr"              			VARCHAR(100)                        NULL,       -- 클러스터포드CIDR
-	"service_cidr"          			VARCHAR(100)                        NULL,       -- 클러스터서비스CIDR
+
+
+	-- K8s 정보
+	"version"               			INTEGER         DEFAULT 1           NOT NULL,   -- 클러스터버전 (Kubernetes)
+	"pod_cidr"              			VARCHAR(30)                         NULL,       -- 클러스터포드CIDR
+	"service_cidr"          			VARCHAR(30)                         NULL,       -- 클러스터서비스CIDR
+	"service_domain"          			VARCHAR(30)                         NULL,       -- 클러스터서비스도메인
+
+	-- Openstack 정보
 	"openstack_info"        			JSON                                NULL,       -- 클러스터오픈스택정보
 
 	-- nodeset 정보

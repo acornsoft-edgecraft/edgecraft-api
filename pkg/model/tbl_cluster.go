@@ -14,9 +14,10 @@ type ClusterTable struct {
 	ClusterUid *string `json:"cluster" db:"cluster_uid"`
 
 	// K8S 정보
-	Version *int    `json:"version" db:"k8s_version"`
-	PodCidr *string `json:"pod_cidr" db:"pod_cidr"`
-	SvcCidr *string `json:"svc_cidr" db:"service_cidr"`
+	Version   *int    `json:"version" db:"k8s_version"`
+	PodCidr   *string `json:"pod_cidr" db:"pod_cidr"`
+	SvcCidr   *string `json:"svc_cidr" db:"service_cidr"`
+	SvcDomain *string `json:"svc_domain" db:"service_domain"`
 
 	// Baremetal 정보
 	BmcCredentialSecret   *string      `json:"secret_name" db:"bmc_credential_secret"`
