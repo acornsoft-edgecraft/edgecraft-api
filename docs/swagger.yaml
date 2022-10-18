@@ -172,10 +172,13 @@ definitions:
   model.KubernetesInfo:
     properties:
       pod_cidr:
-        example: 10.244.0.0/16
+        example: 10.96.0.1/12
         type: string
       svc_cidr:
-        example: 10.244.0.0/16
+        example: 10.96.0.0/12
+        type: string
+      svc_domain:
+        example: cluster.local
         type: string
       version:
         example: 1
@@ -205,7 +208,7 @@ definitions:
   model.NodeSetInfo:
     properties:
       flavor:
-        example: ""
+        example: m1.medium
         type: string
       labels:
         items: {}
@@ -265,7 +268,7 @@ definitions:
         example: 'Openstack Test Cluster #1'
         type: string
       name:
-        example: 'Test #1'
+        example: os-cluster-#1
         type: string
     type: object
   model.OpenstackClusterSet:
@@ -289,6 +292,9 @@ definitions:
       bastion_flavor:
         example: ""
         type: string
+      bastion_floating_ip:
+        example: ""
+        type: string
       bastion_image_name:
         example: ""
         type: string
@@ -296,31 +302,36 @@ definitions:
         example: ""
         type: string
       dns_nameservers:
-        example: ""
+        example: 168.126.63.1
         type: string
       external_network_id:
+        description: public
         example: ""
         type: string
       failure_domain:
+        description: nova
         example: ""
         type: string
       image_name:
-        example: ""
+        example: ubuntu-2004-kube-v1.23.3
+        type: string
+      node_cidr:
+        example: 10.96.0.0/24
         type: string
       openstack_cloud:
-        example: ""
+        example: openstack
         type: string
       openstack_cloud_cacert_b64:
-        example: ""
+        example: Cg==
         type: string
       openstack_cloud_provider_conf_b64:
-        example: ""
+        example: W0dsb2JhbF0KYXV0aC11cmw9aHR0cDovLzE5Mi4xNjguNzcuMTEvaWRlbnRpdHkKdXNlcm5hbWU9InN1bm1pIgpwYXNzd29yZD0iZmtmZms0NDgiCnRlbmFudC1pZD0iNTQyZTdhMDRmNjkxNDgyOWI0M2U3N2Y5ZWYxMmI3NzkiCnRlbmFudC1uYW1lPSJlZGdlY3JhZnQiCmRvbWFpbi1uYW1lPSJEZWZhdWx0IgpyZWdpb249IlJlZ2lvbk9uZSIK
         type: string
       openstack_cloud_yaml_b64:
-        example: ""
+        example: Y2xvdWRzOgogIG9wZW5zdGFjazoKICAgIGF1dGg6CiAgICAgIGF1dGhfdXJsOiBodHRwOi8vMTkyLjE2OC43Ny4xMS9pZGVudGl0eQogICAgICB1c2VybmFtZTogInN1bm1pIgogICAgICBwYXNzd29yZDogImZrZmZrNDQ4IgogICAgICBwcm9qZWN0X2lkOiA1NDJlN2EwNGY2OTE0ODI5YjQzZTc3ZjllZjEyYjc3OQogICAgICBwcm9qZWN0X25hbWU6ICJlZGdlY3JhZnQiCiAgICAgIHVzZXJfZG9tYWluX25hbWU6ICJEZWZhdWx0IgogICAgcmVnaW9uX25hbWU6ICJSZWdpb25PbmUiCiAgICBpbnRlcmZhY2U6ICJwdWJsaWMiCiAgICBpZGVudGl0eV9hcGlfdmVyc2lvbjogMwo=
         type: string
       ssh_key_name:
-        example: ""
+        example: sunmi
         type: string
       use_bastion_host:
         example: false

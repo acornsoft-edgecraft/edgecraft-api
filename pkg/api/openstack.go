@@ -121,7 +121,7 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterSet, common.CodeInvalidData, err)
 	}
 
-	clusterTable, nodeSetTables := clusterSet.ToTable(false, "system", time.Now())
+	clusterTable, nodeSetTables := clusterSet.ToTable(cloudId, false, "system", time.Now())
 
 	// Openstack Cluster 정보 저장
 
@@ -160,7 +160,7 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 
 	// Openstack Cluster 생성 (CAPI with Openstack provider)
 
-	return nil
+	return response.WriteWithCode(c, clusterSet, common.OpenstackClusterRegisteredAndProvisioning, nil)
 }
 
 // UpdateClusterHandler - 클러스터 수정 (Openstack)

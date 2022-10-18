@@ -118,3 +118,20 @@ func Write(c echo.Context, reqBody interface{}, data interface{}) error {
 	logger.Info(formatter)
 	return c.JSON(http.StatusOK, &returnData)
 }
+
+// WriteWithCode - Writes an new json response with code
+func WriteWithCode(c echo.Context, reqBody interface{}, code int, data interface{}) error {
+	req := c.Request()
+	returnData := ReturnData{
+		Error:   false,
+		Code:    common.CodeOK,
+		Message: common.GetMessageByCode(code),
+		Data:    data,
+	}
+	reqJson, _ := json.Marshal(reqBody)
+	retJson, _ := json.Marshal(returnData)
+
+	formatter := fmt.Sprintf("%v %v %v %v %v %v ", common.CodeOK, req.RemoteAddr, req.Method, req.RequestURI, string(reqJson), string(retJson))
+	logger.Info(formatter)
+	return c.JSON(http.StatusOK, &returnData)
+}
