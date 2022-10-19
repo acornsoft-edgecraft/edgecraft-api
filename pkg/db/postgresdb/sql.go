@@ -59,7 +59,7 @@ SELECT
 	A.description,
 	A.created_at,
 	B.k8s_version as version,
-	(SELECT COUNT(node_uid) FROM tbl_cloud_node WHERE cloud_uid = A.cloud_uid) AS nodeCount
+	(SELECT COUNT(node_uid) FROM "edgecraft"."tbl_cloud_node" WHERE cloud_uid = A.cloud_uid) AS nodeCount
 FROM
 	"edgecraft"."tbl_cloud" A
 	LEFT JOIN "edgecraft"."tbl_cloud_cluster" B ON (B.cloud_uid = A.cloud_uid)
@@ -130,7 +130,13 @@ AND node_uid =:node_uid
 
 const getOpenstackClustersSQL = `
 SELECT 
-	A.*
+	A.cloud_uid,
+	A.cluster_uid,
+	A.name,
+	A.state,
+	(SELECT COUNT(node_count) FROM "edgecraft"."tbl_nodeset" B WHERE B.cluster_uid = A.cluster_uid) AS node_count,
+	A.version,
+	A.created_at
 FROM 
 	"edgecraft"."tbl_cluster" A
 WHERE

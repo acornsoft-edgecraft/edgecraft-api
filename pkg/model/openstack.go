@@ -61,6 +61,7 @@ type OpenstackClusterInfo struct {
 	ClusterUid string `json:"cluster_uid" example:""`
 	Name       string `json:"name" example:"os-cluster-#1"`
 	Desc       string `json:"desc" example:"Openstack Test Cluster #1"`
+	Namespace  string `json:"namespace" example:"default"`
 }
 
 // NewKey - Make new UUID V4
@@ -85,12 +86,12 @@ func (osc *OpenstackClusterInfo) ToTable(clusterTable *OpenstackClusterTable, is
 
 	clusterTable.Name = utils.StringPtr(osc.Name)
 	clusterTable.Desc = utils.StringPtr(osc.Desc)
+	clusterTable.Namespace = utils.StringPtr(osc.Namespace)
 }
 
 // NodeSetInfo - Data for Nodeset
 type NodeSetInfo struct {
 	NodeSetUid string  `json:"nodeset_uid" example:""`
-	Namespace  string  `json:"namespace" example:""`
 	Name       string  `json:"name" example:""`
 	NodeCount  int     `json:"node_count" example:"1"`
 	Flavor     string  `json:"flavor" example:"m1.medium"`
@@ -119,7 +120,6 @@ func (nsi *NodeSetInfo) ToTable(nodeSetTable *NodeSetTable, isUpdate bool, user 
 		nodeSetTable.Created = utils.TimePtr(at)
 	}
 
-	nodeSetTable.Namespace = utils.StringPtr(nsi.Namespace)
 	nodeSetTable.Name = utils.StringPtr(nsi.Name)
 	nodeSetTable.NodeCount = utils.IntPrt(nsi.NodeCount)
 	nodeSetTable.Flavor = utils.StringPtr(nsi.Flavor)
@@ -129,7 +129,6 @@ func (nsi *NodeSetInfo) ToTable(nodeSetTable *NodeSetTable, isUpdate bool, user 
 // FromTable - 테이블 정보를 NodeSet 정보로 설정
 func (nsi *NodeSetInfo) FromTable(nodeSetTable *NodeSetTable) {
 	nsi.NodeSetUid = *nodeSetTable.NodeSetUid
-	nsi.Namespace = *nodeSetTable.Namespace
 	nsi.Name = *nodeSetTable.Name
 	nsi.NodeCount = *nodeSetTable.NodeCount
 	nsi.Flavor = *nodeSetTable.Flavor
@@ -188,10 +187,11 @@ func (osnsi *OpenstackNodeSetInfo) FromTable(clusterTable *OpenstackClusterTable
 
 // OpenstackClusterList - Cluster list for openstack
 type OpenstackClusterList struct {
-	ClusterUID string    `json:"cluster_uid"`
-	Name       string    `json:"name"`
+	CloudUID   string    `json:"cloud_uid" db:"cloud_uid"`
+	ClusterUID string    `json:"cluster_uid" db:"cluster_uid"`
+	Name       string    `json:"name" db:"name"`
 	Status     int       `json:"status" db:"state"`
-	NodeCount  int       `json:"nodeCount"`
-	Version    int       `json:"version"`
+	NodeCount  int       `json:"node_count" db:"node_count"`
+	Version    int       `json:"version" db:"version"`
 	Created    time.Time `json:"created" db:"created_at"`
 }

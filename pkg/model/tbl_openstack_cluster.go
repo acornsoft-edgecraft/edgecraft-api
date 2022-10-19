@@ -7,12 +7,12 @@ import "time"
 
 // OpenstackClusterTable - 클러스터 테이블 정보 (Openstack)
 type OpenstackClusterTable struct {
-	CloudUid    *string `json:"cloud_uid" db:"cloud_uid"`
-	ClusterUid  *string `json:"cluster" db:"cluster_uid"`
-	ProjectName *string `json:"project_name" db:"project_name"`
-	Name        *string `json:"name" db:"name"`
-	Desc        *string `json:"desc" db:"description"`
-	Credential  *string `json:"credential" db:"credential"`
+	CloudUid   *string `json:"cloud_uid" db:"cloud_uid"`
+	ClusterUid *string `json:"cluster" db:"cluster_uid"`
+	Namespace  *string `json:"namespace" db:"namespace"`
+	Name       *string `json:"name" db:"name"`
+	Desc       *string `json:"desc" db:"description"`
+	Credential *string `json:"credential" db:"credential"`
 
 	// K8s 정보
 	Version   *int    `json:"version" db:"version"`

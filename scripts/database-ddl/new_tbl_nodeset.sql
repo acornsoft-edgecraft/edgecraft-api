@@ -14,7 +14,6 @@ CREATE TABLE "edgecraft"."tbl_nodeset"
   	"cluster_uid"   CHAR(36)                            NOT NULL, -- 클러스터식별자
 	"nodeset_uid"   CHAR(36)                            NOT NULL, -- 노드셋식별자
 	"type"          INTEGER         DEFAULT 1           NOT NULL,     -- 노드셋유형
-	"namespace"     VARCHAR(50)                         NULL,     -- 노드셋네임스페이스
 	"name"          VARCHAR(50)                         NULL,     -- 노드셋이름
 	"node_count"    INTEGER         DEFAULT 0           NULL,     -- 노드셋노드개수
 	"flavor"        VARCHAR(50)                         NULL,     -- 노드셋FLAVOR

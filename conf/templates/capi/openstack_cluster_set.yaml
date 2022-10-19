@@ -1,6 +1,5 @@
 # External ETCD 처리 방식 : https://main.cluster-api.sigs.k8s.io/tasks/external-etcd.html
 # TODO: External ETCD는 사전에 구성한 경우만 가능
-# TODO: "{{ local_hostname }}" 자체 바인딩 변수처러면 go-template 처리할 떄 문제 발생 확인
 # CHECK: Namespace가 UI에는 NodeSet에 존재하는데 모두 동일?
 
 apiVersion: v1
@@ -38,7 +37,7 @@ spec:
           kubeletExtraArgs:
             cloud-config: /etc/kubernetes/cloud.conf
             cloud-provider: openstack
-          name: {{.LocalHostName}} # "{{ local_hostname }}" ##### Self binding by CAPI???
+          name: "{{ .LocalHostName }}" ##### Self binding by CAPI ({{ local_hostname }})
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
@@ -149,13 +148,13 @@ spec:
         kubeletExtraArgs:
           cloud-config: /etc/kubernetes/cloud.conf
           cloud-provider: openstack
-        name: "{{ local_hostname }}" ##### Self binding by CAPI???
+        name: "{{ .LocalHostName }}" ##### Self binding by CAPI ({{ local_hostname }})
     joinConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
           cloud-config: /etc/kubernetes/cloud.conf
           cloud-provider: openstack
-        name: "{{ local_hostname }}" ##### Self binding by CAPI???
+        name: "{{ .LocalHostName }}" ##### Self binding by CAPI ({{ local_hostname }})
     # calico preinstall, notice if closed cloud environment
     postKubeadmCommands:
       - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
