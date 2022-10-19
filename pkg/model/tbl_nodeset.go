@@ -11,7 +11,6 @@ type NodeSetTable struct {
 	ClusterUid *string    `json:"cluster_uid" db:"cluster_uid"`
 	NodeSetUid *string    `json:"nodeset_uid" db:"nodeset_uid"`
 	Type       *int       `json:"type" db:"type"`
-	Namespace  *string    `json:"namespace" db:"namespace"`
 	Name       *string    `json:"name" db:"name"`
 	NodeCount  *int       `json:"node_count" db:"node_count"`
 	Flavor     *string    `json:"flavor" db:"flavor"`

@@ -24,7 +24,7 @@ func (db *DB) UpdateOpenstackCluster(cluster *model.OpenstackClusterTable) (int6
 
 // GetOpenstackCluster - Query a Openstack Cluster
 func (db *DB) GetOpenstackCluster(cloudId, clusterId string) (*model.OpenstackClusterTable, error) {
-	obj, err := db.GetClient().Get(&model.ClusterTable{}, cloudId, clusterId)
+	obj, err := db.GetClient().Get(&model.OpenstackClusterTable{}, cloudId, clusterId)
 	if err != nil {
 		return nil, err
 	}
@@ -36,18 +36,14 @@ func (db *DB) GetOpenstackCluster(cloudId, clusterId string) (*model.OpenstackCl
 }
 
 // GetOpenstackClusters - Query all Openstack Clusters
-func (db *DB) GetOpenstackClusters(cloudId string) ([]*model.OpenstackClusterTable, error) {
-	clusters, err := db.GetClient().Select(&model.OpenstackClusterTable{}, getOpenstackClustersSQL, cloudId)
+func (db *DB) GetOpenstackClusters(cloudId string) ([]model.OpenstackClusterList, error) {
+	var list []model.OpenstackClusterList
+	_, err := db.GetClient().Select(&list, getOpenstackClustersSQL, cloudId)
 	if err != nil {
 		return nil, err
 	}
 
-	var clusterTables []*model.OpenstackClusterTable = []*model.OpenstackClusterTable{}
-	for _, cluster := range clusters {
-		clusterTables = append(clusterTables, cluster.(*model.OpenstackClusterTable))
-	}
-
-	return clusterTables, nil
+	return list, nil
 }
 
 // DeleteOpenstackCluster - Delete a Openstack Cluster

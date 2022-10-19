@@ -93,8 +93,12 @@ const (
 	// CloudCreated_CantUpdate -
 	CloudCreated_CantUpdate = 25001
 
+	// ProvisioningOnlySaved
+	ProvisioningOnlySaved = 26000
 	// OpenstackClusterRegisteredAndProvisioning
 	OpenstackClusterRegisteredAndProvisioning = 26001
+	// OpenstackClusterProvisioning
+	OpenstackClusterProvisioning = 26002
 
 	//############################################################
 	// K8S 관련 메시지

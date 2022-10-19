@@ -54,7 +54,7 @@ type DB interface {
 	DeleteCloudNodes(string) (int64, error)
 
 	// tbl_cluster (Openstack)
-	GetOpenstackClusters(string) ([]*model.OpenstackClusterTable, error)
+	GetOpenstackClusters(string) ([]model.OpenstackClusterList, error)
 	GetOpenstackCluster(string, string) (*model.OpenstackClusterTable, error)
 	InsertOpenstackCluster(*model.OpenstackClusterTable) error
 	UpdateOpenstackCluster(*model.OpenstackClusterTable) (int64, error)

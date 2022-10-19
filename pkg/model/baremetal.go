@@ -13,6 +13,7 @@ import (
 
 // BaremetalInfo - Data for Baremetal
 type BaremetalInfo struct {
+	Namespace             string       `json:"namespace" example:"default"`
 	BmcCredentialSecret   string       `json:"secret_name" example:"secret1"`
 	BmcCredentialUser     string       `json:"user_name" example:"asdf"`
 	BmcCredentialPassword string       `json:"password" example:"asdf"`
@@ -26,6 +27,7 @@ type BaremetalInfo struct {
 
 // ToTable - Baremetal 정보를 테이블로 설정
 func (bi *BaremetalInfo) ToTable(clusterTable *ClusterTable) {
+	clusterTable.Namespace = utils.StringPtr(bi.Namespace)
 	clusterTable.BmcCredentialSecret = utils.StringPtr(bi.BmcCredentialSecret)
 	clusterTable.BmcCredentialUser = utils.StringPtr(bi.BmcCredentialUser)
 	clusterTable.BmcCredentialPassword = utils.StringPtr(bi.BmcCredentialPassword)
@@ -43,6 +45,7 @@ func (bi *BaremetalInfo) ToTable(clusterTable *ClusterTable) {
 
 // FromTable - 테이블의 정보를 Baremetal 정보로 설정
 func (bi *BaremetalInfo) FromTable(clusterTable *ClusterTable) {
+	bi.Namespace = *clusterTable.Namespace
 	bi.BmcCredentialSecret = *clusterTable.BmcCredentialSecret
 	bi.BmcCredentialUser = *clusterTable.BmcCredentialUser
 	bi.BmcCredentialPassword = *clusterTable.BmcCredentialPassword

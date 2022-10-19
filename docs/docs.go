@@ -341,6 +341,41 @@ const docTemplate = `{
                     }
                 }
             },
+            "post": {
+                "description": "저장된 클러스터 정보를 이용해서 Provision 처리 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster"
+                ],
+                "summary": "ProvisioningCluster",
+                "operationId": "ProvisioningCluster",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
             "delete": {
                 "description": "클러스터 삭제 (Openstack)",
                 "produces": [
@@ -949,6 +984,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "http://192.168.0.1/ubuntu.qcow2"
                 },
+                "namespace": {
+                    "type": "string",
+                    "example": "default"
+                },
                 "password": {
                     "type": "string",
                     "example": "asdf"
@@ -1204,10 +1243,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": ""
                 },
-                "namespace": {
-                    "type": "string",
-                    "example": ""
-                },
                 "node_count": {
                     "type": "integer",
                     "example": 1
@@ -1280,6 +1315,10 @@ const docTemplate = `{
                 "name": {
                     "type": "string",
                     "example": "os-cluster-#1"
+                },
+                "namespace": {
+                    "type": "string",
+                    "example": "default"
                 }
             }
         },

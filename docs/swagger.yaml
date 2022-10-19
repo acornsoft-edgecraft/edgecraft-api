@@ -37,6 +37,9 @@ definitions:
       image_url:
         example: http://192.168.0.1/ubuntu.qcow2
         type: string
+      namespace:
+        example: default
+        type: string
       password:
         example: asdf
         type: string
@@ -216,9 +219,6 @@ definitions:
       name:
         example: ""
         type: string
-      namespace:
-        example: ""
-        type: string
       node_count:
         example: 1
         type: integer
@@ -269,6 +269,9 @@ definitions:
         type: string
       name:
         example: os-cluster-#1
+        type: string
+      namespace:
+        example: default
         type: string
     type: object
   model.OpenstackClusterSet:
@@ -596,6 +599,30 @@ paths:
           schema:
             $ref: '#/definitions/response.ReturnData'
       summary: GetCluster
+      tags:
+      - Openstack-Cluster
+    post:
+      description: 저장된 클러스터 정보를 이용해서 Provision 처리 (Openstack)
+      operationId: ProvisioningCluster
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: ProvisioningCluster
       tags:
       - Openstack-Cluster
     put:

@@ -38,7 +38,6 @@ func (a *API) GetClusterListHandler(c echo.Context) error {
 	}
 
 	return response.Write(c, nil, result)
-
 }
 
 // GetClusterHandler - 클러스터 상세 조회 (Openstack)
@@ -190,4 +189,52 @@ func (a *API) UpdateClusterHandler(c echo.Context) error {
 // @Router /clouds/{cloudId}/clusters/{clusterId} [delete]
 func (a *API) DeleteClusterHandler(c echo.Context) error {
 	return nil
+}
+
+// ProvisioningClusterHandler - 클러스터 Provisioning (Openstack)
+// @Tags Openstack-Cluster
+// @Summary ProvisioningCluster
+// @Description 저장된 클러스터 정보를 이용해서 Provision 처리 (Openstack)
+// @ID ProvisioningCluster
+// @Produce json
+// @Param cloudId path string true "Cloud ID"
+// @Param clusterId path string true "Cluster ID"
+// @Success 200 {object} response.ReturnData
+// @Router /clouds/{cloudId}/clusters/{clusterId} [post]
+func (a *API) ProvisioningClusterHandler(c echo.Context) error {
+	cloudId := c.Param("cloudId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
+	}
+
+	clusterId := c.Param("clusterId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
+	}
+
+	// Cluster 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.DatabaseFalseData, err)
+	}
+
+	// Cluster 상태 검증
+	if *clusterTable.Status != 1 {
+		return response.ErrorfReqRes(c, clusterTable, common.ProvisioningOnlySaved, err)
+	}
+
+	// NodeSets 정보 조회
+	nodeSetTables, err := a.Db.GetNodeSets(clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if len(nodeSetTables) == 0 {
+		return response.ErrorfReqRes(c, nodeSetTables, common.DatabaseFalseData, err)
+	}
+
+	// Provisioning (background)
+	go ProvisioningOpenstackCluster(clusterTable, nodeSetTables)
+
+	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
 }

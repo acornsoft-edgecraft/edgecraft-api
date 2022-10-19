@@ -13,7 +13,7 @@ CREATE TABLE "edgecraft"."tbl_cluster"
 (
     "cloud_uid"             			CHAR(36)                            NOT NULL,   -- 클라우드식별자
 	"cluster_uid"           			CHAR(36)                            NOT NULL,   -- 클러스터식별자
-	"project_name"          			VARCHAR(50)                         NULL,       -- 오픈스택프로젝트이름
+	"namespace"							VARCHAR(100)	DEFAULT 'default'	NULL,		-- CR정보 생성을 위한 Namespace
 	"name"                  			VARCHAR(50)                         NULL,       -- 클러스터이름
 	"description"           			VARCHAR(100)                        NULL,       -- 클러스터설명
 	"credential"            			TEXT                                NULL,       -- 클러스터자격증명

@@ -20,6 +20,7 @@ type ClusterTable struct {
 	SvcDomain *string `json:"svc_domain" db:"service_domain"`
 
 	// Baremetal 정보
+	Namespace             *string      `json:"namespace" db:"namespace"`
 	BmcCredentialSecret   *string      `json:"secret_name" db:"bmc_credential_secret"`
 	BmcCredentialUser     *string      `json:"user_name" db:"bmc_credential_user"`
 	BmcCredentialPassword *string      `json:"password" db:"bmc_credential_password"`
