@@ -10,6 +10,9 @@ import (
 
 // ProvisioningOpenstackCluster - 오픈스택 클러스터 Provisioning
 func ProvisioningOpenstackCluster(cluster *model.OpenstackClusterTable, nodeSets []*model.NodeSetTable) {
+	// Make provision data
+	data := model.OpenstackClusterSet{}
+	data.FromTable(cluster, nodeSets)
 	// // Make provision data
 	// data := model.OpenstackCAPI{}
 	// data.FromTable(cluster, nodeSets)

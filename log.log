@@ -2706,3 +2706,5 @@
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-19T17:46:42.350+0900","caller":"cmd/starter.go:68","msg":"[Using config file: /Volumes/MorrisSSD/Workspaces/MyWorks/edge-craft/projects/edgecraft-api/conf/config.yml]"}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-19T17:46:42.366+0900","caller":"cmd/starter.go:79","msg":"Server initialized..."}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-19T17:46:42.500+0900","caller":"cobra@v1.5.0/command.go:902","msg":"[Intialize done.]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-19T19:14:52.320+0900","caller":"runtime/asm_amd64.s:1594","msg":"Received interrupt signal"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-19T19:14:52.322+0900","caller":"cmd/starter.go:38","msg":"Shutdown HTTP Server..."}

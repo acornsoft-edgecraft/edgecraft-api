@@ -36,6 +36,11 @@ func (ocs *OpenstackClusterSet) ToTable(cloudId string, isUpdate bool, user stri
 	return
 }
 
+// FromTable - 테이블 정보를 기준으로 Openstack Cluster Set 구성
+func (ocs *OpenstackClusterSet) FromTable(clusterTable *OpenstackClusterTable, nodeSetTables []*NodeSetTable) {
+
+}
+
 // OpenstackInfo - Configuration for Openstack
 type OpenstackInfo struct {
 	Cloud               string `json:"openstack_cloud" example:"openstack"`
