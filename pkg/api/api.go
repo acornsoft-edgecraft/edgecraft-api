@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 )
 
@@ -12,23 +13,9 @@ import (
 
 // ===== [ Types ] =====
 
-// Config - Represents the API Server configuration
-type Config struct {
-	Type        string   `yaml:"type"`
-	Port        string   `yaml:"port"`
-	Host        string   `yaml:"host"`
-	HomePageURL string   `yaml:"homePageUrl"`
-	Secret      string   `yaml:"secret"`
-	PathPrefix  string   `yaml:"pathPrefix"`
-	Langs       []string `yaml:"langs"`
-	LangPath    string   `yaml:"langPath"`
-	Mode        string   `yaml:"mode"`
-	// EdgeDatabase postgresdb.Config `yaml:"edge_database"`
-}
-
 // API - Represents the structure of the API
 type API struct {
-	Config *Config
+	Config *config.ApiConfig
 	Db     db.DB
 	// EdgeDb map[string]db.DB
 	// Mail   *mail.Client
@@ -74,7 +61,7 @@ func getRequestData(req *http.Request, data interface{}) error {
 // ===== [ Public Functions ] =====
 
 // New - Returns the api settings
-func New(conf *Config, db db.DB) (*API, error) {
+func New(conf *config.ApiConfig, db db.DB) (*API, error) {
 	api := &API{
 		Config: conf,
 		Db:     db,

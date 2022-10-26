@@ -4,6 +4,9 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 package model
 
 import (
+	"database/sql/driver"
+	"encoding/json"
+	"errors"
 	"time"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
@@ -26,6 +29,7 @@ func (ocs *OpenstackClusterSet) ToTable(cloudId string, isUpdate bool, user stri
 	clusterTable.CloudUid = utils.StringPtr(cloudId)
 	ocs.Cluster.ToTable(clusterTable, isUpdate, user, at)
 	ocs.K8s.ToOpenstackTable(clusterTable)
+	ocs.Openstack.ToTable(clusterTable)
 
 	// TODO: ETCD/STORAGE 정보에 대한 정의 필요함.
 	ocs.EtcdStorage.ToOpenstackTable(clusterTable)
@@ -38,12 +42,32 @@ func (ocs *OpenstackClusterSet) ToTable(cloudId string, isUpdate bool, user stri
 
 // FromTable - 테이블 정보를 기준으로 Openstack Cluster Set 구성
 func (ocs *OpenstackClusterSet) FromTable(clusterTable *OpenstackClusterTable, nodeSetTables []*NodeSetTable) {
-
+	if ocs.Cluster == nil {
+		ocs.Cluster = &OpenstackClusterInfo{}
+	}
+	ocs.Cluster.FromTable(clusterTable)
+	if ocs.K8s == nil {
+		ocs.K8s = &KubernetesInfo{}
+	}
+	ocs.K8s.FromOpenstackTable(clusterTable)
+	if ocs.Openstack == nil {
+		ocs.Openstack = &OpenstackInfo{}
+	}
+	ocs.Openstack.FromTable(clusterTable)
+	if ocs.Nodes == nil {
+		ocs.Nodes = &OpenstackNodeSetInfo{}
+	}
+	ocs.Nodes.FromTable(clusterTable, nodeSetTables)
+	if ocs.EtcdStorage == nil {
+		ocs.EtcdStorage = &EtcdStorageInfo{}
+	}
+	ocs.EtcdStorage.FromOpenstackTable(clusterTable)
 }
 
 // OpenstackInfo - Configuration for Openstack
 type OpenstackInfo struct {
 	Cloud               string `json:"openstack_cloud" example:"openstack"`
+	LocalHostName       string `json:"local_hostname" example:"{{local_hostname}}"` // go-template에서 충돌이 발생하는 self binding 처리용
 	ProviderConfB64     string `json:"openstack_cloud_provider_conf_b64" example:"W0dsb2JhbF0KYXV0aC11cmw9aHR0cDovLzE5Mi4xNjguNzcuMTEvaWRlbnRpdHkKdXNlcm5hbWU9InN1bm1pIgpwYXNzd29yZD0iZmtmZms0NDgiCnRlbmFudC1pZD0iNTQyZTdhMDRmNjkxNDgyOWI0M2U3N2Y5ZWYxMmI3NzkiCnRlbmFudC1uYW1lPSJlZGdlY3JhZnQiCmRvbWFpbi1uYW1lPSJEZWZhdWx0IgpyZWdpb249IlJlZ2lvbk9uZSIK"`
 	YamlB64             string `json:"openstack_cloud_yaml_b64" example:"Y2xvdWRzOgogIG9wZW5zdGFjazoKICAgIGF1dGg6CiAgICAgIGF1dGhfdXJsOiBodHRwOi8vMTkyLjE2OC43Ny4xMS9pZGVudGl0eQogICAgICB1c2VybmFtZTogInN1bm1pIgogICAgICBwYXNzd29yZDogImZrZmZrNDQ4IgogICAgICBwcm9qZWN0X2lkOiA1NDJlN2EwNGY2OTE0ODI5YjQzZTc3ZjllZjEyYjc3OQogICAgICBwcm9qZWN0X25hbWU6ICJlZGdlY3JhZnQiCiAgICAgIHVzZXJfZG9tYWluX25hbWU6ICJEZWZhdWx0IgogICAgcmVnaW9uX25hbWU6ICJSZWdpb25PbmUiCiAgICBpbnRlcmZhY2U6ICJwdWJsaWMiCiAgICBpZGVudGl0eV9hcGlfdmVyc2lvbjogMwo="`
 	CACertB64           string `json:"openstack_cloud_cacert_b64" example:"Cg=="`
@@ -59,6 +83,65 @@ type OpenstackInfo struct {
 	BastionImageName    string `json:"bastion_image_name" example:""`
 	BastionSSHKeyName   string `json:"bastion_ssh_key_name" example:""`
 	BastionFloatingIP   string `json:"bastion_floating_ip" example:""`
+}
+
+// ToTable - Openstack 정보를 테이블로 설정
+func (osi *OpenstackInfo) ToTable(clusterTable *OpenstackClusterTable) {
+	if clusterTable.OpenstackInfo == nil {
+		clusterTable.OpenstackInfo = &OpenstackInfo{}
+	}
+
+	clusterTable.OpenstackInfo.Cloud = osi.Cloud
+	clusterTable.OpenstackInfo.ProviderConfB64 = osi.ProviderConfB64
+	clusterTable.OpenstackInfo.YamlB64 = osi.YamlB64
+	clusterTable.OpenstackInfo.CACertB64 = osi.CACertB64
+	clusterTable.OpenstackInfo.DNSNameServers = osi.DNSNameServers
+	clusterTable.OpenstackInfo.FailureDomain = osi.FailureDomain
+	clusterTable.OpenstackInfo.ImageName = osi.ImageName
+	clusterTable.OpenstackInfo.SSHKeyName = osi.SSHKeyName
+	clusterTable.OpenstackInfo.ExternalNetworkID = osi.ExternalNetworkID
+	clusterTable.OpenstackInfo.APIServerFloatingIP = osi.APIServerFloatingIP
+	clusterTable.OpenstackInfo.NodeCidr = osi.NodeCidr
+	clusterTable.OpenstackInfo.UseBastionHost = osi.UseBastionHost
+	clusterTable.OpenstackInfo.BastionFlavor = osi.BastionFlavor
+	clusterTable.OpenstackInfo.BastionImageName = osi.BastionImageName
+	clusterTable.OpenstackInfo.BastionSSHKeyName = osi.BastionSSHKeyName
+	clusterTable.OpenstackInfo.BastionFloatingIP = osi.BastionFloatingIP
+}
+
+// FromTable - 테이블 정보를 Openstack 정보로 설정
+func (osi *OpenstackInfo) FromTable(clusterTable *OpenstackClusterTable) {
+	osi.Cloud = clusterTable.OpenstackInfo.Cloud
+	osi.LocalHostName = "{{local_hostname}}" // 테이블에 저장되지 않는 고정 값
+	osi.ProviderConfB64 = clusterTable.OpenstackInfo.ProviderConfB64
+	osi.YamlB64 = clusterTable.OpenstackInfo.YamlB64
+	osi.CACertB64 = clusterTable.OpenstackInfo.CACertB64
+	osi.DNSNameServers = clusterTable.OpenstackInfo.DNSNameServers
+	osi.FailureDomain = clusterTable.OpenstackInfo.FailureDomain
+	osi.ImageName = clusterTable.OpenstackInfo.ImageName
+	osi.SSHKeyName = clusterTable.OpenstackInfo.SSHKeyName
+	osi.ExternalNetworkID = clusterTable.OpenstackInfo.ExternalNetworkID
+	osi.APIServerFloatingIP = clusterTable.OpenstackInfo.APIServerFloatingIP
+	osi.NodeCidr = clusterTable.OpenstackInfo.NodeCidr
+	osi.UseBastionHost = clusterTable.OpenstackInfo.UseBastionHost
+	osi.BastionFlavor = clusterTable.OpenstackInfo.BastionFlavor
+	osi.BastionImageName = clusterTable.OpenstackInfo.BastionImageName
+	osi.BastionSSHKeyName = clusterTable.OpenstackInfo.BastionSSHKeyName
+	osi.BastionFloatingIP = clusterTable.OpenstackInfo.BastionFloatingIP
+}
+
+// Value Marshal
+func (osi OpenstackInfo) Value() (driver.Value, error) {
+	return json.Marshal(osi)
+}
+
+// Scan Unmarshal
+func (osi *OpenstackInfo) Scan(value interface{}) error {
+	b, ok := value.([]byte)
+	if !ok {
+		return errors.New("type assertion to []byte failed")
+	}
+	return json.Unmarshal(b, &osi)
 }
 
 // OpenstackClusterInfo - Basic data for openstack cluster
@@ -92,6 +175,14 @@ func (osc *OpenstackClusterInfo) ToTable(clusterTable *OpenstackClusterTable, is
 	clusterTable.Name = utils.StringPtr(osc.Name)
 	clusterTable.Desc = utils.StringPtr(osc.Desc)
 	clusterTable.Namespace = utils.StringPtr(osc.Namespace)
+}
+
+// FromTable - 테이블 정보를 Openstack Cluster 정보로 설정
+func (osc *OpenstackClusterInfo) FromTable(clusterTable *OpenstackClusterTable) {
+	osc.ClusterUid = *clusterTable.ClusterUid
+	osc.Name = *clusterTable.Name
+	osc.Desc = *clusterTable.Desc
+	osc.Namespace = *clusterTable.Namespace
 }
 
 // NodeSetInfo - Data for Nodeset

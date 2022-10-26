@@ -7,10 +7,11 @@ import "github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 
 // KubernetesInfo - Data for Kubernetes
 type KubernetesInfo struct {
-	Version   int    `json:"version" example:"1"`
-	PodCidr   string `json:"pod_cidr" example:"10.96.0.1/12"`
-	SvcCidr   string `json:"svc_cidr" example:"10.96.0.0/12"`
-	SvcDomain string `json:"svc_domain" example:"cluster.local"`
+	Version     int    `json:"version" example:"1"`
+	VersionName string `json:"-"` // Template 처리시에 활용할 코드 값.
+	PodCidr     string `json:"pod_cidr" example:"10.96.0.1/12"`
+	SvcCidr     string `json:"svc_cidr" example:"10.96.0.0/12"`
+	SvcDomain   string `json:"svc_domain" example:"cluster.local"`
 }
 
 // ToTable - K8S 정보르 테이블로 설정

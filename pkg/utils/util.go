@@ -240,3 +240,13 @@ func IntPrt(val int) *int {
 func BoolPtr(val bool) *bool {
 	return &val
 }
+
+// ArrayContains - 지정한 배열내에 지정한 값이 있는지 검증
+func ArrayContains(arr []string, str string) bool {
+	for _, s := range arr {
+		if s == str {
+			return true
+		}
+	}
+	return false
+}

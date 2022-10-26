@@ -13,6 +13,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/route"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/server"
+	"github.com/labstack/gommon/log"
 	"github.com/spf13/cobra"
 )
 
@@ -50,14 +51,16 @@ func Execute() {
 	}
 }
 
+// init - called on package loading
 func init() {
 	cobra.OnInitialize(initConfig)
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	// k8s config flag
+	rootCmd.Flags().String("kubeconfig", "", "The path to the kubeconfig used to connect to the kubernetes API server and the Kubelets")
 }
 
 func initConfig() {
-
 	// create default logger
 	err := logger.New()
 	if err != nil {
@@ -70,6 +73,16 @@ func initConfig() {
 		logger.Fatalf("Could not load configuration: %s", err.Error())
 		os.Exit(0)
 	}
+
+	// Make K8s Client for multiple clusters using File/ConfigMap
+	kubeconfig, err := rootCmd.Flags().GetString("kubeconfig")
+	if err != nil {
+		logger.Warnf("invalid kubeconfig parameter", err.Error())
+	}
+	log.Infof("kubeconfig is '%s'", kubeconfig)
+
+	config.SetupClusters(kubeconfig)
+	//client.SetupClient(kubeconfig)
 
 	// Load Message Files (i18n)
 	common.LoadMessages(conf.API.LangPath, conf.API.Langs)
@@ -89,6 +102,10 @@ func initConfig() {
 
 	// create API instance & Initialize API
 	api, err := api.New(conf.API, DB)
+	if err != nil {
+		logger.WithError(err).Fatal("Could not create api instance and initialize")
+		return
+	}
 
 	// httpserver's route setting
 	route.SetRoutes(api, gatewayServer)

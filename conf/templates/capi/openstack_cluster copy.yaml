@@ -37,7 +37,7 @@ spec:
           kubeletExtraArgs:
             cloud-config: /etc/kubernetes/cloud.conf
             cloud-provider: openstack
-          name: "{{ .LocalHostName }}" ##### Self binding by CAPI ({{ local_hostname }})
+          name: "{{ .LocalHostName }}" ##### Self binding by CAPI
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
@@ -71,7 +71,7 @@ metadata:
   namespace: {{or .Namespace "default"}} #default ##### apply namespace
 spec:
   clusterName: {{.ClusterName}} # ${CLUSTER_NAME} ##### apply cluster name
-  replicas: {{.WorkerMachineCount} # ${WORKER_MACHINE_COUNT} ##### apply worker machine count
+  replicas: {{.WorkerMachineCount}} # ${WORKER_MACHINE_COUNT} ##### apply worker machine count
   selector:
     matchLabels: null
   template:
@@ -97,14 +97,14 @@ spec:
   kubeadmConfigSpec:
     clusterConfiguration:
       {{ if eq true .UseExternalETCD }}
-      {{ $etcd := .Use..}}
       etcd:
         external:"defaul"
           endpoints:
-          {{with ETCDEndpoints}}
+          {{with .ETCDEndpoints}}
             {{ range . }}
-            - https://{{$}} # - https://10.0.0.230:2379
+            - https://{{.}} # - https://10.0.0.230:2379
             {{ end}}
+          {{end}}
           caFile: {{.ETCDCAFile}} # /etc/kubernetes/pki/etcd/ca.crt
           certFile: {{.ETCDCertFile}} # /etc/kubernetes/pki/apiserver-etcd-client.crt
           keyFile: {{.ETCDKeyFile}} # /etc/kubernetes/pki/apiserver-etcd-client.key
@@ -148,13 +148,13 @@ spec:
         kubeletExtraArgs:
           cloud-config: /etc/kubernetes/cloud.conf
           cloud-provider: openstack
-        name: "{{ .LocalHostName }}" ##### Self binding by CAPI ({{ local_hostname }})
+        name: "{{ .LocalHostName }}" ##### Self binding by CAPI
     joinConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
           cloud-config: /etc/kubernetes/cloud.conf
           cloud-provider: openstack
-        name: "{{ .LocalHostName }}" ##### Self binding by CAPI ({{ local_hostname }})
+        name: "{{ .LocalHostName }}" ##### Self binding by CAPI
     # calico preinstall, notice if closed cloud environment
     postKubeadmCommands:
       - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
@@ -206,12 +206,12 @@ spec:
   template:
     spec:
       cloudName: {{.OpenstackCloud}} # ${OPENSTACK_CLOUD} ##### apply cloud name
-      flavor: {{.OpenstackControlPlaneMachineFlavor} # ${OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR} ##### apply control plane machine flavor
+      flavor: {{.OpenstackControlPlaneMachineFlavor}} # ${OPENSTACK_CONTROL_PLANE_MACHINE_FLAVOR} ##### apply control plane machine flavor
       identityRef:
         kind: Secret
         name: {{.ClusterName}}-cloud-config # ${CLUSTER_NAME}-cloud-config ##### apply cluster name
       image: {{.OpenstackImageName}} # ${OPENSTACK_IMAGE_NAME} ##### apply host image name
-      sshKeyName: {{.OpenstackSSHKeyName} # ${OPENSTACK_SSH_KEY_NAME} ##### apply ssh key name
+      sshKeyName: {{.OpenstackSSHKeyName}} # ${OPENSTACK_SSH_KEY_NAME} ##### apply ssh key name
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
 kind: OpenStackMachineTemplate
