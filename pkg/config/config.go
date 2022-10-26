@@ -6,7 +6,6 @@ import (
 	"os"
 	"strings"
 
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db/postgresdb"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/mitchellh/mapstructure"
@@ -21,9 +20,23 @@ const (
 
 // ===== [ Types ] =====
 
+// ApiConfig - Represents the API Server configuration
+type ApiConfig struct {
+	Type        string   `yaml:"type"`
+	Port        string   `yaml:"port"`
+	Host        string   `yaml:"host"`
+	HomePageURL string   `yaml:"homePageUrl"`
+	Secret      string   `yaml:"secret"`
+	PathPrefix  string   `yaml:"pathPrefix"`
+	Langs       []string `yaml:"langs"`
+	LangPath    string   `yaml:"langPath"`
+	Mode        string   `yaml:"mode"`
+	// EdgeDatabase postgresdb.Config `yaml:"edge_database"`
+}
+
 // Config - Represents the configuration
 type Config struct {
-	API *api.Config        `yaml:"api"`
+	API *ApiConfig         `yaml:"api"`
 	DB  *postgresdb.Config `yaml:"database"`
 }
 

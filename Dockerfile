@@ -23,4 +23,4 @@ COPY --from=builder ["/build/edgecraft-api", "/"]
 COPY --from=builder ["/build/conf", "/conf"]
 
 # Command to run when starting the container.
-ENTRYPOINT ["/edgecraft-api"]
+ENTRYPOINT ["/edgecraft-api", "--kubeconfig", "strategy=configmap,namespace=edgecraft,configmap=edgecraft-kubeconfig,filename=config"]

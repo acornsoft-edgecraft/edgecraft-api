@@ -25,13 +25,13 @@ type DynamicClient struct {
 	config       *rest.Config                // Rest config
 	resource     schema.GroupVersionResource // resource gvr definition
 	namespace    string                      // namespace
-	namespaceSet bool                        // namespace 설정 여부
+	hasNamespace bool                        // namespace 설정 여부
 }
 
 // SetNamespace - Namespace 설정
 func (dc *DynamicClient) SetNamespace(ns string) {
 	dc.namespace = ns
-	dc.namespaceSet = (ns != "")
+	dc.hasNamespace = (ns != "")
 }
 
 // List - ListOptions에 따른 List 처리
@@ -42,7 +42,7 @@ func (dc *DynamicClient) List(opts v1.ListOptions) (res *unstructured.Unstructur
 		return
 	}
 
-	if dc.namespaceSet {
+	if dc.hasNamespace {
 		res, err = di.Resource(dc.resource).Namespace(dc.namespace).List(context.TODO(), opts)
 	} else {
 		res, err = di.Resource(dc.resource).List(context.TODO(), opts)
@@ -59,7 +59,7 @@ func (dc *DynamicClient) Get(name string, opts v1.GetOptions) (res *unstructured
 		return
 	}
 
-	if dc.namespaceSet {
+	if dc.hasNamespace {
 		res, err = di.Resource(dc.resource).Namespace(dc.namespace).Get(context.TODO(), name, opts)
 	} else {
 		res, err = di.Resource(dc.resource).Get(context.TODO(), name, opts)
@@ -77,7 +77,7 @@ func (dc *DynamicClient) Watch(opts v1.ListOptions) (wi watch.Interface, err err
 	}
 	opts.Watch = true
 
-	if dc.namespaceSet {
+	if dc.hasNamespace {
 		wi, err = di.Resource(dc.resource).Namespace(dc.namespace).Watch(context.TODO(), opts)
 	} else {
 		wi, err = di.Resource(dc.resource).Watch(context.TODO(), opts)
@@ -94,7 +94,7 @@ func (dc *DynamicClient) Delete(name string, opts v1.DeleteOptions) (err error) 
 		return
 	}
 
-	if dc.namespaceSet {
+	if dc.hasNamespace {
 		err = di.Resource(dc.resource).Namespace(dc.namespace).Delete(context.TODO(), name, opts)
 	} else {
 		err = di.Resource(dc.resource).Delete(context.TODO(), name, opts)
@@ -201,7 +201,7 @@ func (dc *DynamicClient) Patch(name string, patchType types.PatchType, payload i
 		return res, err
 	}
 
-	if dc.namespaceSet {
+	if dc.hasNamespace {
 		res, err = di.Resource(dc.resource).Namespace(dc.namespace).Patch(context.TODO(), name, patchType, data, opts)
 	} else {
 		res, err = di.Resource(dc.resource).Patch(context.TODO(), name, patchType, data, opts)
@@ -210,20 +210,20 @@ func (dc *DynamicClient) Patch(name string, patchType types.PatchType, payload i
 	return
 }
 
-// NewDynamicCleint - Config 기준의 Restfull Client 생성
-func NewDynamicCleint(config *rest.Config) *DynamicClient {
+// NewDynamicClient - Config 기준의 Restfull Client 생성
+func NewDynamicClient(config *rest.Config) *DynamicClient {
 	return &DynamicClient{
 		config:       config,
-		namespaceSet: false,
+		hasNamespace: false,
 	}
 }
 
 // NewDynamicClientSchema - Config, Group, Version, Resource 기준의 Restful Client 생성
-// example: schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1alpha3", Resource: "virtualservices"}
+// ex. schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1alpha3", Resource: "virtualservices"}
 func NewDynamicClientSchema(config *rest.Config, group, version, resource string) *DynamicClient {
 	return &DynamicClient{
 		config:       config,
 		resource:     schema.GroupVersionResource{Group: group, Version: version, Resource: resource},
-		namespaceSet: false,
+		hasNamespace: false,
 	}
 }
