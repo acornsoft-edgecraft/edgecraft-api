@@ -13,7 +13,6 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/route"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/server"
-	"github.com/labstack/gommon/log"
 	"github.com/spf13/cobra"
 )
 
@@ -79,10 +78,9 @@ func initConfig() {
 	if err != nil {
 		logger.Warnf("invalid kubeconfig parameter", err.Error())
 	}
-	log.Infof("kubeconfig is '%s'", kubeconfig)
+	logger.Infof("specified kubeconfig parameter is '%s'", kubeconfig)
 
 	config.SetupClusters(kubeconfig)
-	//client.SetupClient(kubeconfig)
 
 	// Load Message Files (i18n)
 	common.LoadMessages(conf.API.LangPath, conf.API.Langs)
