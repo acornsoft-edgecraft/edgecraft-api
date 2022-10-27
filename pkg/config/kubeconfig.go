@@ -8,8 +8,8 @@ import (
 	"fmt"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/client"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
-	"github.com/labstack/gommon/log"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/discovery"
 	"k8s.io/client-go/kubernetes"
@@ -164,19 +164,19 @@ func newKubeCluster(conf *strategyInfo) (*kubeCluster, error) {
 	if conf.Strategy == KubeConfigStrategyConfigmap {
 		provider, err = createConfigmapClusterConfig(conf.Data["namespace"], conf.Data["configmap"], conf.Data["filename"])
 		if err != nil {
-			log.Warnf("can't create a 'configmap' kubeconfig-provider (cause-%s", err.Error())
+			logger.Warnf("can't create a 'configmap' kubeconfig-provider (cause-%s)", err.Error())
 		}
 	}
 
 	// default provider
 	if provider == nil {
 		if provider, err = createFileClusterConfig(conf.Data["path"]); err != nil {
-			log.Warnf("can't create a 'file' kubeconfig-provider (cause-%s", err.Error())
+			logger.Warnf("can't create a 'file' kubeconfig-provider (cause-%s)", err.Error())
 		}
 	}
 
 	if provider == nil {
-		log.Panicf("can't create a kubeconfig-provider")
+		logger.Panicf("can't create a kubeconfig-provider")
 	}
 
 	clusters := make(map[string]*ClientSet)
@@ -185,7 +185,7 @@ func newKubeCluster(conf *strategyInfo) (*kubeCluster, error) {
 
 	apiConfig, err := provider.load()
 	if err != nil {
-		log.Warnf("can't load a kubeconfig (cause=%s)", err.Error())
+		logger.Warnf("can't load a kubeconfig (cause=%s)", err.Error())
 		apiConfig = &api.Config{
 			Clusters:  make(map[string]*api.Cluster),
 			AuthInfos: make(map[string]*api.AuthInfo),

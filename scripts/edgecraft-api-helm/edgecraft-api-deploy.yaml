@@ -15,9 +15,10 @@ spec:
       labels:
         app: edgecraft-api
     spec:
+      serviceAccountName: edgecraft
       containers:
-      - name: edgecraft-api
-        image: ghcr.io/acornsoft-edgecraft/edgecraft-api:latest
-        imagePullPolicy: Always
-        ports:
-        - containerPort: 8100
+        - name: edgecraft-api
+          image: ghcr.io/acornsoft-edgecraft/edgecraft-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8100
