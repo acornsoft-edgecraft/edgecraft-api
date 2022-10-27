@@ -3325,3 +3325,15 @@
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T11:25:18.837+0900","caller":"v4@v4.9.0/echo.go:646","msg":"HTTP process information","00":"2022-10-27 11:25:18","03":"[::1]:64191","10":"0","11":"0","01":"GET","02":"/swagger/swagger-ui-standalone-preset.js","04":200,"05":"291.764µs","06":"","07":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36"}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T11:25:18.901+0900","caller":"v4@v4.9.0/echo.go:646","msg":"HTTP process information","07":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36","11":"0","02":"/swagger/doc.json","05":"307.678µs","06":"","04":200,"10":"0","00":"2022-10-27 11:25:18","01":"GET","03":"[::1]:64191"}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T11:25:18.911+0900","caller":"v4@v4.9.0/echo.go:646","msg":"HTTP process information","03":"[::1]:64191","06":"","07":"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36","10":"0","01":"GET","02":"/swagger/favicon-32x32.png","05":"52.142µs","11":"0","00":"2022-10-27 11:25:18","04":200}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T12:00:13.028+0900","caller":"runtime/asm_amd64.s:1594","msg":"Received interrupt signal"}
+{"level":"\u001b[31mERROR\u001b[0m","ts":"2022-10-27T12:00:13.031+0900","caller":"cmd/starter.go:43","msg":"HTTP Server stoped: http: Server closed"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T12:00:13.031+0900","caller":"cmd/starter.go:43","msg":"HTTP Server started...++++++"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T12:00:13.030+0900","caller":"cmd/starter.go:39","msg":"Shutdown HTTP Server..."}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T13:54:00.284+0900","caller":"cmd/starter.go:71","msg":"[Using config file: /Volumes/MorrisSSD/Workspaces/MyWorks/edge-craft/projects/edgecraft-api/conf/config.yml]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T13:54:00.306+0900","caller":"cmd/starter.go:84","msg":"Initialzied clusters (kubeconfig-strategy=file, in-cluster=false, running-in-cluster=false, contexts=[minikube openstack edgecraft k8s-monitoring], default-context=edgecraft)"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T13:54:00.309+0900","caller":"cmd/starter.go:92","msg":"Server initialized..."}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T13:54:00.362+0900","caller":"cobra@v1.5.0/command.go:902","msg":"[Intialize done.]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T13:54:20.178+0900","caller":"runtime/asm_amd64.s:1594","msg":"Received interrupt signal"}
+{"level":"\u001b[31mERROR\u001b[0m","ts":"2022-10-27T13:54:20.179+0900","caller":"cmd/starter.go:43","msg":"HTTP Server stoped: http: Server closed"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T13:54:20.179+0900","caller":"cmd/starter.go:39","msg":"Shutdown HTTP Server..."}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-10-27T13:54:20.179+0900","caller":"cmd/starter.go:43","msg":"HTTP Server started...++++++"}

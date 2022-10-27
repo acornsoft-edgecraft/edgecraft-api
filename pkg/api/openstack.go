@@ -6,6 +6,7 @@ package api
 import (
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
@@ -255,22 +256,22 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	// }
 
 	// Get Kubeconfig
-	// data, err := kubemethod.GetKubeconfig("default", "os-cluster-kubeconfig", "value")
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	// Add cluster's kubeconfig
-	// err = config.HostCluster.Add([]byte(data))
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	// Remove cluster's kubeconfig
-	err := config.HostCluster.Remove("os-cluster")
+	data, err := kubemethod.GetKubeconfig("default", "os-cluster-kubeconfig", "value")
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	}
+
+	// Add cluster's kubeconfig
+	err = config.HostCluster.Add([]byte(data))
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+
+	// // Remove cluster's kubeconfig
+	// err := config.HostCluster.Remove("os-cluster")
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// }
 
 	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, data)
 	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
