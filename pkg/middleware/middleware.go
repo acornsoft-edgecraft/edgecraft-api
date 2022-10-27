@@ -43,13 +43,13 @@ func Preflight(c echo.Context) error {
 }
 
 // HealthCheck Method
-// @Tags Common
-// @Summary Health check k8s-api-gateway
+// @Tags        Common
+// @Summary     Health check k8s-api-gateway
 // @Description for health check
-// @ID health-check
-// @Produce  json
-// @Success 200 {object} response.ReturnData
-// @Router /health [get]
+// @ID          health-check
+// @Produce     json
+// @Success     200 {object} response.ReturnData
+// @Router      /health [get]
 func HealthCheck(c echo.Context) error {
 	return response.WriteWithFields(c, struct {
 		Status string `json:"status"`

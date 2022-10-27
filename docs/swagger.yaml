@@ -318,10 +318,6 @@ definitions:
       image_name:
         example: ubuntu-2004-kube-v1.23.3
         type: string
-      local_hostname:
-        description: go-template에서 충돌이 발생하는 self binding 처리용
-        example: '{{local_hostname}}'
-        type: string
       node_cidr:
         example: 10.96.0.0/24
         type: string
@@ -1013,4 +1009,7 @@ paths:
       summary: Health check k8s-api-gateway
       tags:
       - Common
+schemes:
+- http
+- https
 swagger: "2.0"

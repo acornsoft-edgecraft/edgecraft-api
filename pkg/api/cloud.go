@@ -17,13 +17,13 @@ import (
  *******************************/
 
 // GetCloudListHandler - 전체 클라우드 리스트
-// @Tags Cloud
-// @Summary GetCloudList
+// @Tags        Cloud
+// @Summary     GetCloudList
 // @Description Get all cloud list
-// @ID GetCloudList
-// @Produce json
-// @Success 200 {object} response.ReturnData
-// @Router /clouds [get]
+// @ID          GetCloudList
+// @Produce     json
+// @Success     200 {object} response.ReturnData
+// @Router      /clouds [get]
 func (a *API) GetCloudListHandler(c echo.Context) error {
 	result, err := a.Db.GetClouds()
 	if err != nil {
@@ -33,14 +33,14 @@ func (a *API) GetCloudListHandler(c echo.Context) error {
 }
 
 // GetCloudHandler - 클라우드 상세 정보
-// @Tags Cloud
-// @Summary GetCloud
+// @Tags        Cloud
+// @Summary     GetCloud
 // @Description Get specific cloud
-// @ID GetCloud
-// @Produce json
-// @Param cloudId path string true "cloudId"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId} [get]
+// @ID          GetCloud
+// @Produce     json
+// @Param       cloudId path     string true "cloudId"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId} [get]
 func (a *API) GetCloudHandler(c echo.Context) error {
 	cloudId := c.Param("cloudId")
 	if cloudId == "" {
@@ -83,14 +83,14 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 }
 
 // SetCloudHandler - 클라우드 등록
-// @Tags Cloud
-// @Summary SetCloud
+// @Tags        Cloud
+// @Summary     SetCloud
 // @Description Register cloud
-// @ID SetCloud
-// @Produce json
-// @Param cloudSet body model.CloudSet true "Cloud Set"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds [post]
+// @ID          SetCloud
+// @Produce     json
+// @Param       cloudSet body     model.CloudSet true "Cloud Set"
+// @Success     200      {object} response.ReturnData
+// @Router      /clouds [post]
 func (a *API) SetCloudHandler(c echo.Context) error {
 	// TODO: 로그인 사용자 정보 활용 방법은?
 	var cloudSet model.CloudSet
@@ -149,15 +149,15 @@ func (a *API) SetCloudHandler(c echo.Context) error {
 }
 
 // UpdateCloudHandler - 클라우드 갱신
-// @Tags Cloud
-// @Summary UpdateCloud
+// @Tags        Cloud
+// @Summary     UpdateCloud
 // @Description Update cloud
-// @ID UpdateCloud
-// @Produce json
-// @Param cloudId path string true "cloudId"
-// @Param cloudSet body model.CloudSet true "Cloud Set"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId} [put]
+// @ID          UpdateCloud
+// @Produce     json
+// @Param       cloudId  path     string         true "cloudId"
+// @Param       cloudSet body     model.CloudSet true "Cloud Set"
+// @Success     200      {object} response.ReturnData
+// @Router      /clouds/{cloudId} [put]
 func (a *API) UpdateCloudHandler(c echo.Context) error {
 	// TODO: 로그인 사용자 정보 활용 방법은?
 	cloudId := c.Param("cloudId")
@@ -305,14 +305,14 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 }
 
 // DeleteCloudHandler - 클라우드 삭제
-// @Tags Cloud
-// @Summary DeleteCloud
+// @Tags        Cloud
+// @Summary     DeleteCloud
 // @Description Delete cloud
-// @ID DeleteCloud
-// @Produce json
-// @Param cloudId path string true "cloudId"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId} [delete]
+// @ID          DeleteCloud
+// @Produce     json
+// @Param       cloudId path     string true "cloudId"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId} [delete]
 func (a *API) DeleteCloudHandler(c echo.Context) error {
 	// TODO: 로그인 사용자 정보 활용 방법은?
 	cloudId := c.Param("cloudId")
@@ -390,14 +390,14 @@ func (a *API) DeleteCloudHandler(c echo.Context) error {
  *******************************/
 
 // GetCloudNodeListHandler - 클라우드에 속한 노드 리스트 조회
-// @Tags CloudNode
-// @Summary GetCloudNodeList
+// @Tags        CloudNode
+// @Summary     GetCloudNodeList
 // @Description 클라우드에 속한 노드 리스트 조회
-// @ID GetCloudNodeList
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/nodes [get]
+// @ID          GetCloudNodeList
+// @Produce     json
+// @Param       cloudId path     string true "Cloud ID"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId}/nodes [get]
 func (a *API) GetCloudNodeListHandler(c echo.Context) error {
 	cloudId := c.Param("cloudId")
 	if cloudId == "" {
@@ -430,15 +430,15 @@ func (a *API) GetCloudNodeListHandler(c echo.Context) error {
 }
 
 // GetCloudNodeHandler - 클라우드에 속한 노드 상세정보 조회
-// @Tags CloudNode
-// @Summary GetCloudNode
+// @Tags        CloudNode
+// @Summary     GetCloudNode
 // @Description 클라우드에 속한 노드 상세정보 조회
-// @ID GetCloudNode
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param nodeId path string true "Node ID"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/nodes/{nodeId} [get]
+// @ID          GetCloudNode
+// @Produce     json
+// @Param       cloudId path     string true "Cloud ID"
+// @Param       nodeId  path     string true "Node ID"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId}/nodes/{nodeId} [get]
 func (a *API) GetCloudNodeHandler(c echo.Context) error {
 	cloudId := c.Param("cloudId")
 	if cloudId == "" {
@@ -465,15 +465,15 @@ func (a *API) GetCloudNodeHandler(c echo.Context) error {
 }
 
 // SetCloudNodeHandler - 클라우드에 노드 등록
-// @Tags CloudNode
-// @Summary SetCloudNode
+// @Tags        CloudNode
+// @Summary     SetCloudNode
 // @Description 클라우드에 노드 등록
-// @ID SetCloudNode
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param node body model.NodeSpecificInfo true "Node Specific Info"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/nodes [post]
+// @ID          SetCloudNode
+// @Produce     json
+// @Param       cloudId path     string                 true "Cloud ID"
+// @Param       node    body     model.NodeSpecificInfo true "Node Specific Info"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId}/nodes [post]
 func (a *API) SetCloudNodeHandler(c echo.Context) error {
 	// TODO: 로그인 사용자 정보 활용 방법은?
 
@@ -531,16 +531,16 @@ func (a *API) SetCloudNodeHandler(c echo.Context) error {
 }
 
 // UpdateCloudNodeHandler - 클라우드의 노드 수정
-// @Tags CloudNode
-// @Summary UpdateCloudNode
+// @Tags        CloudNode
+// @Summary     UpdateCloudNode
 // @Description 클라우드의 노드 수정
-// @ID UpdateCloudNode
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param nodeId path string true "Node ID"
-// @Param node body model.NodeSpecificInfo true "Nodes Info"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/nodes/{nodeId} [put]
+// @ID          UpdateCloudNode
+// @Produce     json
+// @Param       cloudId path     string                 true "Cloud ID"
+// @Param       nodeId  path     string                 true "Node ID"
+// @Param       node    body     model.NodeSpecificInfo true "Nodes Info"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId}/nodes/{nodeId} [put]
 func (a *API) UpdateCloudNodeHandler(c echo.Context) error {
 	// TODO: 로그인 사용자 정보 활용 방법은?
 
@@ -616,15 +616,15 @@ func (a *API) UpdateCloudNodeHandler(c echo.Context) error {
 }
 
 // DeleteCloudNodeHandler - 클라우드의 노드 삭제
-// @Tags CloudNode
-// @Summary DeleteCloudNode
+// @Tags        CloudNode
+// @Summary     DeleteCloudNode
 // @Description 클라우드의 노드 삭제
-// @ID DeleteCloudNode
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param nodeId path string true "Node ID"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/nodes/{nodeId} [delete]
+// @ID          DeleteCloudNode
+// @Produce     json
+// @Param       cloudId path     string true "Cloud ID"
+// @Param       nodeId  path     string true "Node ID"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId}/nodes/{nodeId} [delete]
 func (a *API) DeleteCloudNodeHandler(c echo.Context) error {
 	// Cloud Id 수신
 	cloudId := c.Param("cloudId")
