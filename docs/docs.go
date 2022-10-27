@@ -1383,11 +1383,6 @@ const docTemplate = `{
                     "type": "string",
                     "example": "ubuntu-2004-kube-v1.23.3"
                 },
-                "local_hostname": {
-                    "description": "go-template에서 충돌이 발생하는 self binding 처리용",
-                    "type": "string",
-                    "example": "{{local_hostname}}"
-                },
                 "node_cidr": {
                     "type": "string",
                     "example": "10.96.0.0/24"
@@ -1496,7 +1491,7 @@ var SwaggerInfo = &swag.Spec{
 	Version:          "0.1.0",
 	Host:             "",
 	BasePath:         "/api/v1",
-	Schemes:          []string{},
+	Schemes:          []string{"http", "https"},
 	Title:            "EdgeCraft Swagger API",
 	Description:      "",
 	InfoInstanceName: "swagger",

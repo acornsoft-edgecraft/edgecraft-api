@@ -19,14 +19,14 @@ import (
  *******************************/
 
 // GetClusterListHandler - 전체 클러스터 리스트 (Openstack)
-// @Tags Openstack-Cluster
-// @Summary GetClusterList
+// @Tags        Openstack-Cluster
+// @Summary     GetClusterList
 // @Description 전체 클러스터 리스트 (Openstack)
-// @ID GetClusterList
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/clusters [get]
+// @ID          GetClusterList
+// @Produce     json
+// @Param       cloudId path     string true "Cloud ID"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId}/clusters [get]
 func (a *API) GetClusterListHandler(c echo.Context) error {
 	cloudId := c.Param("cloudId")
 	if cloudId == "" {
@@ -42,15 +42,15 @@ func (a *API) GetClusterListHandler(c echo.Context) error {
 }
 
 // GetClusterHandler - 클러스터 상세 조회 (Openstack)
-// @Tags Openstack-Cluster
-// @Summary GetCluster
+// @Tags        Openstack-Cluster
+// @Summary     GetCluster
 // @Description 클러스터 상세 조회 (Openstack)
-// @ID GetCluster
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param clusterId path string true "Cluster ID"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/clusters/{clusterId} [get]
+// @ID          GetCluster
+// @Produce     json
+// @Param       cloudId   path     string true "Cloud ID"
+// @Param       clusterId path     string true "Cluster ID"
+// @Success     200       {object} response.ReturnData
+// @Router      /clouds/{cloudId}/clusters/{clusterId} [get]
 func (a *API) GetClusterHandler(c echo.Context) error {
 	cloudId := c.Param("cloudId")
 	if cloudId == "" {
@@ -99,15 +99,15 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 }
 
 // SetClusterHandler - 클러스터 추가 (Openstack)
-// @Tags Openstack-Cluster
-// @Summary SetCluster
+// @Tags        Openstack-Cluster
+// @Summary     SetCluster
 // @Description 클러스터 추가 (Openstack)
-// @ID SetCluster
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param OpenstackClusterSet body model.OpenstackClusterSet true "Openstack Cluster Info"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/clusters [post]
+// @ID          SetCluster
+// @Produce     json
+// @Param       cloudId             path     string                    true "Cloud ID"
+// @Param       OpenstackClusterSet body     model.OpenstackClusterSet true "Openstack Cluster Info"
+// @Success     200                 {object} response.ReturnData
+// @Router      /clouds/{cloudId}/clusters [post]
 func (a *API) SetClusterHandler(c echo.Context) error {
 	// TODO: 로그인 사용자 정보 활용 방법은?
 	cloudId := c.Param("cloudId")
@@ -164,44 +164,44 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 }
 
 // UpdateClusterHandler - 클러스터 수정 (Openstack)
-// @Tags Openstack-Cluster
-// @Summary UpdateCluster
+// @Tags        Openstack-Cluster
+// @Summary     UpdateCluster
 // @Description 클러스터 수정 (Openstack)
-// @ID UpdateCluster
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param clusterId path string true "Cluster ID"
-// @Param OpenstackClusterSet body model.OpenstackClusterSet true "Openstack Cluster Info"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/clusters/{clusterId} [put]
+// @ID          UpdateCluster
+// @Produce     json
+// @Param       cloudId             path     string                    true "Cloud ID"
+// @Param       clusterId           path     string                    true "Cluster ID"
+// @Param       OpenstackClusterSet body     model.OpenstackClusterSet true "Openstack Cluster Info"
+// @Success     200                 {object} response.ReturnData
+// @Router      /clouds/{cloudId}/clusters/{clusterId} [put]
 func (a *API) UpdateClusterHandler(c echo.Context) error {
 	return nil
 
 }
 
 // DeleteClusterHandler - 클러스터 삭제 (Openstack)
-// @Tags Openstack-Cluster
-// @Summary DeleteCluster
+// @Tags        Openstack-Cluster
+// @Summary     DeleteCluster
 // @Description 클러스터 삭제 (Openstack)
-// @ID DeleteCluster
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/clusters/{clusterId} [delete]
+// @ID          DeleteCluster
+// @Produce     json
+// @Param       cloudId path     string true "Cloud ID"
+// @Success     200     {object} response.ReturnData
+// @Router      /clouds/{cloudId}/clusters/{clusterId} [delete]
 func (a *API) DeleteClusterHandler(c echo.Context) error {
 	return nil
 }
 
 // ProvisioningClusterHandler - 클러스터 Provisioning (Openstack)
-// @Tags Openstack-Cluster
-// @Summary ProvisioningCluster
+// @Tags        Openstack-Cluster
+// @Summary     ProvisioningCluster
 // @Description 저장된 클러스터 정보를 이용해서 Provision 처리 (Openstack)
-// @ID ProvisioningCluster
-// @Produce json
-// @Param cloudId path string true "Cloud ID"
-// @Param clusterId path string true "Cluster ID"
-// @Success 200 {object} response.ReturnData
-// @Router /clouds/{cloudId}/clusters/{clusterId} [post]
+// @ID          ProvisioningCluster
+// @Produce     json
+// @Param       cloudId   path     string true "Cloud ID"
+// @Param       clusterId path     string true "Cluster ID"
+// @Success     200       {object} response.ReturnData
+// @Router      /clouds/{cloudId}/clusters/{clusterId} [post]
 func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	//TODO: 테스트를 위해서 주석처리
 	// cloudId := c.Param("cloudId")

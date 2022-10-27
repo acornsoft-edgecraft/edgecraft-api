@@ -67,7 +67,7 @@ func (ocs *OpenstackClusterSet) FromTable(clusterTable *OpenstackClusterTable, n
 // OpenstackInfo - Configuration for Openstack
 type OpenstackInfo struct {
 	Cloud               string `json:"openstack_cloud" example:"openstack"`
-	LocalHostName       string `json:"local_hostname" example:"{{local_hostname}}"` // go-template에서 충돌이 발생하는 self binding 처리용
+	LocalHostName       string `json:"-"` // go-template에서 충돌이 발생하는 self binding 처리용 {{local_hostname}}
 	ProviderConfB64     string `json:"openstack_cloud_provider_conf_b64" example:"W0dsb2JhbF0KYXV0aC11cmw9aHR0cDovLzE5Mi4xNjguNzcuMTEvaWRlbnRpdHkKdXNlcm5hbWU9InN1bm1pIgpwYXNzd29yZD0iZmtmZms0NDgiCnRlbmFudC1pZD0iNTQyZTdhMDRmNjkxNDgyOWI0M2U3N2Y5ZWYxMmI3NzkiCnRlbmFudC1uYW1lPSJlZGdlY3JhZnQiCmRvbWFpbi1uYW1lPSJEZWZhdWx0IgpyZWdpb249IlJlZ2lvbk9uZSIK"`
 	YamlB64             string `json:"openstack_cloud_yaml_b64" example:"Y2xvdWRzOgogIG9wZW5zdGFjazoKICAgIGF1dGg6CiAgICAgIGF1dGhfdXJsOiBodHRwOi8vMTkyLjE2OC43Ny4xMS9pZGVudGl0eQogICAgICB1c2VybmFtZTogInN1bm1pIgogICAgICBwYXNzd29yZDogImZrZmZrNDQ4IgogICAgICBwcm9qZWN0X2lkOiA1NDJlN2EwNGY2OTE0ODI5YjQzZTc3ZjllZjEyYjc3OQogICAgICBwcm9qZWN0X25hbWU6ICJlZGdlY3JhZnQiCiAgICAgIHVzZXJfZG9tYWluX25hbWU6ICJEZWZhdWx0IgogICAgcmVnaW9uX25hbWU6ICJSZWdpb25PbmUiCiAgICBpbnRlcmZhY2U6ICJwdWJsaWMiCiAgICBpZGVudGl0eV9hcGlfdmVyc2lvbjogMwo="`
 	CACertB64           string `json:"openstack_cloud_cacert_b64" example:"Cg=="`
@@ -92,6 +92,7 @@ func (osi *OpenstackInfo) ToTable(clusterTable *OpenstackClusterTable) {
 	}
 
 	clusterTable.OpenstackInfo.Cloud = osi.Cloud
+	clusterTable.OpenstackInfo.LocalHostName = "{{local_hostname}}" // 고정 값
 	clusterTable.OpenstackInfo.ProviderConfB64 = osi.ProviderConfB64
 	clusterTable.OpenstackInfo.YamlB64 = osi.YamlB64
 	clusterTable.OpenstackInfo.CACertB64 = osi.CACertB64
@@ -112,7 +113,7 @@ func (osi *OpenstackInfo) ToTable(clusterTable *OpenstackClusterTable) {
 // FromTable - 테이블 정보를 Openstack 정보로 설정
 func (osi *OpenstackInfo) FromTable(clusterTable *OpenstackClusterTable) {
 	osi.Cloud = clusterTable.OpenstackInfo.Cloud
-	osi.LocalHostName = "{{local_hostname}}" // 테이블에 저장되지 않는 고정 값
+	osi.LocalHostName = clusterTable.OpenstackInfo.LocalHostName
 	osi.ProviderConfB64 = clusterTable.OpenstackInfo.ProviderConfB64
 	osi.YamlB64 = clusterTable.OpenstackInfo.YamlB64
 	osi.CACertB64 = clusterTable.OpenstackInfo.CACertB64

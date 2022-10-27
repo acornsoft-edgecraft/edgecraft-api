@@ -11,14 +11,14 @@ import (
 )
 
 // LoginHandler - 사용자 로그인 처리
-// @Tags Auth
-// @Summary Login
+// @Tags        Auth
+// @Summary     Login
 // @Description User Login
-// @ID Login
-// @Produce json
-// @Param loginInfo body model.Login true "Request json"
-// @Success 200 {object} response.ReturnData
-// @Router /auth [post]
+// @ID          Login
+// @Produce     json
+// @Param       loginInfo body     model.Login true "Request json"
+// @Success     200       {object} response.ReturnData
+// @Router      /auth [post]
 func (a *API) LoginHandler(c echo.Context) error {
 	var login model.Login
 
