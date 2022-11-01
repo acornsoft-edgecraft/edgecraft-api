@@ -9,6 +9,7 @@ import (
 	"io"
 	"strings"
 
+	"k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -103,7 +104,125 @@ func (dc *DynamicClient) Delete(name string, opts v1.DeleteOptions) (err error) 
 	return
 }
 
-// Post - 데이터 스트림과 갱신여부에 따른 POST 처리
+// 우선순위 결정
+// Secret
+// KubeadConfigTemplate
+// OpenStackMachineTemplate (ControlPlane)
+// OpenStackMachineTemplate (Machine)
+// MachineDeployment
+// kubeadmControlPlane
+// OpenStackCluster
+// Cluster
+
+// OpenstackProvisionPost - 데이터 스트림과 갱신여부에 따른 POST 처리 (Multiple Resource)
+func (dc *DynamicClient) OpenstackProvisionPost(payload io.Reader) (resources []*unstructured.Unstructured, err error) {
+	// 데이터 스트림 Decode
+	decoder := yaml.NewYAMLOrJSONDecoder(payload, 4096)
+
+	for {
+		// decode payload
+		data := &unstructured.Unstructured{}
+		err = decoder.Decode(data)
+		if err == io.EOF || err != nil {
+			// No content or err
+			break
+		}
+
+		// get version, kind
+		version := data.GetAPIVersion()
+		kind := data.GetKind()
+
+		gv, err := schema.ParseGroupVersion(version)
+		if err != nil {
+			gv = schema.GroupVersion{Version: version}
+		}
+
+		// 설정에 따르는 Discovery 클라이언트 생성
+		discoveryClient, err := discovery.NewDiscoveryClientForConfig(dc.config)
+		if err != nil {
+			return resources, err
+		}
+
+		// Version에 맞는 리소스 리스트 조회
+		apiResourceList, err := discoveryClient.ServerResourcesForGroupVersion(version)
+		if err != nil {
+			return resources, err
+		}
+
+		apiResources := apiResourceList.APIResources
+
+		// Kind에 해당하는 리소스 검색
+		var resource *v1.APIResource
+		for _, apiResource := range apiResources {
+			if apiResource.Kind == kind && !strings.Contains(apiResource.Name, "/") {
+				resource = &apiResource
+				break
+			}
+		}
+
+		if resource == nil {
+			err = fmt.Errorf("unknown resource kind: %s", kind)
+			return resources, err
+		}
+
+		// Get dynamic interface
+		di, err := dynamic.NewForConfig(dc.config)
+		if err != nil {
+			return resources, err
+		}
+
+		dc.resource = schema.GroupVersionResource{Group: gv.Group, Version: gv.Version, Resource: resource.Name}
+		dc.namespace = data.GetNamespace()
+
+		// Check resource
+		var res *unstructured.Unstructured
+		//targetRes, err := di.Resource(dc.resource).Namespace(dc.namespace).Get(context.TODO(), data.GetName(), v1.GetOptions{})
+		_, err = di.Resource(dc.resource).Namespace(dc.namespace).Get(context.TODO(), data.GetName(), v1.GetOptions{})
+		if err != nil {
+			if errType, ok := err.(*errors.StatusError); ok {
+				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
+					// Create
+					if resource.Namespaced {
+						res, err = di.Resource(dc.resource).Namespace(dc.namespace).Create(context.TODO(), data, v1.CreateOptions{})
+						if err != nil {
+							return resources, err
+						}
+					} else {
+						res, err = di.Resource(dc.resource).Create(context.TODO(), data, v1.CreateOptions{})
+						if err != nil {
+							return resources, err
+						}
+					}
+				} else {
+					return resources, nil
+				}
+			} else {
+				return resources, nil
+			}
+		}
+		// else {
+		// 	// Update
+		// 	data.SetResourceVersion(targetRes.GetResourceVersion())
+		// 	if resource.Namespaced {
+		// 		res, err = di.Resource(dc.resource).Namespace(dc.namespace).Update(context.TODO(), data, v1.UpdateOptions{})
+		// 		if err != nil {
+		// 			return resources, err
+		// 		}
+		// 	} else {
+		// 		res, err = di.Resource(dc.resource).Update(context.TODO(), data, v1.UpdateOptions{})
+		// 		if err != nil {
+		// 			return resources, err
+		// 		}
+		// 	}
+		// }
+
+		resources = append(resources, res)
+	}
+
+	return resources, nil
+}
+
+// Post - 데이터 스트림과 갱신여부에 따른 POST 처리 (Single Resource)
 func (dc *DynamicClient) Post(payload io.Reader, isUpdate bool) (res *unstructured.Unstructured, err error) {
 	// 데이터 스트림 Decode
 	decoder := yaml.NewYAMLOrJSONDecoder(payload, 4096)

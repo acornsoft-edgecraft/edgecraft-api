@@ -16,63 +16,6 @@ metadata:
   name: {{$ClusterName}}-cloud-config
   namespace: {{or $Namespace "default"}}
 ---
-apiVersion: cluster.x-k8s.io/v1beta1
-kind: Cluster
-metadata:
-  name: {{$ClusterName}}
-  namespace: {{or $Namespace "default"}}
-spec:
-  clusterNetwork:
-    pods:
-      cidrBlocks:
-        - {{.K8s.PodCidr}}
-    {{if ne "" .K8s.SvcCidr -}}
-    services:
-      cidrBlocks:
-        - {{.K8s.SvcCidr}}
-    {{end -}}
-    serviceDomain: {{or .K8s.SvcDomain "cluster.local"}}
-  controlPlaneRef:
-    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
-    kind: KubeadmControlPlane
-    name: {{$ClusterName}}-control-plane
-  infrastructureRef:
-    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
-    kind: OpenStackCluster
-    name: {{$ClusterName}}
----
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
-kind: OpenStackCluster
-metadata:
-  name: {{$ClusterName}}
-  namespace: {{or $Namespace "default"}}
-spec:
-  {{ if eq true .Openstack.UseBastionHost -}}
-  bastion:
-    enabled: true
-    instance:
-      flavor: {{.Openstack.BastionFlavor }}
-      image:  {{.Openstack.BastionImageName }}
-      sshKeyName: {{.Openstack.BastionSSHKeyName }}
-      {{if ne "" .Openstack.BastionFloatingIP -}}
-      floatingIP: {{.Openstack.BastionFloatingIP}}
-      {{end -}}
-  {{ end -}}
-  apiServerLoadBalancer:
-    enabled: {{.Nodes.UseLoadbalancer}}
-  cloudName: {{$OpenstackCloud}}
-  dnsNameservers:
-    - {{.Openstack.DNSNameServers}}
-  externalNetworkId: {{or .Openstack.ExternalNetworkID "public"}}
-  identityRef:
-    kind: Secret
-    name: {{$ClusterName}}-cloud-config
-  managedSecurityGroups: true
-  nodeCidr: {{.Openstack.NodeCidr}}
-  {{if ne "" .Openstack.APIServerFloatingIP -}}
-  apiServerFloatingIP: {{.Openstack.APIServerFloatingIP}}
-  {{end -}}
----
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
 kind: KubeadmConfigTemplate
 metadata:
@@ -99,26 +42,86 @@ spec:
             cloud-provider: openstack
           name: "{{ .Openstack.LocalHostName }}"
 ---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+kind: OpenStackMachineTemplate
+metadata:
+  name: {{$ClusterName}}-control-plane
+  namespace: {{or $Namespace "default"}}
+spec:
+  template:
+    spec:
+      cloudName: {{$OpenstackCloud}}
+      flavor: {{(index .Nodes.MasterSets 0).Flavor}}
+      identityRef:
+        kind: Secret
+        name: {{$ClusterName}}-cloud-config
+      image: {{$OpenstackImageName}}
+      sshKeyName: {{$OpenstackSSHKeyName}}
+---
+{{range .Nodes.WorkerSets -}}
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+kind: OpenStackMachineTemplate
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  template:
+    spec:
+      cloudName: {{$OpenstackCloud}}
+      flavor: {{.Flavor}}
+      identityRef:
+        kind: Secret
+        name: {{$ClusterName}}-cloud-config
+      image: {{$OpenstackImageName}}
+      sshKeyName: {{$OpenstackSSHKeyName}}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  clusterName: {{$ClusterName}}
+  replicas: {{.NodeCount}}
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KubeadmConfigTemplate
+          name: {{$ClusterName}}-md-0
+      clusterName: {{$ClusterName}}
+      failureDomain: {{or $FailureDomain "nova"}}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+        kind: OpenStackMachineTemplate
+        name: {{$ClusterName}}-{{.Name}}
+      version: {{$KubernetesVersion}}
+---
+{{end}}
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: KubeadmControlPlane
 metadata:
   name: {{$ClusterName}}-control-plane
+  namespace: {{or $Namespace "default"}}
 spec:
   kubeadmConfigSpec:
     clusterConfiguration:
-      {{ if eq true .EtcdStorage.Etcd.UseExternalEtcd -}}
+      {{if eq true .EtcdStorage.Etcd.UseExternalEtcd}}
       etcd:
         external:"defaul"
           endpoints:
-          {{with .EtcdStorage.Etcd.Endpoints -}}
+          {{with .EtcdStorage.Etcd.Endpoints}}
             {{ range . }}
             - https://{{.}} # - https://10.0.0.230:2379
-            {{ end -}}
-          {{end -}}
+            {{ end}}
+          {{end}}
           caFile: {{.EtcdStorage.Etcd.CAFile}} # /etc/kubernetes/pki/etcd/ca.crt
           certFile: {{.EtcdStorage.Etcd.CertFile}} # /etc/kubernetes/pki/apiserver-etcd-client.crt
           keyFile: {{.EtcdStorage.Etcd.KeyFile}} # /etc/kubernetes/pki/apiserver-etcd-client.key
-      {{ end -}}  
+      {{end -}}  
       apiServer:
         extraArgs:
           cloud-config: /etc/kubernetes/cloud.conf
@@ -170,65 +173,65 @@ spec:
       - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
   machineTemplate:
     infrastructureRef:
-      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
+      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
       kind: OpenStackMachineTemplate
       name: {{$ClusterName}}-control-plane
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
   version: {{$KubernetesVersion}}
 ---
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
-kind: OpenStackMachineTemplate
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+kind: OpenStackCluster
 metadata:
-  name: {{$ClusterName}}-control-plane
-spec:
-  template:
-    spec:
-      cloudName: {{$OpenstackCloud}}
-      flavor: {{(index .Nodes.MasterSets 0).Flavor}}
-      identityRef:
-        kind: Secret
-        name: {{$ClusterName}}-cloud-config
-      image: {{$OpenstackImageName}}
-      sshKeyName: {{$OpenstackSSHKeyName}}
-{{range .Nodes.WorkerSets -}}
----
-apiVersion: cluster.x-k8s.io/v1beta1
-kind: MachineDeployment
-metadata:
-  name: {{$ClusterName}}-{{.Name}}
+  name: {{$ClusterName}}
   namespace: {{or $Namespace "default"}}
 spec:
-  clusterName: {{$ClusterName}}
-  replicas: {{.NodeCount}}
-  selector:
-    matchLabels: null
-  template:
-    spec:
-      bootstrap:
-        configRef:
-          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
-          kind: KubeadmConfigTemplate
-          name: {{$ClusterName}}-md-0
-      clusterName: {{$ClusterName}}
-      failureDomain: {{or $FailureDomain "nova"}}
-      infrastructureRef:
-        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
-        kind: OpenStackMachineTemplate
-        name: {{$ClusterName}}-{{.Name}}
-      version: {{$KubernetesVersion}}
+  {{if eq true .Openstack.UseBastionHost}}
+  bastion:
+    enabled: true
+    instance:
+      flavor: {{.Openstack.BastionFlavor }}
+      image:  {{.Openstack.BastionImageName }}
+      sshKeyName: {{.Openstack.BastionSSHKeyName }}
+      {{if ne "" .Openstack.BastionFloatingIP}}
+      floatingIP: {{.Openstack.BastionFloatingIP}}
+      {{end}}
+  {{end -}}
+  apiServerLoadBalancer:
+    enabled: {{.Nodes.UseLoadbalancer}}
+  cloudName: {{$OpenstackCloud}}
+  dnsNameservers:
+    - {{.Openstack.DNSNameServers}}
+  externalNetworkId: {{or .Openstack.ExternalNetworkID "public"}}
+  identityRef:
+    kind: Secret
+    name: {{$ClusterName}}-cloud-config
+  managedSecurityGroups: true
+  nodeCidr: {{.Openstack.NodeCidr}}
+  {{if ne "" .Openstack.APIServerFloatingIP}}
+  apiServerFloatingIP: {{.Openstack.APIServerFloatingIP}}
+  {{end}}
 ---
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
-kind: OpenStackMachineTemplate
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: Cluster
 metadata:
-  name: {{$ClusterName}}-{{.Name}}
+  name: {{$ClusterName}}
+  namespace: {{or $Namespace "default"}}
 spec:
-  template:
-    spec:
-      cloudName: {{$OpenstackCloud}}
-      flavor: {{.Flavor}}
-      identityRef:
-        kind: Secret
-        name: {{$ClusterName}}-cloud-config
-      image: {{$OpenstackImageName}}
-      sshKeyName: {{$OpenstackSSHKeyName}}
-{{end -}}
+  clusterNetwork:
+    pods:
+      cidrBlocks:
+        - {{.K8s.PodCidr}}
+    {{if ne "" .K8s.SvcCidr -}}
+    services:
+      cidrBlocks:
+        - {{.K8s.SvcCidr}}
+    {{end -}}
+    serviceDomain: {{or .K8s.SvcDomain "cluster.local"}}
+  controlPlaneRef:
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    kind: KubeadmControlPlane
+    name: {{$ClusterName}}-control-plane
+  infrastructureRef:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+    kind: OpenStackCluster
+    name: {{$ClusterName}}

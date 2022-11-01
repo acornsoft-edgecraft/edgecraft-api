@@ -6,10 +6,8 @@ package api
 import (
 	"time"
 
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	"github.com/labstack/echo/v4"
@@ -190,6 +188,7 @@ func (a *API) UpdateClusterHandler(c echo.Context) error {
 // @Success     200     {object} response.ReturnData
 // @Router      /clouds/{cloudId}/clusters/{clusterId} [delete]
 func (a *API) DeleteClusterHandler(c echo.Context) error {
+	// TODO: Delete Cluster and resources
 	return nil
 }
 
@@ -204,68 +203,80 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 // @Success     200       {object} response.ReturnData
 // @Router      /clouds/{cloudId}/clusters/{clusterId} [post]
 func (a *API) ProvisioningClusterHandler(c echo.Context) error {
-	//TODO: 테스트를 위해서 주석처리
-	// cloudId := c.Param("cloudId")
-	// if cloudId == "" {
-	// 	return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
-	// }
+	cloudId := c.Param("cloudId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
+	}
 
-	// clusterId := c.Param("clusterId")
-	// if cloudId == "" {
-	// 	return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
-	// }
+	clusterId := c.Param("clusterId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
+	}
 
-	// // Cluster 정보 조회
-	// clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if clusterTable == nil {
-	// 	return response.ErrorfReqRes(c, clusterTable, common.DatabaseFalseData, err)
-	// }
+	// Cluster 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.DatabaseFalseData, err)
+	}
 
-	// // Cluster 상태 검증
-	// if *clusterTable.Status != 1 {
-	// 	return response.ErrorfReqRes(c, clusterTable, common.ProvisioningOnlySaved, err)
-	// }
+	// Cluster 상태 검증
+	if *clusterTable.Status != 1 {
+		return response.ErrorfReqRes(c, clusterTable, common.ProvisioningOnlySaved, err)
+	}
 
-	// // Kubernetes 버전 조회
-	// codeTable, err := a.Db.GetCode("K8sVersions", *clusterTable.Version)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if codeTable == nil {
-	// 	return response.ErrorfReqRes(c, clusterTable, common.DatabaseFalseData, err)
-	// }
+	// Kubernetes 버전 조회
+	codeTable, err := a.Db.GetCode("K8sVersions", *clusterTable.Version)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if codeTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.DatabaseFalseData, err)
+	}
 
-	// // NodeSets 정보 조회
-	// nodeSetTables, err := a.Db.GetNodeSets(clusterId)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if len(nodeSetTables) == 0 {
-	// 	return response.ErrorfReqRes(c, nodeSetTables, common.DatabaseFalseData, err)
-	// }
+	// NodeSets 정보 조회
+	nodeSetTables, err := a.Db.GetNodeSets(clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	} else if len(nodeSetTables) == 0 {
+		return response.ErrorfReqRes(c, nodeSetTables, common.DatabaseFalseData, err)
+	}
 
-	// // Provisioning (background)
-	// go ProvisioningOpenstackCluster(clusterTable, nodeSetTables, *codeTable.Name)
+	// Provisioning (background)
+	err = ProvisioningOpenstackCluster(clusterTable, nodeSetTables, *codeTable.Name)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
+	}
 
+	// TODO: Workload Cluster 관련 후처리 작업
+	//       - kubeconfig 설정
+	//       - check cluster provisioned or failed
+	//       - machine crated (controlplane, workers)
 	// TODO: Provisioning 종료를 확인하는 방법은? Webhook, readyness??
 
-	// Get Pod List
-	// podList, err := kubemethod.GetPodList("", "")
+	// // Get Pod List
+	// podList, err := kubemethod.GetPodList("os-cluster", "")
 	// if err != nil {
 	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	// }
 
-	// Get Kubeconfig
-	data, err := kubemethod.GetKubeconfig("default", "os-cluster-kubeconfig", "value")
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	}
+	// // Get Node List
+	// nodeList, err := kubemethod.GetNodeList("os-cluster")
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// }
 
-	// Add cluster's kubeconfig
-	err = config.HostCluster.Add([]byte(data))
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	}
+	// // Get Kubeconfig
+	// data, err := kubemethod.GetKubeconfig("default", "os-cluster-kubeconfig", "value")
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// }
+
+	// // Add cluster's kubeconfig
+	// err = config.HostCluster.Add([]byte(data))
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// }
 
 	// // Remove cluster's kubeconfig
 	// err := config.HostCluster.Remove("os-cluster")
@@ -274,5 +285,6 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	// }
 
 	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, data)
+	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, podList)
 	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
 }

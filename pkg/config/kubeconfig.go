@@ -234,14 +234,16 @@ func newKubeCluster(conf *strategyInfo) (*kubeCluster, error) {
 
 	// Get client by context
 	kc.Client = func(context string) (*ClientSet, error) {
-		if !utils.ArrayContains(kc.ClusterNames, context) {
+		val := utils.EndWithOnArray(kc.ClusterNames, context)
+		if val == "" {
+			//if !utils.ArrayContains(kc.ClusterNames, context) {
 			if context == IN_CLUSTER_NAME && kc.InCluster != nil {
 				return kc.InCluster, nil
 			} else {
 				return nil, fmt.Errorf("can't find a context '%s' in %v", context, kc.ClusterNames)
 			}
 		}
-		return kc.clients[context], nil
+		return kc.clients[val], nil
 	}
 
 	// Save kubeconfig using provider (file or configmap)

@@ -58,6 +58,7 @@
 "26000": "Provisioning 은 저장 상태만 가능합니다." # ProvisioningOnlySaved
 "26001": "오픈 스택 클러스터 등록 후 Provision 처리 중입니다. (시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterRegisteredAndProvisioning
 "26002": "오픈 스택 클러스터 Provision 처리 중입니다.(시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterProvisioning
+"26100": "Provision 요청이 실패하였습니다." #ProvisioningFailed
 
 ##############################################################
 # k8s api 메시지

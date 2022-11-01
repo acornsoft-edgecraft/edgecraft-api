@@ -148,7 +148,7 @@ func (osi *OpenstackInfo) Scan(value interface{}) error {
 // OpenstackClusterInfo - Basic data for openstack cluster
 type OpenstackClusterInfo struct {
 	ClusterUid string `json:"cluster_uid" example:""`
-	Name       string `json:"name" example:"os-cluster-#1"`
+	Name       string `json:"name" example:"os-test-1"`
 	Desc       string `json:"desc" example:"Openstack Test Cluster #1"`
 	Namespace  string `json:"namespace" example:"default"`
 }
@@ -292,3 +292,8 @@ type OpenstackClusterList struct {
 	Version    int       `json:"version" db:"version"`
 	Created    time.Time `json:"created" db:"created_at"`
 }
+
+// NOTE: Openstack Cluster Name Reg Validatiaon 필요. (소문자, -, . 만 가능, 처음과 끝은 반드시 alphanumeric) '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*'
+// NOTE: v1alpha5 버전까지만 사용 가능 (Management Cluster의 설치 버전과 연계)
+// NOTE: v1alpha5 버전에서 Meta 정보에 Namespace 지정하지 않으면 "the server could not find the requested resource" 메시지와 404 오류 발생
+// NOTE: openstack_cluster.yaml (template)은 ref 지정된 순서대로 생성하는 것으로 정리

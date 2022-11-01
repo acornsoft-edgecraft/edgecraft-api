@@ -100,6 +100,9 @@ const (
 	// OpenstackClusterProvisioning
 	OpenstackClusterProvisioning = 26002
 
+	// ProvisioningFailed -
+	ProvisioningFailed = 26100
+
 	//############################################################
 	// K8S 관련 메시지
 	//############################################################
