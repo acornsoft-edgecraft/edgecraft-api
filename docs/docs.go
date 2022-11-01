@@ -1314,7 +1314,7 @@ const docTemplate = `{
                 },
                 "name": {
                     "type": "string",
-                    "example": "os-cluster-#1"
+                    "example": "os-test-1"
                 },
                 "namespace": {
                     "type": "string",

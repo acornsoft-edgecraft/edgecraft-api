@@ -45,17 +45,36 @@ type kubeCluster struct {
 	clients            map[string]*ClientSet                // cluster's client (using rest.Config)
 }
 
-// GetKubernetesClient - 지정한 클러스터에 대한 Kubernetes client 반환
-func (kc *kubeCluster) GetKubernetesClient(clusterId string) (*kubernetes.Clientset, error) {
-	if clusterId == "" {
-		clusterId = HostCluster.DefaultContext
+// checkClusterName - 클러스터 명을 검증하고, 없는 경우는 DefaultContext 반환
+func (kc *kubeCluster) checkClusterName(clusterName string) string {
+	if clusterName == "" {
+		return HostCluster.DefaultContext
 	}
+	return clusterName
+}
 
-	clientSet, err := HostCluster.Client(clusterId)
+// GetClientSet - 클러스터명에 해당하는 ClientSet 반환
+func (kc *kubeCluster) GetClientSet(clusterName string) (*ClientSet, error) {
+	clusterName = kc.checkClusterName(clusterName)
+	return HostCluster.Client(clusterName)
+}
+
+// GetKubernetesClient - 지정한 클러스터에 대한 Kubernetes client 반환
+func (kc *kubeCluster) GetKubernetesClient(clusterName string) (*kubernetes.Clientset, error) {
+	clientSet, err := kc.GetClientSet(clusterName)
 	if err != nil {
 		return nil, err
 	}
 	return clientSet.NewKubernetesClient()
+}
+
+// GetDynamicClient - 지정한 클러스터에 대한 Kubernetes dynamic client 반환
+func (kc *kubeCluster) GetDynamicClient(clusterName string) (*client.DynamicClient, error) {
+	clientSet, err := kc.GetClientSet(clusterName)
+	if err != nil {
+		return nil, err
+	}
+	return clientSet.NewDynamicClient()
 }
 
 // ClientSet - Kubernetes 연계용 Client 정보

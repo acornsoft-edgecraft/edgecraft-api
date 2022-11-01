@@ -9,6 +9,7 @@ import (
 	"net"
 	"reflect"
 	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -249,4 +250,14 @@ func ArrayContains(arr []string, str string) bool {
 		}
 	}
 	return false
+}
+
+// EndWithOnArray - 지정한 배열내의 값들 중에서 EndsWith에 해당하는 값이 있는지 검증
+func EndWithOnArray(arr []string, str string) string {
+	for _, s := range arr {
+		if strings.HasSuffix(s, str) {
+			return s
+		}
+	}
+	return ""
 }

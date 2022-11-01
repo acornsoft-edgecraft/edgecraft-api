@@ -268,7 +268,7 @@ definitions:
         example: 'Openstack Test Cluster #1'
         type: string
       name:
-        example: os-cluster-#1
+        example: os-test-1
         type: string
       namespace:
         example: default

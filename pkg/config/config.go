@@ -2,7 +2,6 @@
 package config
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -86,8 +85,6 @@ func Load() (*Config, error) {
 	viper.Unmarshal(&conf, func(decoderConfig *mapstructure.DecoderConfig) {
 		decoderConfig.TagName = "yaml"
 	})
-
-	fmt.Printf("config info : %v", conf)
 
 	return &conf, err
 }
