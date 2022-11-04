@@ -7,6 +7,7 @@ import (
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/job"
 )
 
 // ===== [ Constants and Variables ] =====
@@ -17,6 +18,7 @@ import (
 type API struct {
 	Config *config.ApiConfig
 	Db     db.DB
+	Worker *job.IWorker
 	// EdgeDb map[string]db.DB
 	// Mail   *mail.Client
 }
@@ -61,10 +63,11 @@ func getRequestData(req *http.Request, data interface{}) error {
 // ===== [ Public Functions ] =====
 
 // New - Returns the api settings
-func New(conf *config.ApiConfig, db db.DB) (*API, error) {
+func New(conf *config.ApiConfig, db db.DB, worker *job.IWorker) (*API, error) {
 	api := &API{
 		Config: conf,
 		Db:     db,
+		Worker: worker,
 	}
 
 	return api, nil

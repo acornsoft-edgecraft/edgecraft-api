@@ -5,6 +5,7 @@ package kubemethod
 
 import (
 	"context"
+	"encoding/json"
 	"strings"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
@@ -13,29 +14,6 @@ import (
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
-
-// // SplitResourcesFromYaml - Yaml 포맷 문자열에 존재하는 리소스들을 분린 반환
-// func SplitResourcesFromYaml(yamlString string) ([][]byte, error) {
-// 	dec := yaml.NewDecoder(strings.NewReader(yamlString))
-// 	var res [][]byte
-// 	for {
-// 		var value interface{}
-// 		err := dec.Decode(&value)
-// 		if err == io.EOF {
-// 			break
-// 		}
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		valueBytes, err := yaml.Marshal(value)
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		res = append(res, valueBytes)
-// 	}
-
-// 	return res, nil
-// }
 
 // Apply - 지정한 YAML 문자열 정보를 Kubernetes에 적용
 func Apply(clusterName, yaml string) error {
@@ -73,6 +51,29 @@ func GetKubeconfig(namespace, secretName, keyName string) (string, error) {
 	}
 
 	return string(secret.Data[keyName]), nil
+}
+
+// GetProvisioned - 지정한 클러스터에 대한 Provision 상태 검증.
+func GetProvisioned(namespace, clusterName, group, version, resource string) (bool, error) {
+	// Get kubernetes client
+	//dynamicClient, err := config.HostCluster.GetDynamicClient("")
+	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", group, version, resource)
+	if err != nil {
+		return false, err
+	}
+
+	//data, err := dynamicClient.Get(clusterName, metaV1.GetOptions{})
+	data, err := dynamicClient.List(metaV1.ListOptions{})
+	if err != nil {
+		return false, err
+	} else if data != nil {
+		bytes, err := json.Marshal(data)
+		if err != nil {
+			return false, err
+		}
+		logger.Info(string(bytes))
+	}
+	return true, nil
 }
 
 // GetPodList - description

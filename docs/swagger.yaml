@@ -63,6 +63,9 @@ definitions:
       name:
         example: test cloud
         type: string
+      status:
+        example: 1
+        type: integer
       type:
         example: 1
         type: integer
@@ -79,6 +82,8 @@ definitions:
         $ref: '#/definitions/model.NodesInfo'
       openstack:
         $ref: '#/definitions/model.OpenstackInfo'
+      save_only:
+        type: boolean
     type: object
   model.ClusterInfo:
     properties:
@@ -286,6 +291,8 @@ definitions:
         $ref: '#/definitions/model.OpenstackNodeSetInfo'
       openstack:
         $ref: '#/definitions/model.OpenstackInfo'
+      save_only:
+        type: boolean
     type: object
   model.OpenstackInfo:
     properties:

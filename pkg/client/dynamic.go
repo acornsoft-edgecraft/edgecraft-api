@@ -104,16 +104,6 @@ func (dc *DynamicClient) Delete(name string, opts v1.DeleteOptions) (err error) 
 	return
 }
 
-// 우선순위 결정
-// Secret
-// KubeadConfigTemplate
-// OpenStackMachineTemplate (ControlPlane)
-// OpenStackMachineTemplate (Machine)
-// MachineDeployment
-// kubeadmControlPlane
-// OpenStackCluster
-// Cluster
-
 // OpenstackProvisionPost - 데이터 스트림과 갱신여부에 따른 POST 처리 (Multiple Resource)
 func (dc *DynamicClient) OpenstackProvisionPost(payload io.Reader) (resources []*unstructured.Unstructured, err error) {
 	// 데이터 스트림 Decode

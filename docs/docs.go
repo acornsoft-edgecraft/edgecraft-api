@@ -1020,6 +1020,10 @@ const docTemplate = `{
                     "type": "string",
                     "example": "test cloud"
                 },
+                "status": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "type": {
                     "type": "integer",
                     "example": 1
@@ -1043,6 +1047,9 @@ const docTemplate = `{
                 },
                 "openstack": {
                     "$ref": "#/definitions/model.OpenstackInfo"
+                },
+                "save_only": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1339,6 +1346,9 @@ const docTemplate = `{
                 },
                 "openstack": {
                     "$ref": "#/definitions/model.OpenstackInfo"
+                },
+                "save_only": {
+                    "type": "boolean"
                 }
             }
         },

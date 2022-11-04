@@ -2,10 +2,11 @@
 package logger
 
 import (
-	"github.com/sirupsen/logrus"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"os"
+
+	"github.com/sirupsen/logrus"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 // ===== [ Constants and Variables ] =====
@@ -84,6 +85,13 @@ func (ll *logrusLogger) Panicf(format string, args ...interface{}) {
 	ll.logger.Fatalf(format, args...)
 }
 
+// WithField - Implements of Logger's WithField on LogrusLogger
+func (ll *logrusLogger) WithField(field string, value interface{}) Logger {
+	return &logrusLogEntry{
+		entry: ll.logger.WithField(field, value),
+	}
+}
+
 // WithFields - Implements of Logger's WithFields on LogrusLogger
 func (ll *logrusLogger) WithFields(fields Fields) Logger {
 	return &logrusLogEntry{
@@ -156,6 +164,13 @@ func (le *logrusLogEntry) Panic(args ...interface{}) {
 // Panicf - Implements of Logger's Panicf on LogrusLogEntry
 func (le *logrusLogEntry) Panicf(format string, args ...interface{}) {
 	le.entry.Fatalf(format, args...)
+}
+
+// WithField - Implements of Logger's WithField on LogrusLogEntry
+func (le *logrusLogEntry) WithField(field string, value interface{}) Logger {
+	return &logrusLogEntry{
+		entry: le.entry.WithField(field, value),
+	}
 }
 
 // WithFields - Implements of Logger's WithFields on LogrusLogEntry

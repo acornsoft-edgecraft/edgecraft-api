@@ -1015,6 +1015,10 @@
                     "type": "string",
                     "example": "test cloud"
                 },
+                "status": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "type": {
                     "type": "integer",
                     "example": 1
@@ -1038,6 +1042,9 @@
                 },
                 "openstack": {
                     "$ref": "#/definitions/model.OpenstackInfo"
+                },
+                "save_only": {
+                    "type": "boolean"
                 }
             }
         },
@@ -1334,6 +1341,9 @@
                 },
                 "openstack": {
                     "$ref": "#/definitions/model.OpenstackInfo"
+                },
+                "save_only": {
+                    "type": "boolean"
                 }
             }
         },

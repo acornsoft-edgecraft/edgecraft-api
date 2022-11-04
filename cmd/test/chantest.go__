@@ -1,0 +1,124 @@
+/*
+Copyright 2022 Acornsoft Authors. All right reserved.
+*/
+package main
+
+import (
+	"bufio"
+	"context"
+	"fmt"
+	"os"
+	"runtime"
+	"strconv"
+)
+
+// CheckInfo - checking info for Workload cluster
+type CheckInfo struct {
+	ClusterID   string `json:"cluster_uid"`
+	ClusterName string `json:"cluster_name"`
+	CheckType   string `json:"check_type"` // kubeconfig, provision
+}
+
+// ProvisionManager - Provision 정보 검증
+func ProvisionManager(req <-chan CheckInfo, res chan<- CheckInfo)  {
+	
+}
+
+// Channel Relations
+// Channel Creator - main
+//
+
+// PlusOne - 더하기
+func PlusOne(step string, ctx context.Context, in <-chan int) <-chan int {
+	out := make(chan int)
+
+	go func() {
+		defer func() {
+			close(out)
+		}()
+
+		for num := range in {
+			fmt.Println("[" + step + "] received number is (" + strconv.Itoa(num) + ").")
+			select {
+			case out <- num + 1:
+			case <-ctx.Done():
+				return
+			}
+		}
+	}()
+
+	return out
+}
+
+// main -
+func main() {
+	// check go routine
+	fmt.Println("Go routines: [" + strconv.Itoa(runtime.NumGoroutine()) + "]")
+
+	// create channels
+	//sigs := make(chan os.Signal, 1) // os signal with buffer 1
+	//done := make(chan bool, 1)      // close with buffer 1
+	checker := make(chan<- CheckInfo, 10)
+	receiver := make(<-chan CheckInfo, 10)
+
+	// register signal
+	//signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	c := make(chan int)
+	go func() {
+		defer close(c)
+		for i := 3; i < 103; i += 10 {
+			fmt.Println("num (" + strconv.Itoa(i) + ") passed to channel")
+			c <- i
+		}
+	}()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	nums := PlusOne("A", ctx, PlusOne("B", ctx, PlusOne("C", ctx, PlusOne("D", ctx, PlusOne("E", ctx, c)))))
+	for num := range nums {
+		fmt.Println(num)
+		if num == 18 {
+			fmt.Println("cancel called")
+			cancel()
+			break
+		}
+	}
+
+	// Launch checker and receiver function
+
+	// waiting for input
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Print("Enter your command: ")
+		scanner.Scan()
+		text := scanner.Text()
+
+		if len(text) != 0 {
+			if text == "stop" {
+				break
+			}
+			fmt.Println(text)
+		}
+	}
+
+	// waiting for signal
+	//<-sigs
+	fmt.Println("Program exited.")
+}
+
+/**
+ * 시나리오
+ *
+1. program 시작
+	1.1. go routine 수 검증 (메모리 누수 확인용)
+2. channel 생성 (with context)
+	2.1. signal 처리 추가
+3. 데이터 대기
+
+4. provision 접수
+5. checker 구동 (by data to request channel)
+6. 데이터 검증 및 결과 전송 (by data to response channel)
+7. program 종료
+	7.1. signal 수신하면 종료
+
+**/

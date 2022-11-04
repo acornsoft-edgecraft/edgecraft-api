@@ -8,6 +8,7 @@ import (
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/job"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	echo "github.com/labstack/echo/v4"
 )
@@ -17,6 +18,7 @@ type Instance struct {
 	Config     *config.Config
 	HTTPServer *echo.Echo
 	DB         db.DB
+	Worker     job.IWorker
 }
 
 // ===== [ Implementations ] =====
@@ -24,29 +26,36 @@ type Instance struct {
 // Init - Initialize the server
 func (i *Instance) Init() {
 	i.HTTPServer = NewHTTPServer()
-	logger.Infof("Server initialized...")
+
+	// Initialize workers
+	i.Worker = job.NewWorker(10, 100)
+
+	logger.Infof("Server and workers initialized...")
 }
 
 // Start - Starts the server
 func (i *Instance) Start() {
+	i.Worker.Start(context.Background())
+
 	// Startup the HTTP Server in a way that we can gracefully shut it down again
 	err := i.HTTPServer.Start(i.Config.API.Host + ":" + i.Config.API.Port)
 	if err != http.ErrServerClosed {
 		logger.Errorf("HTTP Server stopped unexpected: %s", err.Error())
 		i.Shutdown()
-	} else if err != nil {
-		logger.Errorf("HTTP Server stoped: %s", err.Error())
+	} else if err == http.ErrServerClosed {
+		logger.Infof("HTTP server closed by signal.")
 	} else {
 		logger.Infof("HTTP Server stopped normally")
 	}
-
-	logger.Infof("HTTP Server started...++++++")
 }
 
 // Shutdown - Stops the server
 func (i *Instance) Shutdown() {
 	// Shutdown all dependencies
 	i.DB.CloseConnection()
+
+	// Shutdown workers
+	i.Worker.Stop()
 
 	// Shutdown HTTP Server
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

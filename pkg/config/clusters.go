@@ -77,6 +77,15 @@ func (kc *kubeCluster) GetDynamicClient(clusterName string) (*client.DynamicClie
 	return clientSet.NewDynamicClient()
 }
 
+// GetDynamicClientWithScema - 지정한 클러스터 및 GVR Schema에 대한 Kubernetes dynamic client 반환
+func (kc *kubeCluster) GetDynamicClientWithSchema(clusterName, group, version, resource string) (*client.DynamicClient, error) {
+	clientSet, err := kc.GetClientSet(clusterName)
+	if err != nil {
+		return nil, err
+	}
+	return clientSet.NewDynamicClientSchema(group, version, resource)
+}
+
 // ClientSet - Kubernetes 연계용 Client 정보
 type ClientSet struct {
 	Name                   string

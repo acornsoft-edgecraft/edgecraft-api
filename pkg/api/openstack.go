@@ -6,6 +6,7 @@ package api
 import (
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
@@ -242,11 +243,11 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nodeSetTables, common.DatabaseFalseData, err)
 	}
 
-	// Provisioning (background)
-	err = ProvisioningOpenstackCluster(clusterTable, nodeSetTables, *codeTable.Name)
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
-	}
+	// // Provisioning (background)
+	// err = ProvisioningOpenstackCluster(a.Worker, clusterTable, nodeSetTables, *codeTable.Name)
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
+	// }
 
 	// TODO: Workload Cluster 관련 후처리 작업
 	//       - kubeconfig 설정
@@ -284,7 +285,14 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	// }
 
-	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, data)
+	// Check workload cluster provisioning complete
+	data, err := kubemethod.GetProvisioned(*clusterTable.Namespace, *clusterTable.Name,
+		"infrastructure.cluster.x-k8s.io", "v1alph5", "OpenStackCluster")
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+
+	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, data)
 	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, podList)
-	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
+	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
 }

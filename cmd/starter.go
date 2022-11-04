@@ -85,7 +85,7 @@ func initConfig() {
 	// Load Message Files (i18n)
 	common.LoadMessages(conf.API.LangPath, conf.API.Langs)
 
-	// create server instance & initialize the server
+	// create server instance & initialize the server & workers
 	gatewayServer = server.NewInstance(conf)
 	gatewayServer.Init()
 
@@ -99,7 +99,7 @@ func initConfig() {
 	gatewayServer.DB = DB
 
 	// create API instance & Initialize API
-	api, err := api.New(conf.API, DB)
+	api, err := api.New(conf.API, DB, &gatewayServer.Worker)
 	if err != nil {
 		logger.WithError(err).Fatal("Could not create api instance and initialize")
 		return

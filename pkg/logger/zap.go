@@ -2,10 +2,11 @@
 package logger
 
 import (
+	"os"
+
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"gopkg.in/natefinch/lumberjack.v2"
-	"os"
 )
 
 // ===== [ Constants and Variables ] =====
@@ -77,6 +78,12 @@ func (zl *zapLogger) Panic(args ...interface{}) {
 // Panicf - Implements of Logger's Panicf
 func (zl *zapLogger) Panicf(format string, args ...interface{}) {
 	zl.sugaredLogger.Fatalf(format, args...)
+}
+
+// WithField - Implements of Logger's WithField
+func (zl *zapLogger) WithField(field string, value interface{}) Logger {
+	newLogger := zl.sugaredLogger.With(field, value)
+	return &zapLogger{newLogger}
 }
 
 // WithFields - Implements of Logger's WithFields
