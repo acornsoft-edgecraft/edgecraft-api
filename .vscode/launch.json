@@ -11,6 +11,13 @@
       "mode": "auto",
       "program": "${workspaceFolder}",
       "args": ["--kubeconfig", "strategy=file,path=${env:HOME}/.kube/config"]
+    },
+    {
+      "name": "WorkerTest",
+      "type": "go",
+      "request": "launch",
+      "mode": "auto",
+      "program": "${workspaceFolder}/cmd/test/workertest.go"
     }
   ]
 }

@@ -6,6 +6,7 @@ require (
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/go-playground/validator/v10 v10.11.0
 	github.com/gofrs/uuid v4.3.0+incompatible
+	github.com/gorilla/mux v1.8.0
 	github.com/labstack/echo/v4 v4.9.0
 	github.com/lib/pq v1.10.7
 	github.com/mitchellh/mapstructure v1.5.0
@@ -20,12 +21,13 @@ require (
 	gopkg.in/gorp.v2 v2.2.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/yaml.v3 v3.0.1
-	k8s.io/api v0.25.2
-	k8s.io/apimachinery v0.25.2
-	k8s.io/client-go v0.25.2
+	k8s.io/api v0.25.3
+	k8s.io/apimachinery v0.25.3
+	k8s.io/client-go v0.25.3
 )
 
 require (
+	cloud.google.com/go/compute v1.6.1 // indirect
 	github.com/BurntSushi/toml v1.1.0 // indirect
 	github.com/KyleBanks/depth v1.2.1 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect

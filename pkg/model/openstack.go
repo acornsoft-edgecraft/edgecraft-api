@@ -20,6 +20,7 @@ type OpenstackClusterSet struct {
 	Openstack   *OpenstackInfo        `json:"openstack"`
 	Nodes       *OpenstackNodeSetInfo `json:"nodes"`
 	EtcdStorage *EtcdStorageInfo      `json:"etcd_storage"`
+	SaveOnly    bool                  `json:"save_only"`
 }
 
 // ToTable - Openstack Cluster Set을 대상 Table 정보로 매핑 처리

@@ -14,6 +14,7 @@ type CloudSet struct {
 	Nodes       *NodesInfo       `json:"nodes"`
 	EtcdStorage *EtcdStorageInfo `json:"etcd_storage"`
 	OpenStack   *OpenstackInfo   `json:"openstack"`
+	SaveOnly    bool             `json:"save_only"`
 }
 
 // ToTable - CloudInfo를 대상 Table 정보에 매핑 처리
@@ -46,6 +47,7 @@ type CloudInfo struct {
 	Name     string `json:"name" example:"test cloud"`
 	Type     int    `json:"type" example:"1"`
 	Desc     string `json:"desc" example:"Baremtal cloud"`
+	Status   int    `json:"status" example:"1"`
 }
 
 // NewKey - Make new UUID V4
@@ -73,6 +75,7 @@ func (ci *CloudInfo) ToTable(cloudTable *CloudTable, isUpdate bool, user string,
 	cloudTable.Name = utils.StringPtr(ci.Name)
 	cloudTable.Type = utils.IntPrt(ci.Type)
 	cloudTable.Desc = utils.StringPtr(ci.Desc)
+	// NOTES: Status가 UI에 존재하지 않기 때문에 기본값으로 처리
 	cloudTable.Status = utils.IntPrt(1)
 }
 
@@ -82,6 +85,8 @@ func (ci *CloudInfo) FromTable(cloudTable *CloudTable) {
 	ci.Name = *cloudTable.Name
 	ci.Type = *cloudTable.Type
 	ci.Desc = *cloudTable.Desc
+	// NOTES: 조회용으로 상태 처리
+	ci.Status = *cloudTable.Status
 }
 
 // CloudList - List of Clouds

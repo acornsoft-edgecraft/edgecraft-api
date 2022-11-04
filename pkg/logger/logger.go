@@ -26,7 +26,7 @@ const (
 var (
 	// A global variable so that log functions can be directly acccessed
 	log                      Logger
-	errInvalidLoggerInstance = errors.New("Invalid logger instance")
+	errInvalidLoggerInstance = errors.New("invalid logger instance")
 )
 
 // ===== [ Types ] =====
@@ -48,6 +48,7 @@ type Logger interface {
 	Fatalf(format string, args ...interface{})
 	Panic(args ...interface{})
 	Panicf(format string, args ...interface{})
+	WithField(field string, value interface{}) Logger
 	WithFields(keyValues Fields) Logger
 	WithError(err error) Logger
 }
@@ -168,6 +169,11 @@ func Panic(args ...interface{}) {
 // Panicf - Writes panic information through the specified format.
 func Panicf(format string, args ...interface{}) {
 	log.Panicf(format, args...)
+}
+
+// WithField - Returns a logger that contains the specified field information.
+func WithField(field string, value interface{}) Logger {
+	return log.WithField(field, value)
 }
 
 // WithFields - Returns a logger that contains the specified fields information.
