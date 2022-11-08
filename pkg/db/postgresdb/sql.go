@@ -150,6 +150,14 @@ WHERE
 	A.cloud_uid = $1
 `
 
+const updateProvisionStatusSQL = `
+UPDATE	"edgecraft"."tbl_cluster" A
+   SET	state = $3
+WHERE
+		cloud_uid = $1
+AND		cluster_uid = $2
+`
+
 /***************************************
  * Cloud - Cluster - NodeSet (Openstack)
  ****************************************/

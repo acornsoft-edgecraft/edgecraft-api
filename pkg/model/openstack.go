@@ -93,7 +93,7 @@ func (osi *OpenstackInfo) ToTable(clusterTable *OpenstackClusterTable) {
 	}
 
 	clusterTable.OpenstackInfo.Cloud = osi.Cloud
-	clusterTable.OpenstackInfo.LocalHostName = "{{local_hostname}}" // 고정 값
+	clusterTable.OpenstackInfo.LocalHostName = "{{ local_hostname }}" // 고정 값
 	clusterTable.OpenstackInfo.ProviderConfB64 = osi.ProviderConfB64
 	clusterTable.OpenstackInfo.YamlB64 = osi.YamlB64
 	clusterTable.OpenstackInfo.CACertB64 = osi.CACertB64
@@ -114,7 +114,7 @@ func (osi *OpenstackInfo) ToTable(clusterTable *OpenstackClusterTable) {
 // FromTable - 테이블 정보를 Openstack 정보로 설정
 func (osi *OpenstackInfo) FromTable(clusterTable *OpenstackClusterTable) {
 	osi.Cloud = clusterTable.OpenstackInfo.Cloud
-	osi.LocalHostName = clusterTable.OpenstackInfo.LocalHostName
+	osi.LocalHostName = "{{ local_hostname }}" // 고정 값
 	osi.ProviderConfB64 = clusterTable.OpenstackInfo.ProviderConfB64
 	osi.YamlB64 = clusterTable.OpenstackInfo.YamlB64
 	osi.CACertB64 = clusterTable.OpenstackInfo.CACertB64

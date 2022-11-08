@@ -15,6 +15,23 @@ import (
 )
 
 /************************
+ * Code Utilities
+ ************************/
+
+// getCodeNameByKey - 키에 해당하는 이름을 반환
+func (a *API) getCodeNameByKey(group string, key int) string {
+	// Kubernetes 버전 조회
+	codeTable, err := a.Db.GetCode(group, key)
+	if err != nil {
+		return ""
+	} else if codeTable == nil {
+		return ""
+	}
+
+	return *codeTable.Name
+}
+
+/************************
  * Code Group
  ************************/
 

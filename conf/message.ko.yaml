@@ -56,7 +56,7 @@
 "25001": "이미 생성된 클라우드는 수정할 수 없습니다." # CloudCreated_CantUpdate
 
 "26000": "Provisioning 은 저장 상태만 가능합니다." # ProvisioningOnlySaved
-"26001": "오픈 스택 클러스터 등록 후 Provision 처리 중입니다. (시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterRegisteredAndProvisioning
+"26001": "오픈 스택 클러스터 정보가 등록되었습니다." # OpenstackClusterRegistered
 "26002": "오픈 스택 클러스터 Provision 처리 중입니다.(시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterProvisioning
 "26100": "Provision 요청이 실패하였습니다." #ProvisioningFailed
 

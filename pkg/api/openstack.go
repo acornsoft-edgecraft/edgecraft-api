@@ -6,7 +6,6 @@ package api
 import (
 	"time"
 
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
@@ -123,8 +122,6 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 
 	clusterTable, nodeSetTables := clusterSet.ToTable(cloudId, false, "system", time.Now())
 
-	// Openstack Cluster 정보 저장
-
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()
 	if err != nil {
@@ -158,9 +155,18 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 		logger.Info("DB commit Failed.", txErr)
 	}
 
-	// Openstack Cluster 생성 (CAPI with Openstack provider)
+	if !clusterSet.SaveOnly {
+		// Provisioning (background)
+		err = ProvisioningOpenstackCluster(a.Worker, a.Db, clusterTable, nodeSetTables, a.getCodeNameByKey("K8sVersions", *clusterTable.Version))
+		if err != nil {
+			return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
+		}
 
-	return response.WriteWithCode(c, clusterSet, common.OpenstackClusterRegisteredAndProvisioning, nil)
+		return response.WriteWithCode(c, clusterSet, common.OpenstackClusterProvisioning, nil)
+	} else {
+		// Saved
+		return response.WriteWithCode(c, clusterSet, common.OpenstackClusterRegistered, nil)
+	}
 }
 
 // UpdateClusterHandler - 클러스터 수정 (Openstack)
@@ -227,14 +233,6 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterTable, common.ProvisioningOnlySaved, err)
 	}
 
-	// Kubernetes 버전 조회
-	codeTable, err := a.Db.GetCode("K8sVersions", *clusterTable.Version)
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if codeTable == nil {
-		return response.ErrorfReqRes(c, clusterTable, common.DatabaseFalseData, err)
-	}
-
 	// NodeSets 정보 조회
 	nodeSetTables, err := a.Db.GetNodeSets(clusterId)
 	if err != nil {
@@ -243,17 +241,11 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nodeSetTables, common.DatabaseFalseData, err)
 	}
 
-	// // Provisioning (background)
-	// err = ProvisioningOpenstackCluster(a.Worker, clusterTable, nodeSetTables, *codeTable.Name)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
-	// }
-
-	// TODO: Workload Cluster 관련 후처리 작업
-	//       - kubeconfig 설정
-	//       - check cluster provisioned or failed
-	//       - machine crated (controlplane, workers)
-	// TODO: Provisioning 종료를 확인하는 방법은? Webhook, readyness??
+	// Provisioning (background)
+	err = ProvisioningOpenstackCluster(a.Worker, a.Db, clusterTable, nodeSetTables, a.getCodeNameByKey("K8sVersions", *clusterTable.Version))
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
+	}
 
 	// // Get Pod List
 	// podList, err := kubemethod.GetPodList("os-cluster", "")
@@ -268,7 +260,7 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	// }
 
 	// // Get Kubeconfig
-	// data, err := kubemethod.GetKubeconfig("default", "os-cluster-kubeconfig", "value")
+	// data, err := kubemethod.GetKubeconfig(*clusterTable.Namespace, *clusterTable.Name, "value")
 	// if err != nil {
 	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	// }
@@ -286,13 +278,13 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	// }
 
 	// Check workload cluster provisioning complete
-	data, err := kubemethod.GetProvisioned(*clusterTable.Namespace, *clusterTable.Name,
-		"infrastructure.cluster.x-k8s.io", "v1alph5", "OpenStackCluster")
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	}
+	// data, err := kubemethod.GetProvisioned(*clusterTable.Namespace, *clusterTable.Name,
+	// 	"infrastructure.cluster.x-k8s.io", "v1alpha3", "openstackclusters")
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// }
 
-	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, data)
+	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, data)
 	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, podList)
-	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
+	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
 }

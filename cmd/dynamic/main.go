@@ -1,10 +1,15 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os/user"
 	"path/filepath"
 
+	"golang.org/x/net/context"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/tools/clientcmd"
 
@@ -154,8 +159,45 @@ func main() {
 // }
 
 func PrintResources(client dynamic.Interface) {
-	// gvr := schema.GroupVersionResource{ Group: ""}
-	// rs :=
+	gvr := schema.GroupVersionResource{Group: "infrastructure.cluster.x-k8s.io", Version: "v1alpha3", Resource: "openstackclusters"}
+	rs := fmt.Sprintf("%s/%s", gvr.Group, gvr.Resource)
+	log.Printf("Listing %s objects", rs)
+	res := client.Resource(gvr).Namespace("default")
+	// log.Printf("Printing %s.%s", rs, "status.ready")
+
+	// 단일 정보
+	item, err := res.Get(context.TODO(), "os-test-1", metav1.GetOptions{})
+	errExit("Failed to list "+rs+" objects", err)
+	fld, exists, err := unstructured.NestedBool(item.Object, "status", "ready")
+	if err != nil {
+		log.Printf("Error reading %s for %s: %v", "status.ready", item.GetName(), err)
+	}
+	if !exists {
+		fld = false
+	}
+	fmt.Printf("  %-10s  -->  %-10v\n", item.GetName(), fld)
+
+	// 리스트 정보
+	// list, err := res.List(context.TODO(), metav1.ListOptions{})
+	// errExit("Failed to list "+rs+" objects", err)
+	// output := make(map[string]interface{})
+	// for _, item := range list.Items {
+	// 	name := item.GetName()
+	// 	log.Printf("resource name: %s", name)
+	// 	fld, exists, err := unstructured.NestedBool(item.Object, "status", "ready")
+	// 	if err != nil {
+	// 		log.Printf("Error reading %s for %s: %v", "status.ready", name, err)
+	// 		continue
+	// 	}
+	// 	if !exists {
+	// 		fld = false
+	// 	}
+	// 	output[name] = fld
+	// }
+
+	// for name, fld := range output {
+	// 	fmt.Printf("  %-10s  -->  %-10v\n", name, fld)
+	// }
 }
 
 func errExit(msg string, err error) {

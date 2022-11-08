@@ -95,8 +95,8 @@ const (
 
 	// ProvisioningOnlySaved
 	ProvisioningOnlySaved = 26000
-	// OpenstackClusterRegisteredAndProvisioning
-	OpenstackClusterRegisteredAndProvisioning = 26001
+	// OpenstackClusterRegistered
+	OpenstackClusterRegistered = 26001
 	// OpenstackClusterProvisioning
 	OpenstackClusterProvisioning = 26002
 
