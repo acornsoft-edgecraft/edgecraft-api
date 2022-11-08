@@ -17,6 +17,7 @@ require (
 	github.com/swaggo/echo-swagger v1.3.5
 	github.com/swaggo/swag v1.8.7
 	go.uber.org/zap v1.23.0
+	golang.org/x/net v0.1.0
 	golang.org/x/text v0.4.0
 	gopkg.in/gorp.v2 v2.2.0
 	gopkg.in/natefinch/lumberjack.v2 v2.0.0
@@ -77,7 +78,6 @@ require (
 	go.uber.org/atomic v1.10.0 // indirect
 	go.uber.org/multierr v1.8.0 // indirect
 	golang.org/x/crypto v0.0.0-20220829220503-c86fa9a7ed90 // indirect
-	golang.org/x/net v0.1.0 // indirect
 	golang.org/x/oauth2 v0.0.0-20220411215720-9780585627b5 // indirect
 	golang.org/x/sys v0.1.0 // indirect
 	golang.org/x/term v0.1.0 // indirect

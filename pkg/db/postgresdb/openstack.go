@@ -64,6 +64,15 @@ func (db *DB) DeleteOpenstackClusters(cloudId string) (int64, error) {
 	return result.RowsAffected()
 }
 
+// UpdateOpenstackClusterStatus - Update status of Openstack Cluster
+func (db *DB) UpdateOpenstackClusterStatus(cloudId, clusterId string, state int) (int64, error) {
+	result, err := db.GetClient().Exec(updateProvisionStatusSQL, cloudId, clusterId, state)
+	if err != nil {
+		return -1, err
+	}
+	return result.RowsAffected()
+}
+
 /***********************
  * NodeSet
  ***********************/

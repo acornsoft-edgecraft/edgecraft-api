@@ -189,7 +189,7 @@ definitions:
         example: cluster.local
         type: string
       version:
-        example: 1
+        example: 3
         type: integer
     type: object
   model.Login:

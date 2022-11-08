@@ -4,17 +4,23 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 package job
 
 import (
+	"strings"
 	"time"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 )
 
-const zeroDuration time.Duration = 0
+const (
+	zeroDuration time.Duration = 0
+)
 
 // TaskData - Provision에 사용할 클러스터 식별 데이터
 type TaskData struct {
+	Database    db.DB
+	CloudId     string
 	ClusterId   string
 	ClusterName string
 	Namespace   string
@@ -27,7 +33,7 @@ func checkKubeConfig(task string, taskData interface{}) {
 	count := 0
 	for range retryTicker.C {
 		// Get kubeconfig for workload cluster
-		kubeconfig, err := kubemethod.GetKubeconfig(data.Namespace, data.ClusterName+"-kubeconfig", "value")
+		kubeconfig, err := kubemethod.GetKubeconfig(data.Namespace, data.ClusterName, "value")
 		if err != nil {
 			logger.WithField("task", task).WithError(err).Infof("Retrieve kubeconfig for (%s) failed.", data.ClusterName)
 		} else {
@@ -45,7 +51,7 @@ func checkKubeConfig(task string, taskData interface{}) {
 		count += 1
 		if count > 30 {
 			retryTicker.Stop()
-			logger.WithField("task", task).Info("Close checking for kubeconfig. retry count (30 - 5min) over.")
+			logger.WithField("task", task).Info("Close checking for kubeconfig. retry count (30 times in 5 minues) over.")
 			return
 		}
 	}
@@ -53,21 +59,55 @@ func checkKubeConfig(task string, taskData interface{}) {
 
 // checkProvisioned - Provision 처리 종료 여부
 func checkProvisioned(task string, taskData interface{}) {
-	retryTicker := time.NewTicker(8 * time.Second)
+	data := taskData.(*TaskData)
+	retryTicker := time.NewTicker(30 * time.Second)
 	count := 0
 	for range retryTicker.C {
-		logger.WithField("task", task).Infof("provisioned retry - %d", count)
+		// Get phase for workload cluster
+		phase, err := kubemethod.GetProvisioned(data.Namespace, data.ClusterName)
+		if err != nil {
+			logger.WithField("task", task).WithError(err).Infof("Retrieve provision status for (%s) failed.", data.ClusterName)
+		} else {
+			var state int
+			if strings.ToLower(phase) == "provisioned" {
+				state = 3
+			} else if phase == "failed" {
+				state = 4
+			}
+
+			if phase != "" {
+				// update database. provisioned
+				affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, state)
+				if err != nil {
+					logger.WithField("task", task).WithError(err).Infof("Update provision state (%d) for (%s) failed.", state, data.ClusterName)
+					retryTicker.Stop()
+					return
+				} else if affected != 1 {
+					logger.WithField("task", task).WithError(err).Infof("Close checking for provision state (%d) for (%s) failed. (data not found, check cloud/cluster id)", state, data.ClusterName)
+					retryTicker.Stop()
+					return
+				}
+
+				logger.WithField("task", task).Info("Checking provisioned and update to database")
+				retryTicker.Stop()
+				return
+			}
+		}
+
 		count += 1
-		if count > 5 {
+		if count > 120 {
 			retryTicker.Stop()
+			logger.WithField("task", task).Info("Close checking provisioned. retry count (120 times in hour) over.")
 			return
 		}
 	}
 }
 
 // InvokeProvisionCheck - Providion 처리 중인 클러스터에 대한 진행 검증 작업
-func InvokeProvisionCheck(worker *IWorker, clusterId, clusterName, namespace string) {
+func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) {
 	taskData := &TaskData{
+		Database:    db,
+		CloudId:     cloudId,
 		ClusterId:   clusterId,
 		ClusterName: clusterName,
 		Namespace:   namespace,

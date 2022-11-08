@@ -59,6 +59,7 @@ type DB interface {
 	InsertOpenstackCluster(*model.OpenstackClusterTable) error
 	UpdateOpenstackCluster(*model.OpenstackClusterTable) (int64, error)
 	DeleteOpenstackCluster(string, string) (int64, error)
+	UpdateOpenstackClusterStatus(string, string, int) (int64, error)
 
 	// tbl_nodeset (Openstack)
 	GetNodeSets(string) ([]*model.NodeSetTable, error)

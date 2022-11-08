@@ -5,7 +5,6 @@ package kubemethod
 
 import (
 	"context"
-	"encoding/json"
 	"strings"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
@@ -13,7 +12,32 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
 	coreV1 "k8s.io/api/core/v1"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 )
+
+const (
+	//zeroDuration time.Duration = 0
+
+	// openstack_capi_group     string = "infrastructure.cluster.x-k8s.io"
+	// openstack_capi_version   string = "v1alpha3"
+	// openstack_capi_resources string = "openstackclusters"
+
+	openstack_cluster_group     string = "cluster.x-k8s.io"
+	openstack_cluster_version   string = "v1alpha3"
+	openstack_cluster_resources string = "clusters"
+)
+
+// checkProvisioningPhase - 전달된 unstructured 에서 Statue/Ready 상태 검증
+func checkProvisioningPhase(item *unstructured.Unstructured) (string, error) {
+	val, exists, err := unstructured.NestedString(item.Object, "status", "phase")
+	if err != nil {
+		return "", err
+	} else if !exists {
+		return "", nil
+	}
+
+	return val, nil
+}
 
 // Apply - 지정한 YAML 문자열 정보를 Kubernetes에 적용
 func Apply(clusterName, yaml string) error {
@@ -34,14 +58,14 @@ func Apply(clusterName, yaml string) error {
 }
 
 // GetKubeconfig - 지정한 클러스터에 대한 Kubeconfig 추출
-func GetKubeconfig(namespace, secretName, keyName string) (string, error) {
+func GetKubeconfig(namespace, clusterName, keyName string) (string, error) {
 	// Get kubernetes client
 	apiClient, err := config.HostCluster.GetKubernetesClient("")
 	if err != nil {
 		return "", err
 	}
 
-	secret, err := apiClient.CoreV1().Secrets(namespace).Get(context.TODO(), secretName, metaV1.GetOptions{})
+	secret, err := apiClient.CoreV1().Secrets(namespace).Get(context.TODO(), clusterName+"-kubeconfig", metaV1.GetOptions{})
 	if err != nil {
 		return "", err
 	}
@@ -54,26 +78,24 @@ func GetKubeconfig(namespace, secretName, keyName string) (string, error) {
 }
 
 // GetProvisioned - 지정한 클러스터에 대한 Provision 상태 검증.
-func GetProvisioned(namespace, clusterName, group, version, resource string) (bool, error) {
+func GetProvisioned(namespace, clusterName string) (string, error) {
 	// Get kubernetes client
 	//dynamicClient, err := config.HostCluster.GetDynamicClient("")
-	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", group, version, resource)
+	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", openstack_cluster_group, openstack_cluster_version, openstack_cluster_resources)
 	if err != nil {
-		return false, err
+		return "", err
 	}
 
-	//data, err := dynamicClient.Get(clusterName, metaV1.GetOptions{})
-	data, err := dynamicClient.List(metaV1.ListOptions{})
+	// checking the clsuter ready
+	dynamicClient.SetNamespace(namespace)
+	data, err := dynamicClient.Get(clusterName, metaV1.GetOptions{})
 	if err != nil {
-		return false, err
+		return "", err
 	} else if data != nil {
-		bytes, err := json.Marshal(data)
-		if err != nil {
-			return false, err
-		}
-		logger.Info(string(bytes))
+		// TODO: Checking Provision
+		return checkProvisioningPhase(data)
 	}
-	return true, nil
+	return "", nil
 }
 
 // GetPodList - description

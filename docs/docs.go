@@ -1201,7 +1201,7 @@ const docTemplate = `{
                 },
                 "version": {
                     "type": "integer",
-                    "example": 1
+                    "example": 3
                 }
             }
         },
