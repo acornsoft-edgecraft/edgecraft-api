@@ -24,6 +24,8 @@ CREATE TABLE "edgecraft"."tbl_cluster"
 	"pod_cidr"              			VARCHAR(30)                         NULL,       -- 클러스터포드CIDR
 	"service_cidr"          			VARCHAR(30)                         NULL,       -- 클러스터서비스CIDR
 	"service_domain"          			VARCHAR(30)                         NULL,       -- 클러스터서비스도메인
+	"master_extra_config"     			JSON         						NULL,     	-- 클라우드클러스터마스터엑스트라구성
+	"worker_extra_config"     			JSON         						NULL,     	-- 클라우드클러스터워커엑스트라구성
 
 	-- Openstack 정보
 	"openstack_info"        			JSON                                NULL,       -- 클러스터오픈스택정보
