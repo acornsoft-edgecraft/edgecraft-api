@@ -15,10 +15,12 @@ type OpenstackClusterTable struct {
 	Credential *string `json:"credential" db:"credential"`
 
 	// K8s 정보
-	Version   *int    `json:"version" db:"version"`
-	PodCidr   *string `json:"pod_cidr" db:"pod_cidr"`
-	SvcCidr   *string `json:"svc_cidr" db:"service_cidr"`
-	SvcDomain *string `json:"svc_domain" db:"service_domain"`
+	Version           *int         `json:"version" db:"version"`
+	PodCidr           *string      `json:"pod_cidr" db:"pod_cidr"`
+	SvcCidr           *string      `json:"svc_cidr" db:"service_cidr"`
+	SvcDomain         *string      `json:"svc_domain" db:"service_domain"`
+	MasterExtraConfig *ExtraConfig `json:"cp_kubeadm_extra_config" db:"master_extra_config"`
+	WorkerExtraConfig *ExtraConfig `json:"worker_kubeadm_extra_config" db:"worker_extra_config"`
 
 	// Openstack 정보
 	OpenstackInfo *OpenstackInfo `json:"openstack_info" db:"openstack_info"`

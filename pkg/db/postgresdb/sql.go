@@ -134,7 +134,7 @@ SELECT
 	A.cluster_uid,
 	A.name,
 	A.state,
-	(SELECT COUNT(node_count) FROM "edgecraft"."tbl_nodeset" B WHERE B.cluster_uid = A.cluster_uid) AS node_count,
+	(SELECT SUM(node_count) FROM "edgecraft"."tbl_nodeset" B WHERE B.cluster_uid = A.cluster_uid GROUP BY B.cluster_uid) AS node_count,
 	A.version,
 	A.created_at
 FROM 

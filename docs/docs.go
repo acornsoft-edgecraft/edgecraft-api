@@ -965,9 +965,6 @@ const docTemplate = `{
         "model.BaremetalInfo": {
             "type": "object",
             "properties": {
-                "cp_kubeadm_extra_config": {
-                    "$ref": "#/definitions/model.ExtraConfig"
-                },
                 "image_checksum": {
                     "type": "string",
                     "example": "http://192.168.0.1/ubuntu.qcow2.md5sum"
@@ -999,9 +996,6 @@ const docTemplate = `{
                 "user_name": {
                     "type": "string",
                     "example": "asdf"
-                },
-                "worker_kubeadm_extra_config": {
-                    "$ref": "#/definitions/model.ExtraConfig"
                 }
             }
         },
@@ -1160,33 +1154,36 @@ const docTemplate = `{
             "properties": {
                 "files": {
                     "type": "string",
-                    "example": "c"
+                    "example": ""
                 },
                 "format": {
                     "type": "string",
-                    "example": "f"
+                    "example": ""
                 },
                 "ntp": {
                     "type": "string",
-                    "example": "e"
+                    "example": ""
                 },
                 "post_kubeadm_commands": {
                     "type": "string",
-                    "example": "b"
+                    "example": "kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml"
                 },
                 "pre_kubeadm_commands": {
                     "type": "string",
-                    "example": "a"
+                    "example": ""
                 },
                 "users": {
                     "type": "string",
-                    "example": "d"
+                    "example": ""
                 }
             }
         },
         "model.KubernetesInfo": {
             "type": "object",
             "properties": {
+                "cp_kubeadm_extra_config": {
+                    "$ref": "#/definitions/model.ExtraConfig"
+                },
                 "pod_cidr": {
                     "type": "string",
                     "example": "10.96.0.1/12"
@@ -1202,6 +1199,9 @@ const docTemplate = `{
                 "version": {
                     "type": "integer",
                     "example": 3
+                },
+                "worker_kubeadm_extra_config": {
+                    "$ref": "#/definitions/model.ExtraConfig"
                 }
             }
         },

@@ -23,8 +23,6 @@ definitions:
     type: object
   model.BaremetalInfo:
     properties:
-      cp_kubeadm_extra_config:
-        $ref: '#/definitions/model.ExtraConfig'
       image_checksum:
         example: http://192.168.0.1/ubuntu.qcow2.md5sum
         type: string
@@ -49,8 +47,6 @@ definitions:
       user_name:
         example: asdf
         type: string
-      worker_kubeadm_extra_config:
-        $ref: '#/definitions/model.ExtraConfig'
     type: object
   model.CloudInfo:
     properties:
@@ -159,26 +155,28 @@ definitions:
   model.ExtraConfig:
     properties:
       files:
-        example: c
+        example: ""
         type: string
       format:
-        example: f
+        example: ""
         type: string
       ntp:
-        example: e
+        example: ""
         type: string
       post_kubeadm_commands:
-        example: b
+        example: kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
         type: string
       pre_kubeadm_commands:
-        example: a
+        example: ""
         type: string
       users:
-        example: d
+        example: ""
         type: string
     type: object
   model.KubernetesInfo:
     properties:
+      cp_kubeadm_extra_config:
+        $ref: '#/definitions/model.ExtraConfig'
       pod_cidr:
         example: 10.96.0.1/12
         type: string
@@ -191,6 +189,8 @@ definitions:
       version:
         example: 3
         type: integer
+      worker_kubeadm_extra_config:
+        $ref: '#/definitions/model.ExtraConfig'
     type: object
   model.Login:
     properties:
