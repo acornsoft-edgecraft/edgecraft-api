@@ -64,18 +64,20 @@ func checkProvisioned(task string, taskData interface{}) {
 	count := 0
 	for range retryTicker.C {
 		// Get phase for workload cluster
-		phase, err := kubemethod.GetProvisioned(data.Namespace, data.ClusterName)
+		phase, err := kubemethod.GetProvisionPhase(data.Namespace, data.ClusterName)
 		if err != nil {
 			logger.WithField("task", task).WithError(err).Infof("Retrieve provision status for (%s) failed.", data.ClusterName)
 		} else {
-			var state int
-			if strings.ToLower(phase) == "provisioned" {
+			var state int = 1
+			if strings.ToLower(phase) == "Provisioned" {
 				state = 3
-			} else if phase == "failed" {
+			} else if phase == "Failed" || phase == "Pending" || phase == "Unknown" {
 				state = 4
+			} else if phase == "provisioning" {
+				state = 2
 			}
 
-			if phase != "" {
+			if phase != "" && phase != "Provisioning" {
 				// update database. provisioned
 				affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, state)
 				if err != nil {

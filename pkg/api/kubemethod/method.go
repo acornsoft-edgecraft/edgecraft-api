@@ -77,8 +77,8 @@ func GetKubeconfig(namespace, clusterName, keyName string) (string, error) {
 	return string(secret.Data[keyName]), nil
 }
 
-// GetProvisioned - 지정한 클러스터에 대한 Provision 상태 검증.
-func GetProvisioned(namespace, clusterName string) (string, error) {
+// GetProvisionPhase - 지정한 클러스터에 대한 Provision Phase 검증.
+func GetProvisionPhase(namespace, clusterName string) (string, error) {
 	// Get kubernetes client
 	//dynamicClient, err := config.HostCluster.GetDynamicClient("")
 	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", openstack_cluster_group, openstack_cluster_version, openstack_cluster_resources)
