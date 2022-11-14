@@ -4782,3 +4782,7 @@ T$H‹„$à   H‰D$H‹„$è   H‰D$H‹„$ğ   H‰D$ è[˜ÆÿH‹D$(Æ€  H‹„$˜   é¯şÿÿH¸Ğ   H
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-11-14T15:16:11.993+0900","caller":"runtime/asm_amd64.s:1594","msg":"Complete requested work.","task":"check-kubeconfig"}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-11-14T15:16:32.016+0900","caller":"job/worker.go:82","msg":"Checking provisioned and update to database","task":"check-provisioned"}
 {"level":"\u001b[34mINFO\u001b[0m","ts":"2022-11-14T15:16:32.017+0900","caller":"runtime/asm_amd64.s:1594","msg":"Complete requested work.","task":"check-provisioned"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-11-14T17:25:23.544+0900","caller":"runtime/asm_amd64.s:1594","msg":"Received interrupt signal"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-11-14T17:25:23.548+0900","caller":"server/server.go:58","msg":"[stop workers]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-11-14T17:25:23.548+0900","caller":"server/server.go:58","msg":"[all workers exited!]"}
+{"level":"\u001b[34mINFO\u001b[0m","ts":"2022-11-14T17:25:23.548+0900","caller":"cmd/starter.go:42","msg":"HTTP server closed by signal."}
