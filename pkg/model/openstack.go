@@ -9,6 +9,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 )
@@ -47,18 +48,22 @@ func (ocs *OpenstackClusterSet) FromTable(clusterTable *OpenstackClusterTable, n
 		ocs.Cluster = &OpenstackClusterInfo{}
 	}
 	ocs.Cluster.FromTable(clusterTable)
+
 	if ocs.K8s == nil {
 		ocs.K8s = &KubernetesInfo{}
 	}
 	ocs.K8s.FromOpenstackTable(clusterTable)
+
 	if ocs.Openstack == nil {
 		ocs.Openstack = &OpenstackInfo{}
 	}
 	ocs.Openstack.FromTable(clusterTable)
+
 	if ocs.Nodes == nil {
 		ocs.Nodes = &OpenstackNodeSetInfo{}
 	}
 	ocs.Nodes.FromTable(clusterTable, nodeSetTables)
+
 	if ocs.EtcdStorage == nil {
 		ocs.EtcdStorage = &EtcdStorageInfo{}
 	}
@@ -189,11 +194,12 @@ func (osc *OpenstackClusterInfo) FromTable(clusterTable *OpenstackClusterTable) 
 
 // NodeSetInfo - Data for Nodeset
 type NodeSetInfo struct {
-	NodeSetUid string  `json:"nodeset_uid" example:""`
-	Name       string  `json:"name" example:""`
-	NodeCount  int     `json:"node_count" example:"1"`
-	Flavor     string  `json:"flavor" example:"m1.medium"`
-	Labels     *Labels `json:"labels"`
+	NodeSetUid string     `json:"nodeset_uid" example:""`
+	Name       string     `json:"name" example:""`
+	NodeCount  int        `json:"node_count" example:"1"`
+	Flavor     string     `json:"flavor" example:"m1.medium"`
+	Labels     *Labels    `json:"labels"`
+	Nodes      []k8s.Node `json:"nodes"` // 해당 클러스터의 GetNode 정보로 설정 필요.
 }
 
 // NewKey - Make new UUID V4

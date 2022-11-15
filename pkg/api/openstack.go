@@ -4,8 +4,10 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 package api
 
 import (
+	"strings"
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
@@ -61,40 +63,84 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
 	}
 
-	cloudSet := &model.CloudSet{}
+	openstackClusterSet := &model.OpenstackClusterSet{}
 
-	// Cloud 조회
-	cloudTable, err := a.Db.GetCloud(cloudId)
+	// TODO: Cluster정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if cloudTable == nil {
-		return response.ErrorfReqRes(c, cloudTable, common.DatabaseFalseData, err)
 	}
-	cloudTable.ToSet(cloudSet)
 
-	// Cluster 조회
-	clusters, err := a.Db.GetClusters(cloudId)
+	// TODO: Node 정보 조회
+	nodeSets, err := a.Db.GetNodeSets(clusterId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if len(clusters) == 0 {
-		return response.ErrorfReqRes(c, clusters, common.DatabaseFalseData, err)
 	}
 
-	clusters[0].ToSet(cloudSet)
+	openstackClusterSet.FromTable(clusterTable, nodeSets)
 
-	// Node 조회
-	nodes, err := a.Db.GetNodes(cloudId, *clusters[0].ClusterUid)
+	// TODO: Kubernetes Node 정보 조회
+	nodeList, err := kubemethod.GetNodeList(*clusterTable.Name)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if nodes == nil {
-		return response.ErrorfReqRes(c, nodes, common.DatabaseFalseData, err)
 	}
 
-	cloudSet.Nodes = &model.NodesInfo{}
-	cloudSet.Nodes.FromTable(clusters[0], nodes)
+	// Add node info
+	for _, node := range nodeList {
+		find := false
+		for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
+			if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
+				nodeSet.Nodes = append(nodeSet.Nodes, node)
+				find = true
+				break
+			}
+		}
 
-	return response.Write(c, nil, cloudSet)
+		if !find {
+			for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
+				if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
+					nodeSet.Nodes = append(nodeSet.Nodes, node)
+					break
+				}
+			}
+		}
 
+	}
+
+	// cloudSet := &model.CloudSet{}
+
+	// // Cloud 조회
+	// cloudTable, err := a.Db.GetCloud(cloudId)
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// } else if cloudTable == nil {
+	// 	return response.ErrorfReqRes(c, cloudTable, common.DatabaseFalseData, err)
+	// }
+	// cloudTable.ToSet(cloudSet)
+
+	// // Cluster 조회
+	// clusters, err := a.Db.GetClusters(cloudId)
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// } else if len(clusters) == 0 {
+	// 	return response.ErrorfReqRes(c, clusters, common.DatabaseFalseData, err)
+	// }
+
+	// clusters[0].ToSet(cloudSet)
+
+	// // Node 조회
+	// nodes, err := a.Db.GetNodes(cloudId, *clusters[0].ClusterUid)
+	// if err != nil {
+	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	// } else if nodes == nil {
+	// 	return response.ErrorfReqRes(c, nodes, common.DatabaseFalseData, err)
+	// }
+
+	// cloudSet.Nodes = &model.NodesInfo{}
+	// cloudSet.Nodes.FromTable(clusters[0], nodes)
+
+	//return response.Write(c, nil, cloudSet)
+	return response.Write(c, nil, openstackClusterSet)
 }
 
 // SetClusterHandler - 클러스터 추가 (Openstack)
