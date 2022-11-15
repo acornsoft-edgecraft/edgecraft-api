@@ -69,13 +69,16 @@ func checkProvisioned(task string, taskData interface{}) {
 			logger.WithField("task", task).WithError(err).Infof("Retrieve provision status for (%s) failed.", data.ClusterName)
 		} else {
 			var state int = 1
-			if strings.ToLower(phase) == "Provisioned" {
+			var provisionState = strings.ToLower(phase)
+			if provisionState == "provisioned" {
 				state = 3
-			} else if phase == "Failed" || phase == "Pending" || phase == "Unknown" {
+			} else if provisionState == "failed" || provisionState == "pending" || provisionState == "Unknown" {
 				state = 4
-			} else if phase == "provisioning" {
+			} else if provisionState == "provisioning" {
 				state = 2
 			}
+
+			logger.WithField("task", task).Infof("Checked state (%d), phase (%s), cluster (%s)", state, phase, data.ClusterName)
 
 			if phase != "" && phase != "Provisioning" {
 				// update database. provisioned
@@ -90,7 +93,7 @@ func checkProvisioned(task string, taskData interface{}) {
 					return
 				}
 
-				logger.WithField("task", task).Info("Checking provisioned and update to database")
+				logger.WithField("task", task).Infof("Checking provisioned and update to database [state: %d, cluster: %s]", state, data.ClusterName)
 				retryTicker.Stop()
 				return
 			}
