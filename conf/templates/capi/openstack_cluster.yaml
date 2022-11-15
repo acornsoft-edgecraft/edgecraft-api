@@ -22,7 +22,7 @@ metadata:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
 kind: OpenStackMachineTemplate
 metadata:
-  name: {{$ClusterName}}-control-plane
+  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
   namespace: {{or $Namespace "default"}}
 spec:
   template:
@@ -107,7 +107,7 @@ spec:
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: KubeadmControlPlane
 metadata:
-  name: {{$ClusterName}}-control-plane
+  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
   namespace: {{or $Namespace "default"}}
 spec:
   kubeadmConfigSpec:
@@ -180,7 +180,7 @@ spec:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
       kind: OpenStackMachineTemplate
-      name: {{$ClusterName}}-control-plane
+      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
   version: v{{$KubernetesVersion}}
 ---
@@ -235,7 +235,7 @@ spec:
   controlPlaneRef:
     apiVersion: controlplane.cluster.x-k8s.io/v1beta1
     kind: KubeadmControlPlane
-    name: {{$ClusterName}}-control-plane
+    name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
     kind: OpenStackCluster

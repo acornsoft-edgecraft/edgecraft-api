@@ -259,26 +259,17 @@ func newKubeCluster(conf *strategyInfo) (*kubeCluster, error) {
 		}
 
 		for k, v := range config.Clusters {
-			if _, exists := kc.KubeConfig.Clusters[k]; exists {
-				continue
-			}
-
+			delete(kc.KubeConfig.Clusters, k)
 			kc.KubeConfig.Clusters[k] = v
 		}
 
 		for k, v := range config.Contexts {
-			if _, exists := kc.KubeConfig.Contexts[k]; exists {
-				continue
-			}
-
+			delete(kc.KubeConfig.Contexts, k)
 			kc.KubeConfig.Contexts[k] = v
 		}
 
 		for k, v := range config.AuthInfos {
-			if _, exists := kc.KubeConfig.AuthInfos[k]; exists {
-				continue
-			}
-
+			delete(kc.KubeConfig.AuthInfos, k)
 			kc.KubeConfig.AuthInfos[k] = v
 		}
 

@@ -933,6 +933,41 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "k8s.Node": {
+            "type": "object",
+            "properties": {
+                "age": {
+                    "type": "string"
+                },
+                "container_image": {
+                    "type": "string"
+                },
+                "external_ip": {
+                    "type": "string"
+                },
+                "internal_ip": {
+                    "type": "string"
+                },
+                "kernel_version": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "os_image": {
+                    "type": "string"
+                },
+                "role": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "string"
+                }
+            }
+        },
         "model.BaremetalHostInfo": {
             "type": "object",
             "properties": {
@@ -1253,6 +1288,13 @@ const docTemplate = `{
                 "node_count": {
                     "type": "integer",
                     "example": 1
+                },
+                "nodes": {
+                    "description": "해당 클러스터의 GetNode 정보로 설정 필요.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/k8s.Node"
+                    }
                 },
                 "nodeset_uid": {
                     "type": "string",
