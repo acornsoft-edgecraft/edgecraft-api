@@ -258,19 +258,31 @@ func newKubeCluster(conf *strategyInfo) (*kubeCluster, error) {
 			return err
 		}
 
+		// add or modify clsuters
 		for k, v := range config.Clusters {
 			delete(kc.KubeConfig.Clusters, k)
 			kc.KubeConfig.Clusters[k] = v
 		}
 
-		for k, v := range config.Contexts {
-			delete(kc.KubeConfig.Contexts, k)
-			kc.KubeConfig.Contexts[k] = v
-		}
-
+		// add or modify authinfos
 		for k, v := range config.AuthInfos {
 			delete(kc.KubeConfig.AuthInfos, k)
 			kc.KubeConfig.AuthInfos[k] = v
+		}
+
+		// add or modify  contexts
+		for k, v := range config.Contexts {
+			delete(kc.KubeConfig.Contexts, k)
+			kc.KubeConfig.Contexts[k] = v
+
+			// add or modify clients
+			if restConfig, err := clientcmd.NewNonInteractiveClientConfig(*kc.KubeConfig, k, &clientcmd.ConfigOverrides{}, nil).ClientConfig(); err == nil {
+				utils.RemoveStringArrayItem(kc.ClusterNames, k)
+				kc.ClusterNames = append(kc.ClusterNames, k)
+
+				delete(kc.clients, k)
+				kc.clients[k] = createClientSet(k, restConfig)
+			}
 		}
 
 		return kc.Save()
@@ -284,6 +296,9 @@ func newKubeCluster(conf *strategyInfo) (*kubeCluster, error) {
 				delete(kc.KubeConfig.Clusters, v.Cluster)
 				delete(kc.KubeConfig.AuthInfos, v.AuthInfo)
 				delete(kc.KubeConfig.Contexts, k)
+
+				utils.RemoveStringArrayItem(kc.ClusterNames, k)
+				delete(kc.clients, k)
 
 				modified = true
 				break

@@ -93,8 +93,8 @@ const (
 	// CloudCreated_CantUpdate -
 	CloudCreated_CantUpdate = 25001
 
-	// ProvisioningOnlySaved
-	ProvisioningOnlySaved = 26000
+	// ProvisioningOnlySavedOrDeleted
+	ProvisioningOnlySavedOrDeleted = 26000
 	// OpenstackClusterRegistered
 	OpenstackClusterRegistered = 26001
 	// OpenstackClusterProvisioning

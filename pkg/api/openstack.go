@@ -12,6 +12,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
 	"github.com/labstack/echo/v4"
 )
 
@@ -79,67 +80,43 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 
 	openstackClusterSet.FromTable(clusterTable, nodeSets)
 
-	// TODO: Kubernetes Node 정보 조회
-	nodeList, err := kubemethod.GetNodeList(*clusterTable.Name)
-	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	}
-
-	// Add node info
-	for _, node := range nodeList {
-		find := false
-		for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
-			if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
-				nodeSet.Nodes = append(nodeSet.Nodes, node)
-				find = true
-				break
-			}
+	if *clusterTable.Status == 3 {
+		// TODO: Kubernetes Node 정보 조회
+		nodeList, err := kubemethod.GetNodeList(*clusterTable.Name)
+		if err != nil {
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 		}
 
-		if !find {
-			for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
+		// Add node info
+		for _, node := range nodeList {
+			find := false
+			for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
 				if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
 					nodeSet.Nodes = append(nodeSet.Nodes, node)
+					find = true
 					break
 				}
 			}
+
+			if !find {
+				for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
+					if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
+						nodeSet.Nodes = append(nodeSet.Nodes, node)
+						break
+					}
+				}
+			}
+		}
+	} else {
+		for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
+			nodeSet.Nodes = []k8s.Node{}
 		}
 
+		for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
+			nodeSet.Nodes = []k8s.Node{}
+		}
 	}
 
-	// cloudSet := &model.CloudSet{}
-
-	// // Cloud 조회
-	// cloudTable, err := a.Db.GetCloud(cloudId)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if cloudTable == nil {
-	// 	return response.ErrorfReqRes(c, cloudTable, common.DatabaseFalseData, err)
-	// }
-	// cloudTable.ToSet(cloudSet)
-
-	// // Cluster 조회
-	// clusters, err := a.Db.GetClusters(cloudId)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if len(clusters) == 0 {
-	// 	return response.ErrorfReqRes(c, clusters, common.DatabaseFalseData, err)
-	// }
-
-	// clusters[0].ToSet(cloudSet)
-
-	// // Node 조회
-	// nodes, err := a.Db.GetNodes(cloudId, *clusters[0].ClusterUid)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// } else if nodes == nil {
-	// 	return response.ErrorfReqRes(c, nodes, common.DatabaseFalseData, err)
-	// }
-
-	// cloudSet.Nodes = &model.NodesInfo{}
-	// cloudSet.Nodes.FromTable(clusters[0], nodes)
-
-	//return response.Write(c, nil, cloudSet)
 	return response.Write(c, nil, openstackClusterSet)
 }
 
@@ -238,6 +215,7 @@ func (a *API) UpdateClusterHandler(c echo.Context) error {
 // @ID          DeleteCluster
 // @Produce     json
 // @Param       cloudId path     string true "Cloud ID"
+// @Param       clusterId path   string true "Cluster ID"
 // @Success     200     {object} response.ReturnData
 // @Router      /clouds/{cloudId}/clusters/{clusterId} [delete]
 func (a *API) DeleteClusterHandler(c echo.Context) error {
@@ -275,8 +253,8 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	}
 
 	// Cluster 상태 검증
-	if *clusterTable.Status != 1 {
-		return response.ErrorfReqRes(c, clusterTable, common.ProvisioningOnlySaved, err)
+	if *clusterTable.Status != 1 && *clusterTable.Status != 6 {
+		return response.ErrorfReqRes(c, clusterTable, common.ProvisioningOnlySavedOrDeleted, err)
 	}
 
 	// NodeSets 정보 조회

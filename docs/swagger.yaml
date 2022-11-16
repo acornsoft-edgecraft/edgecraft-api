@@ -602,6 +602,11 @@ paths:
         name: cloudId
         required: true
         type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
       produces:
       - application/json
       responses:
