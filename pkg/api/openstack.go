@@ -12,6 +12,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
 	"github.com/labstack/echo/v4"
 )
 
@@ -105,7 +106,14 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 					}
 				}
 			}
+		}
+	} else {
+		for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
+			nodeSet.Nodes = []k8s.Node{}
+		}
 
+		for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
+			nodeSet.Nodes = []k8s.Node{}
 		}
 	}
 

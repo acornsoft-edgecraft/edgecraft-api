@@ -393,6 +393,13 @@ const docTemplate = `{
                         "name": "cloudId",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
