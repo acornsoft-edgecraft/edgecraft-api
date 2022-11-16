@@ -3,10 +3,11 @@ package common
 
 import (
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
 // ===== [ Constants and Variables ] =====
@@ -59,7 +60,7 @@ func CreateRandString(n int) string {
 func ParseJWT(secretKey string, tokenString string) (jwt.MapClaims, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
-			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
+			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
 
 		return []byte(secretKey), nil

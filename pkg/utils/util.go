@@ -261,3 +261,34 @@ func EndWithOnArray(arr []string, str string) string {
 	}
 	return ""
 }
+
+// FindIndex - 지정된 Slice에서 지정한 값에 해당하는 인덱스 반환
+func FindIndex[T any](slice []T, matchFunc func(T) bool) int {
+	for index, elem := range slice {
+		if matchFunc(elem) {
+			return index
+		}
+	}
+
+	return -1
+}
+
+// RemoveStringArrayItem - 지정한 배열내의 값들 중에서 해당하는 값을 삭제
+func RemoveStringArrayItem(slice []string, val string) []string {
+	sliceLen := len(slice)
+	sliceLastIndex := sliceLen - 1
+
+	idx := FindIndex(slice, func(elem string) bool {
+		return elem == val
+	})
+
+	if idx < 0 {
+		return slice
+	}
+
+	if idx != sliceLastIndex {
+		slice[idx] = slice[sliceLastIndex]
+	}
+
+	return slice[:sliceLastIndex]
+}

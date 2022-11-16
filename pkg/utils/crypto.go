@@ -54,7 +54,7 @@ const (
 	AESGCM CryptMode = "AES_GCM"
 )
 
-//matchKeyBytes - AES 대칭키, 32bit(AES 256), the value is 'The AES Key used in the Web API.'
+// matchKeyBytes - AES 대칭키, 32bit(AES 256), the value is 'The AES Key used in the Web API.'
 var matchKeyBytes = []byte{
 	0x54, 0x68,
 	0x65, 0x20,
@@ -83,8 +83,8 @@ func EncryptAES(plaintext []byte) ([]byte, error) {
 func EncryptAESWithMode(plaintext []byte, mode CryptMode) ([]byte, error) {
 	var ciphertext []byte
 	var err error
-	if plaintext == nil || len(plaintext) == 0 {
-		return nil, fmt.Errorf("No data")
+	if len(plaintext) == 0 {
+		return nil, fmt.Errorf("no data")
 	}
 
 	switch mode {
@@ -106,8 +106,8 @@ func DecryptAES(ciphertext []byte) ([]byte, error) {
 func DecryptAESWithMode(ciphertext []byte, mode CryptMode) ([]byte, error) {
 	var plaintext []byte
 	var err error
-	if ciphertext == nil || len(ciphertext) == 0 {
-		return nil, fmt.Errorf("No data")
+	if len(ciphertext) == 0 {
+		return nil, fmt.Errorf("no data")
 	}
 
 	switch mode {
@@ -146,8 +146,8 @@ func encryptCBC(plaintext []byte) ([]byte, error) {
 
 func decryptCBC(ciphertext []byte) ([]byte, error) {
 	// 데이터 체크
-	if ciphertext == nil || len(ciphertext) == 0 {
-		return nil, fmt.Errorf("No data")
+	if len(ciphertext) == 0 {
+		return nil, fmt.Errorf("no data")
 	}
 
 	block, err := aes.NewCipher(matchKeyBytes) // AES 대칭키 암호화 블록 생성
@@ -158,7 +158,7 @@ func decryptCBC(ciphertext []byte) ([]byte, error) {
 	}
 	if len(ciphertext)%aes.BlockSize != 0 { // 블록 크기의 배수가 아니면 리턴
 		fmt.Println("암호화된 데이터의 길이는 블록 크기의 배수가 되어야합니다.")
-		return nil, fmt.Errorf("The length of the encrypted data must be a multiple of the block size.. lenth : %d", len(ciphertext))
+		return nil, fmt.Errorf("the length of the encrypted data must be a multiple of the block size.. lenth : %d", len(ciphertext))
 	}
 
 	iv := ciphertext[:aes.BlockSize]        // 부분 슬라이스로 초기화 벡터 공간을 가져옴
@@ -206,8 +206,8 @@ func encryptGCM(plaintext []byte) ([]byte, error) {
 
 func decryptGCM(ciphertext []byte) ([]byte, error) {
 	// 데이터 체크
-	if ciphertext == nil || len(ciphertext) == 0 {
-		return nil, fmt.Errorf("No data")
+	if len(ciphertext) == 0 {
+		return nil, fmt.Errorf("no data")
 	}
 	block, err := aes.NewCipher(matchKeyBytes)
 	if err != nil {
