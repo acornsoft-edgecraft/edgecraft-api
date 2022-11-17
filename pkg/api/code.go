@@ -71,7 +71,7 @@ func (a *API) GetCodeGroupHandler(c echo.Context) error {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
 	if data == nil {
-		return response.Errorf(c, common.DatabaseFalseData, err)
+		return response.Errorf(c, common.DatabaseCodeFalseData, err)
 	}
 	return response.Write(c, nil, data)
 }
@@ -144,7 +144,7 @@ func (a *API) UpdateCodeGroupHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, codeGroup, common.CodeFailedDatabase, err)
 	} else if codeGroupTable == nil {
-		return response.ErrorfReqRes(c, codeGroup, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, codeGroup, common.DatabaseCodeFalseData, err)
 	}
 
 	codeGroup.ToTable(codeGroupTable, true, "system", time.Now())
@@ -201,7 +201,7 @@ func (a *API) DeleteCodeGroupHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, groupId, common.CodeFailedDatabase, err)
 	} else if codeGroupTable == nil {
-		return response.ErrorfReqRes(c, groupId, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, groupId, common.DatabaseCodeFalseData, err)
 	}
 
 	// Start. Transaction 얻어옴
@@ -263,7 +263,7 @@ func (a *API) GetCodeListHandler(c echo.Context) error {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
 	if len(list) == 0 {
-		return response.Errorf(c, common.DatabaseFalseData, err)
+		return response.Errorf(c, common.DatabaseCodeFalseData, err)
 	}
 
 	return response.Write(c, nil, list)
@@ -289,7 +289,7 @@ func (a *API) GetCodeListByGroupHandler(c echo.Context) error {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
 	if len(list) == 0 {
-		return response.Errorf(c, common.DatabaseFalseData, err)
+		return response.Errorf(c, common.DatabaseCodeFalseData, err)
 	}
 
 	return response.Write(c, nil, list)
@@ -321,7 +321,7 @@ func (a *API) GetCodeHandler(c echo.Context) error {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
 	if data == nil {
-		return response.Errorf(c, common.DatabaseFalseData, err)
+		return response.Errorf(c, common.DatabaseCodeFalseData, err)
 	}
 
 	return response.Write(c, nil, data)
@@ -404,7 +404,7 @@ func (a *API) UpdateCodeHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, code, common.CodeFailedDatabase, err)
 	} else if codeTable == nil {
-		return response.ErrorfReqRes(c, code, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, code, common.DatabaseCodeFalseData, err)
 	}
 
 	// 변경정보 갱신
@@ -468,7 +468,7 @@ func (a *API) DeleteCodeHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, code, common.CodeFailedDatabase, err)
 	} else if codeTable == nil {
-		return response.ErrorfReqRes(c, code, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, code, common.DatabaseCodeFalseData, err)
 	}
 
 	// Start. Transaction 얻어옴

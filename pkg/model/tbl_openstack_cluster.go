@@ -26,10 +26,10 @@ type OpenstackClusterTable struct {
 	OpenstackInfo *OpenstackInfo `json:"openstack_info" db:"openstack_info"`
 
 	// nodes 정보
-	LoadbalancerUse *bool `json:"use_loadbalancer" db:"loadbalancer_use_yn, default:false"`
+	LoadbalancerUse *bool `json:"use_loadbalancer" db:"loadbalancer_use_yn"`
 
 	// ETCD 정보
-	ExternalEtcdUse             *bool      `json:"use_external_etcd" db:"external_etcd_use, default:false"`
+	ExternalEtcdUse             *bool      `json:"use_external_etcd" db:"external_etcd_use"`
 	ExternalEtcdEndPoints       *Endpoints `json:"endpoints" db:"external_etcd_endpoints"`
 	ExternalEtcdCertificateCa   *string    `json:"ca_file" db:"external_etcd_certificate_ca"`
 	ExternalEtcdCertificateCert *string    `json:"cert_file" db:"external_etcd_certificate_cert"`

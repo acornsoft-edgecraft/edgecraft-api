@@ -43,7 +43,7 @@
 ##############################################################
 
 "24000": "DB ERROR" # CodeFailedDatabase
-"24100": "공통코드 데이터를 찾을 수 없습니다." # DatbaseCodeFalseData
+"24100": "공통코드 데이터를 찾을 수 없습니다." # DatabaseCodeFalseData
 
 "24200": "데이터가 없습니다." # DatabaseEmptyData
 "24201": "일치하는 데이터가 없습니다." # DatabaseFalseData
@@ -53,12 +53,22 @@
 # Cloud/Cluster 메시지
 ##############################################################
 
-"25001": "이미 생성된 클라우드는 수정할 수 없습니다." # CloudCreated_CantUpdate
+"25000": "Cloud 정보를 찾을 수 없습니다." # CloudNotFound
+"25001": "Cluster 정보를 찾을 수 없습니다." # ClusterNotFound
+"25002": "Node 정보를 찾을 수 없습니다." # NodeNotFound
+"25003": "NodeSet 정보를 찾을 수 없습니다." # NodeSetNotFound
+
+"25100": "이미 생성된 클라우드는 수정할 수 없습니다." # CreatedCloudNoUpdatable
 
 "26000": "Provisioning은 저장 또는 삭제된 상태만 가능합니다." # ProvisioningOnlySavedOrDeleted
 "26001": "오픈 스택 클러스터 정보가 등록되었습니다." # OpenstackClusterRegistered
 "26002": "오픈 스택 클러스터 Provision 처리 중입니다.(시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterProvisioning
+"26003": "오픈 스택 클러스터 Delete 처리 중입니다.(시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterDeleting
+"26004": "오픈 스택 클러스터 정보가 삭제되었습니다." # OpenstackClusterInfoDeleted
+"26005": "오픈 스택 클러스터 Provision이 삭제되었습니다." # OpenstackProvisionDeleted
+
 "26100": "Provision 요청이 실패하였습니다." #ProvisioningFailed
+"26101": "Delete provisioned cluster 요청이 실패하였습니다." #DeleteProvisionedClusterFailed
 
 ##############################################################
 # k8s api 메시지

@@ -80,7 +80,6 @@ func GetKubeconfig(namespace, clusterName, keyName string) (string, error) {
 // GetProvisionPhase - 지정한 클러스터에 대한 Provision Phase 검증.
 func GetProvisionPhase(namespace, clusterName string) (string, error) {
 	// Get kubernetes client
-	//dynamicClient, err := config.HostCluster.GetDynamicClient("")
 	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", openstack_cluster_group, openstack_cluster_version, openstack_cluster_resources)
 	if err != nil {
 		return "", err
@@ -92,7 +91,7 @@ func GetProvisionPhase(namespace, clusterName string) (string, error) {
 	if err != nil {
 		return "", err
 	} else if data != nil {
-		// TODO: Checking Provision
+		// Checking Provision
 		return checkProvisioningPhase(data)
 	}
 	return "", nil
@@ -123,4 +122,23 @@ func GetNodeList(clusterId string) ([]k8s.Node, error) {
 	}
 
 	return k8s.ConvertToNodeList(nodes)
+}
+
+// RemoveOpenstackProvisioned - 지정한 오픈스택 클러스터의 Provisioning 제거
+func RemoveOpenstackProvisioned(clusterId, clusterName, namespace string) error {
+	// Get kubernetes client
+	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", openstack_cluster_group, openstack_cluster_version, openstack_cluster_resources)
+	if err != nil {
+		return err
+	}
+
+	// checking clsuter
+	dynamicClient.SetNamespace(namespace)
+	data, err := dynamicClient.Get(clusterName, metaV1.GetOptions{})
+	if err != nil {
+		return err
+	} else if data != nil {
+		err = dynamicClient.Delete(clusterName, metaV1.DeleteOptions{})
+	}
+	return err
 }

@@ -54,7 +54,7 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if cloudTable == nil {
-		return response.ErrorfReqRes(c, cloudTable, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, cloudTable, common.CloudNotFound, err)
 	}
 	cloudTable.ToSet(cloudSet)
 
@@ -63,7 +63,7 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if len(clusters) == 0 {
-		return response.ErrorfReqRes(c, clusters, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, clusters, common.ClusterNotFound, err)
 	}
 
 	clusters[0].ToSet(cloudSet)
@@ -73,7 +73,7 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if nodes == nil {
-		return response.ErrorfReqRes(c, nodes, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, nodes, common.NodeNotFound, err)
 	}
 
 	cloudSet.Nodes = &model.NodesInfo{}
@@ -176,7 +176,7 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	// 공통 코드 조회
 	codeTable, err := a.Db.GetCode("CloudStatus", 1)
 	if err != nil || codeTable == nil {
-		return response.ErrorfReqRes(c, cloudSet, common.CodeFailedDatabase, err)
+		return response.ErrorfReqRes(c, cloudSet, common.DatabaseCodeFalseData, err)
 	}
 
 	// Cloud 조회
@@ -184,10 +184,10 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if cloudTable == nil {
-		return response.ErrorfReqRes(c, cloudTable, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, cloudTable, common.CloudNotFound, err)
 	} else if cloudTable.Status == codeTable.Code {
 		// 저장 상태만 수정 가능
-		return response.ErrorfReqRes(c, cloudTable, common.CloudCreated_CantUpdate, nil)
+		return response.ErrorfReqRes(c, cloudTable, common.CreatedCloudNoUpdatable, nil)
 	}
 
 	// Cluster 조회
@@ -195,7 +195,7 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if len(clusterTables) == 0 {
-		return response.ErrorfReqRes(c, clusterTables, common.DatabaseCodeFalseData, err)
+		return response.ErrorfReqRes(c, clusterTables, common.ClusterNotFound, err)
 	}
 
 	// Node 조회
@@ -203,7 +203,7 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if nodeTables == nil {
-		return response.ErrorfReqRes(c, nodeTables, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, nodeTables, common.NodeNotFound, err)
 	}
 
 	newCloudTable, newClusterTable, newNodeTables := cloudSet.ToTable(true, "system", at)
@@ -410,7 +410,7 @@ func (a *API) GetCloudNodeListHandler(c echo.Context) error {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
 	if list == nil {
-		return response.ErrorfReqRes(c, list, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, list, common.NodeNotFound, err)
 	}
 
 	// NodesInfo 구조체 작성
@@ -455,7 +455,7 @@ func (a *API) GetCloudNodeHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	} else if nodeTable == nil {
-		return response.ErrorfReqRes(c, nodeTable, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, nodeTable, common.NodeNotFound, err)
 	}
 
 	var node *model.NodeSpecificInfo = &model.NodeSpecificInfo{}
@@ -496,7 +496,7 @@ func (a *API) SetCloudNodeHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, cloudId, common.CodeFailedDatabase, err)
 	}
 	if clusters == nil {
-		return response.ErrorfReqRes(c, cloudId, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, cloudId, common.ClusterNotFound, err)
 	}
 
 	// Node 정보 설정
@@ -569,7 +569,7 @@ func (a *API) UpdateCloudNodeHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, cloudId, common.CodeFailedDatabase, err)
 	}
 	if clusterTables == nil {
-		return response.ErrorfReqRes(c, cloudId, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, cloudId, common.ClusterNotFound, err)
 	}
 
 	// Node 정보 조회
@@ -578,7 +578,7 @@ func (a *API) UpdateCloudNodeHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nodeId, common.CodeFailedDatabase, err)
 	}
 	if nodeTable == nil {
-		return response.ErrorfReqRes(c, nodeId, common.DatabaseFalseData, err)
+		return response.ErrorfReqRes(c, nodeId, common.NodeNotFound, err)
 	}
 
 	// Node 정보 설정

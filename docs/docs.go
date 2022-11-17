@@ -1364,6 +1364,9 @@ const docTemplate = `{
                     "type": "string",
                     "example": ""
                 },
+                "created": {
+                    "type": "string"
+                },
                 "desc": {
                     "type": "string",
                     "example": "Openstack Test Cluster #1"
@@ -1375,6 +1378,9 @@ const docTemplate = `{
                 "namespace": {
                     "type": "string",
                     "example": "default"
+                },
+                "status": {
+                    "type": "integer"
                 }
             }
         },
