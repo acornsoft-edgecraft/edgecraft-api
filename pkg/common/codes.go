@@ -90,8 +90,17 @@ const (
 	// Cloud/Cluster 관련 메시지
 	//############################################################
 
-	// CloudCreated_CantUpdate -
-	CloudCreated_CantUpdate = 25001
+	// CloudNotFound -
+	CloudNotFound = 25000
+	// ClusterNotFound -
+	ClusterNotFound = 25001
+	// NodeNotFound -
+	NodeNotFound = 25002
+	// NodeSetNotFound -
+	NodeSetNotFound = 25003
+
+	// CreatedCloudNoUpdatable -
+	CreatedCloudNoUpdatable = 25100
 
 	// ProvisioningOnlySavedOrDeleted
 	ProvisioningOnlySavedOrDeleted = 26000
@@ -99,9 +108,17 @@ const (
 	OpenstackClusterRegistered = 26001
 	// OpenstackClusterProvisioning
 	OpenstackClusterProvisioning = 26002
+	// OpenstackClusterDeleting
+	OpenstackClusterDeleting = 26003
+	// OpenstackClusterInfoDeleted
+	OpenstackClusterInfoDeleted = 26004
+	// OpenstackProvisionDeleted
+	OpenstackProvisionDeleted = 26005
 
 	// ProvisioningFailed -
 	ProvisioningFailed = 26100
+	// DeleteProvisionedClusterFailed -
+	DeleteProvisionedClusterFailed = 26101
 
 	//############################################################
 	// K8S 관련 메시지

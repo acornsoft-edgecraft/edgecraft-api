@@ -153,10 +153,12 @@ func (osi *OpenstackInfo) Scan(value interface{}) error {
 
 // OpenstackClusterInfo - Basic data for openstack cluster
 type OpenstackClusterInfo struct {
-	ClusterUid string `json:"cluster_uid" example:""`
-	Name       string `json:"name" example:"os-test-1"`
-	Desc       string `json:"desc" example:"Openstack Test Cluster #1"`
-	Namespace  string `json:"namespace" example:"default"`
+	ClusterUid string    `json:"cluster_uid" example:""`
+	Name       string    `json:"name" example:"os-test-1"`
+	Desc       string    `json:"desc" example:"Openstack Test Cluster #1"`
+	Namespace  string    `json:"namespace" example:"default"`
+	Status     int       `json:"status"`
+	Created    time.Time `json:"created"`
 }
 
 // NewKey - Make new UUID V4
@@ -190,6 +192,8 @@ func (osc *OpenstackClusterInfo) FromTable(clusterTable *OpenstackClusterTable) 
 	osc.Name = *clusterTable.Name
 	osc.Desc = *clusterTable.Desc
 	osc.Namespace = *clusterTable.Namespace
+	osc.Status = *clusterTable.Status
+	osc.Created = *clusterTable.Created
 }
 
 // NodeSetInfo - Data for Nodeset

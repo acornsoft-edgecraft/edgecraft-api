@@ -297,6 +297,8 @@ definitions:
       cluster_uid:
         example: ""
         type: string
+      created:
+        type: string
       desc:
         example: 'Openstack Test Cluster #1'
         type: string
@@ -306,6 +308,8 @@ definitions:
       namespace:
         example: default
         type: string
+      status:
+        type: integer
     type: object
   model.OpenstackClusterSet:
     properties:

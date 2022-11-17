@@ -4,6 +4,7 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 package api
 
 import (
+	"errors"
 	"strings"
 	"time"
 
@@ -66,13 +67,13 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 
 	openstackClusterSet := &model.OpenstackClusterSet{}
 
-	// TODO: Cluster정보 조회
+	// Cluster정보 조회
 	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	}
 
-	// TODO: Node 정보 조회
+	// Node 정보 조회
 	nodeSets, err := a.Db.GetNodeSets(clusterId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
@@ -80,11 +81,11 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 
 	openstackClusterSet.FromTable(clusterTable, nodeSets)
 
+	// Provisioned 상태면 Kubernetes Node 정보 조회 및 설정
 	if *clusterTable.Status == 3 {
-		// TODO: Kubernetes Node 정보 조회
 		nodeList, err := kubemethod.GetNodeList(*clusterTable.Name)
 		if err != nil {
-			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+			return response.ErrorfReqRes(c, nil, common.CodeFailedK8SAPI, err)
 		}
 
 		// Add node info
@@ -108,6 +109,7 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 			}
 		}
 	} else {
+		// Initialize node info
 		for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
 			nodeSet.Nodes = []k8s.Node{}
 		}
@@ -214,13 +216,144 @@ func (a *API) UpdateClusterHandler(c echo.Context) error {
 // @Description 클러스터 삭제 (Openstack)
 // @ID          DeleteCluster
 // @Produce     json
-// @Param       cloudId path     string true "Cloud ID"
+// @Param       cloudId   path     string true "Cloud ID"
 // @Param       clusterId path   string true "Cluster ID"
 // @Success     200     {object} response.ReturnData
 // @Router      /clouds/{cloudId}/clusters/{clusterId} [delete]
 func (a *API) DeleteClusterHandler(c echo.Context) error {
-	// TODO: Delete Cluster and resources
-	return nil
+	cloudId := c.Param("cloudId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
+	}
+
+	clusterId := c.Param("clusterId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
+	}
+
+	// 클러스터 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+
+	// // kubeconfig not found 테스트
+	// _, err = kubemethod.GetKubeconfig(*clusterTable.Namespace, *clusterTable.Name, "value")
+	// if err != nil {
+	// 	if errType, ok := err.(*k8serrors.StatusError); ok {
+	// 		if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
+	// 			return response.WriteWithCode(c, nil, common.OpenstackClusterInfoDeleted, nil)
+	// 		}
+	// 	}
+
+	// 	return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterFailed, err)
+	// } else {
+	// 	return response.ErrorfReqRes(c, nil, common.K8SFailed, errors.New("kubeconfig exist"))
+	// }
+
+	// // cluster not found 테스트
+	// _, err = kubemethod.GetProvisionPhase(*clusterTable.Namespace, *clusterTable.Name)
+	// if err != nil {
+	// 	if errType, ok := err.(*k8serrors.StatusError); ok {
+	// 		if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
+	// 			return response.WriteWithCode(c, nil, common.OpenstackClusterInfoDeleted, nil)
+	// 		}
+	// 	}
+
+	// 	return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterFailed, err)
+	// } else {
+	// 	return response.ErrorfReqRes(c, nil, common.K8SFailed, errors.New("cluster not deleted"))
+	// }
+
+	// 상태 provioning(2), provisioned(3), failed(4)인 경우는 클러스터 삭제 진행
+	// 그외는 데이터 삭제
+	if *clusterTable.Status == 2 || *clusterTable.Status == 3 || *clusterTable.Status == 4 {
+		// 프로비젼 상태인 클러스터 삭제
+		err := kubemethod.RemoveOpenstackProvisioned(clusterId, *clusterTable.Name, *clusterTable.Namespace)
+		if err != nil {
+			return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterFailed, err)
+		}
+
+		// TODO: 삭제 상태 검증 (backgroup)
+
+		// Start. Transaction 얻어옴
+		txdb, err := a.Db.BeginTransaction()
+		if err != nil {
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+		}
+
+		// 클러스터 상태 변경 (deleting)
+		affectedRows, err := a.Db.UpdateOpenstackClusterStatus(cloudId, clusterId, 5)
+		if err != nil {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+		}
+		if affectedRows == 0 {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, errors.New("cannot found cluster"))
+		}
+
+		txErr := txdb.Commit()
+		if txErr != nil {
+			logger.Info("DB commit Failed.", txErr)
+		}
+
+		// TODO: Delete Cluster
+		// TODO: Save to Deleting
+		// TODO: Delete checking job (remove cluster, remove kubeconfig, update cluster status)
+		return response.WriteWithCode(c, nil, common.OpenstackClusterDeleting, nil)
+	} else {
+		// Start. Transaction 얻어옴
+		txdb, err := a.Db.BeginTransaction()
+		if err != nil {
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+		}
+
+		affectedRows, err := a.Db.DeleteNodeSets(*clusterTable.ClusterUid)
+		if err != nil {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+		}
+		if affectedRows == 0 {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, errors.New("cannot found nodesets"))
+		}
+
+		affectedRows, err = a.Db.DeleteOpenstackCluster(cloudId, clusterId)
+		if err != nil {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+		}
+		if affectedRows == 0 {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, errors.New("cannot found cluster"))
+		}
+
+		txErr := txdb.Commit()
+		if txErr != nil {
+			logger.Info("DB commit Failed.", txErr)
+		}
+		// TODO: Delete Data (Cluster and NodeSets)
+		return response.WriteWithCode(c, nil, common.OpenstackClusterInfoDeleted, nil)
+	}
 }
 
 // ProvisioningClusterHandler - 클러스터 Provisioning (Openstack)

@@ -11,6 +11,8 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
+	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 const (
@@ -42,7 +44,7 @@ func checkKubeConfig(task string, taskData interface{}) {
 			if err != nil {
 				logger.WithField("task", task).WithError(err).Infof("Add kubeconfig for (%s) to configmap failed.", data.ClusterName)
 			} else {
-				logger.WithField("task", task).Info("Checking kubeconfig and applied")
+				logger.WithField("task", task).Info("Checking kubeconfig and added")
 				retryTicker.Stop()
 				return
 			}
@@ -51,7 +53,42 @@ func checkKubeConfig(task string, taskData interface{}) {
 		count += 1
 		if count > 30 {
 			retryTicker.Stop()
-			logger.WithField("task", task).Info("Close checking for kubeconfig. retry count (30 times in 5 minues) over.")
+			logger.WithField("task", task).Info("End the check of kubeconfig. exceeding the number of retries (30 times in 5 minues).")
+			return
+		}
+	}
+}
+
+// checkRemovedKubeConfig - 삭제되는 클러스터의 kubeconfig 삭제 처리
+func checkRemovedKubeConfig(task string, taskData interface{}) {
+	data := taskData.(*TaskData)
+	retryTicker := time.NewTicker(10 * time.Second)
+	count := 0
+
+	for range retryTicker.C {
+		// Get kubeconfig for workload cluster
+		_, err := kubemethod.GetKubeconfig(data.Namespace, data.ClusterName, "value")
+		if err != nil {
+			if errType, ok := err.(*errors.StatusError); ok {
+				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
+					// Remove cluster's kubeconfig
+					err = config.HostCluster.Remove(data.ClusterName)
+					if err != nil {
+						logger.WithField("task", task).WithError(err).Infof("Remove kubeconfig for (%s) from configmap failed.", data.ClusterName)
+					} else {
+						logger.WithField("task", task).Info("Checking kubeconfig and removed")
+						retryTicker.Stop()
+						return
+					}
+				}
+			}
+			logger.WithField("task", task).WithError(err).Infof("Retrieve kubeconfig for (%s) failed.", data.ClusterName)
+		}
+
+		count += 1
+		if count > 30 {
+			retryTicker.Stop()
+			logger.WithField("task", task).Info("End the delete check of kubeconfig. exceeding the number of retries (30 times in 5 minues).")
 			return
 		}
 	}
@@ -108,6 +145,11 @@ func checkProvisioned(task string, taskData interface{}) {
 	}
 }
 
+// checkDeleted - 클러스터의 삭제 여부 검증 및 후처리
+func checkDeleted(task string, taskData interface{}) {
+
+}
+
 // InvokeProvisionCheck - Providion 처리 중인 클러스터에 대한 진행 검증 작업
 func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) {
 	taskData := &TaskData{
@@ -130,6 +172,71 @@ func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, cluster
 
 	// check provisioned
 	(*worker).QueueTask("check-provisioned", zeroDuration, taskInfo)
+}
+
+// // InvokeProvisionCheck - Provision 정보를 확인하기 위한 작업 구동
+// func (w *worker) InvokeWorkerInvokeProvisionCheck(clusterId, clusterName string) error {
+// 	var provisionInfo = ProvisionInfo{
+// 		ClusterId:   clusterId,
+// 		ClusterName: clusterName,
+// 	}
+
+// 	time.After(0)
+// 	return w.QueueTask(clusterId, zeroDuration, provisionInfo)
+
+// 	// var input queueTaskInput
+// 	// if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
+// 	// 	logger.WithError(err).Info("failed to read POST body")
+// 	// 	renderResponse(w, http.StatusBadRequest, `{"error": "failed to read POST body"}`)
+// 	// 	return
+// 	// }
+// 	// defer req.Body.Close()
+
+// 	// // parse the work duration from the request body.
+// 	// workDuration, errParse := time.ParseDuration(input.WorkDuration)
+// 	// if errParse != nil {
+// 	// 	logger.WithError(errParse).Info("faile to parse work duration in request")
+// 	// 	renderResponse(w, http.StatusBadRequest, `{"error": "failed to parse work duration in request"}`)
+// 	// 	return
+// 	// }
+
+// 	// // queue the task in background task manager
+// 	// if err := h.worker.QueueTask(input.TaskID, workDuration); err != nil {
+// 	// 	logger.WithError(err).Info("failed to queue task")
+// 	// 	if err == job.ErrWorkerBusy {
+// 	// 		w.Header().Set("Retry-After", "60")
+// 	// 		renderResponse(w, http.StatusServiceUnavailable, `{"error": "workers are busy, try again later"}`)
+// 	// 		return
+// 	// 	}
+// 	// 	renderResponse(w, http.StatusInternalServerError, `{"error": "failed to queue task"}`)
+// 	// 	return
+// 	// }
+
+// 	// renderResponse(w, http.StatusAccepted, `{"status": "task queued successfully"}`)
+// }
+
+// InvokeDeleteCheck - 프로비전된 클러스터의 삭제에 대한 진행 검증 작업
+func InvokeDeleteCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) {
+	taskData := &TaskData{
+		Database:    db,
+		CloudId:     cloudId,
+		ClusterId:   clusterId,
+		ClusterName: clusterName,
+		Namespace:   namespace,
+	}
+
+	taskInfo := TaskInfo{
+		TaskData: taskData,
+		TaskFunc: checkRemovedKubeConfig,
+	}
+
+	// check kubeconfig
+	(*worker).QueueTask("check-removed-kubeconfig", zeroDuration, taskInfo)
+
+	taskInfo.TaskFunc = checkDeleted
+
+	// check provisioned
+	(*worker).QueueTask("check-deleted", zeroDuration, taskInfo)
 }
 
 // // InvokeProvisionCheck - Provision 정보를 확인하기 위한 작업 구동
