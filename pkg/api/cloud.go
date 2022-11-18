@@ -53,7 +53,8 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 	cloudTable, err := a.Db.GetCloud(cloudId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if cloudTable == nil {
+	}
+	if cloudTable == nil {
 		return response.ErrorfReqRes(c, cloudTable, common.CloudNotFound, err)
 	}
 	cloudTable.ToSet(cloudSet)
@@ -62,7 +63,8 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 	clusters, err := a.Db.GetClusters(cloudId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if len(clusters) == 0 {
+	}
+	if len(clusters) == 0 {
 		return response.ErrorfReqRes(c, clusters, common.ClusterNotFound, err)
 	}
 
@@ -72,7 +74,8 @@ func (a *API) GetCloudHandler(c echo.Context) error {
 	nodes, err := a.Db.GetNodes(cloudId, *clusters[0].ClusterUid)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if nodes == nil {
+	}
+	if len(nodes) == 0 {
 		return response.ErrorfReqRes(c, nodes, common.NodeNotFound, err)
 	}
 
@@ -183,9 +186,11 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	cloudTable, err := a.Db.GetCloud(cloudId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if cloudTable == nil {
+	}
+	if cloudTable == nil {
 		return response.ErrorfReqRes(c, cloudTable, common.CloudNotFound, err)
-	} else if cloudTable.Status == codeTable.Code {
+	}
+	if cloudTable.Status == codeTable.Code {
 		// 저장 상태만 수정 가능
 		return response.ErrorfReqRes(c, cloudTable, common.CreatedCloudNoUpdatable, nil)
 	}
@@ -194,7 +199,8 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	clusterTables, err := a.Db.GetClusters(cloudId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if len(clusterTables) == 0 {
+	}
+	if len(clusterTables) == 0 {
 		return response.ErrorfReqRes(c, clusterTables, common.ClusterNotFound, err)
 	}
 
@@ -202,7 +208,8 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	nodeTables, err := a.Db.GetNodes(cloudId, *clusterTables[0].ClusterUid)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if nodeTables == nil {
+	}
+	if len(nodeTables) == 0 {
 		return response.ErrorfReqRes(c, nodeTables, common.NodeNotFound, err)
 	}
 
@@ -409,7 +416,7 @@ func (a *API) GetCloudNodeListHandler(c echo.Context) error {
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
-	if list == nil {
+	if len(list) == 0 {
 		return response.ErrorfReqRes(c, list, common.NodeNotFound, err)
 	}
 
@@ -454,7 +461,8 @@ func (a *API) GetCloudNodeHandler(c echo.Context) error {
 	nodeTable, err := a.Db.GetNodeByCloud(cloudId, nodeId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if nodeTable == nil {
+	}
+	if nodeTable == nil {
 		return response.ErrorfReqRes(c, nodeTable, common.NodeNotFound, err)
 	}
 
@@ -495,7 +503,7 @@ func (a *API) SetCloudNodeHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, cloudId, common.CodeFailedDatabase, err)
 	}
-	if clusters == nil {
+	if len(clusters) == 0 {
 		return response.ErrorfReqRes(c, cloudId, common.ClusterNotFound, err)
 	}
 
@@ -568,7 +576,7 @@ func (a *API) UpdateCloudNodeHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, cloudId, common.CodeFailedDatabase, err)
 	}
-	if clusterTables == nil {
+	if len(clusterTables) == 0 {
 		return response.ErrorfReqRes(c, cloudId, common.ClusterNotFound, err)
 	}
 

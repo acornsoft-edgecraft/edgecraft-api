@@ -115,10 +115,10 @@ const (
 	// OpenstackProvisionDeleted
 	OpenstackProvisionDeleted = 26005
 
-	// ProvisioningFailed -
-	ProvisioningFailed = 26100
-	// DeleteProvisionedClusterFailed -
-	DeleteProvisionedClusterFailed = 26101
+	// ProvisioningCheckJobFailed -
+	ProvisioningCheckJobFailed = 26100
+	// DeleteProvisionedClusterJobFailed -
+	DeleteProvisionedClusterJobFailed = 26101
 
 	//############################################################
 	// K8S 관련 메시지

@@ -11,6 +11,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/job"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
@@ -72,11 +73,17 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.ClusterNotFound, err)
+	}
 
 	// Node 정보 조회
 	nodeSets, err := a.Db.GetNodeSets(clusterId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if len(nodeSets) == 0 {
+		return response.ErrorfReqRes(c, clusterTable, common.NodeSetNotFound, err)
 	}
 
 	openstackClusterSet.FromTable(clusterTable, nodeSets)
@@ -184,7 +191,7 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 		// Provisioning (background)
 		err = ProvisioningOpenstackCluster(a.Worker, a.Db, clusterTable, nodeSetTables, a.getCodeNameByKey("K8sVersions", *clusterTable.Version))
 		if err != nil {
-			return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
+			return response.ErrorfReqRes(c, nil, common.ProvisioningCheckJobFailed, err)
 		}
 
 		return response.WriteWithCode(c, clusterSet, common.OpenstackClusterProvisioning, nil)
@@ -236,6 +243,9 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, nil, common.ClusterNotFound, err)
+	}
 
 	// // kubeconfig not found 테스트
 	// _, err = kubemethod.GetKubeconfig(*clusterTable.Namespace, *clusterTable.Name, "value")
@@ -271,7 +281,7 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 		// 프로비젼 상태인 클러스터 삭제
 		err := kubemethod.RemoveOpenstackProvisioned(clusterId, *clusterTable.Name, *clusterTable.Namespace)
 		if err != nil {
-			return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterFailed, err)
+			return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterJobFailed, err)
 		}
 
 		// TODO: 삭제 상태 검증 (backgroup)
@@ -304,9 +314,13 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 			logger.Info("DB commit Failed.", txErr)
 		}
 
-		// TODO: Delete Cluster
-		// TODO: Save to Deleting
-		// TODO: Delete checking job (remove cluster, remove kubeconfig, update cluster status)
+		// TDelete checking job (remove cluster, remove kubeconfig, update cluster status)
+		err = job.InvokeDeleteCheck(a.Worker, a.Db, cloudId, clusterId, *clusterTable.Name, *clusterTable.Namespace)
+		if err != nil {
+			logger.WithError(err).Infof("Openstack Cluster [%s] provision check job failed.", *clusterTable.Name)
+			return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterJobFailed, err)
+		}
+
 		return response.WriteWithCode(c, nil, common.OpenstackClusterDeleting, nil)
 	} else {
 		// Start. Transaction 얻어옴
@@ -381,8 +395,9 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if clusterTable == nil {
-		return response.ErrorfReqRes(c, clusterTable, common.DatabaseFalseData, err)
+	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.ClusterNotFound, nil)
 	}
 
 	// Cluster 상태 검증
@@ -394,14 +409,15 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	nodeSetTables, err := a.Db.GetNodeSets(clusterId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	} else if len(nodeSetTables) == 0 {
-		return response.ErrorfReqRes(c, nodeSetTables, common.DatabaseFalseData, err)
+	}
+	if len(nodeSetTables) == 0 {
+		return response.ErrorfReqRes(c, nodeSetTables, common.NodeSetNotFound, err)
 	}
 
 	// Provisioning (background)
 	err = ProvisioningOpenstackCluster(a.Worker, a.Db, clusterTable, nodeSetTables, a.getCodeNameByKey("K8sVersions", *clusterTable.Version))
 	if err != nil {
-		return response.ErrorfReqRes(c, nil, common.ProvisioningFailed, err)
+		return response.ErrorfReqRes(c, nil, common.ProvisioningCheckJobFailed, err)
 	}
 
 	// // Get Pod List

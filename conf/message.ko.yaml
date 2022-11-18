@@ -67,8 +67,8 @@
 "26004": "오픈 스택 클러스터 정보가 삭제되었습니다." # OpenstackClusterInfoDeleted
 "26005": "오픈 스택 클러스터 Provision이 삭제되었습니다." # OpenstackProvisionDeleted
 
-"26100": "Provision 요청이 실패하였습니다." #ProvisioningFailed
-"26101": "Delete provisioned cluster 요청이 실패하였습니다." #DeleteProvisionedClusterFailed
+"26100": "Cluster provisioning 상태 검증 작업을 진행할 수 없습니다." # ProvisioningCheckJobFailed
+"26101": "Provisioned cluster 상태 검증 작업을 진행할 수 없습니다." # DeleteProvisionedClusterJobFailed
 
 ##############################################################
 # k8s api 메시지
