@@ -66,6 +66,7 @@
 "26003": "오픈 스택 클러스터 Delete 처리 중입니다.(시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterDeleting
 "26004": "오픈 스택 클러스터 정보가 삭제되었습니다." # OpenstackClusterInfoDeleted
 "26005": "오픈 스택 클러스터 Provision이 삭제되었습니다." # OpenstackProvisionDeleted
+"26006": "오픈 스택 클러스터 Delete 작업이 이미 요청된 상태입니다. (시간이 지난 후 상태를 확인하십시오.)" # OpenstsackClusterAlreadyDeleting = 26006
 
 "26100": "Cluster provisioning 상태 검증 작업을 진행할 수 없습니다." # ProvisioningCheckJobFailed
 "26101": "Provisioned cluster 상태 검증 작업을 진행할 수 없습니다." # DeleteProvisionedClusterJobFailed

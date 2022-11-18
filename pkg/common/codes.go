@@ -114,6 +114,8 @@ const (
 	OpenstackClusterInfoDeleted = 26004
 	// OpenstackProvisionDeleted
 	OpenstackProvisionDeleted = 26005
+	// OpenstsackClusterAlreadyDeleting
+	OpenstsackClusterAlreadyDeleting = 26006
 
 	// ProvisioningCheckJobFailed -
 	ProvisioningCheckJobFailed = 26100

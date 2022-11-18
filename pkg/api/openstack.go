@@ -247,44 +247,17 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nil, common.ClusterNotFound, err)
 	}
 
-	// // kubeconfig not found 테스트
-	// _, err = kubemethod.GetKubeconfig(*clusterTable.Namespace, *clusterTable.Name, "value")
-	// if err != nil {
-	// 	if errType, ok := err.(*k8serrors.StatusError); ok {
-	// 		if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
-	// 			return response.WriteWithCode(c, nil, common.OpenstackClusterInfoDeleted, nil)
-	// 		}
-	// 	}
-
-	// 	return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterFailed, err)
-	// } else {
-	// 	return response.ErrorfReqRes(c, nil, common.K8SFailed, errors.New("kubeconfig exist"))
-	// }
-
-	// // cluster not found 테스트
-	// _, err = kubemethod.GetProvisionPhase(*clusterTable.Namespace, *clusterTable.Name)
-	// if err != nil {
-	// 	if errType, ok := err.(*k8serrors.StatusError); ok {
-	// 		if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
-	// 			return response.WriteWithCode(c, nil, common.OpenstackClusterInfoDeleted, nil)
-	// 		}
-	// 	}
-
-	// 	return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterFailed, err)
-	// } else {
-	// 	return response.ErrorfReqRes(c, nil, common.K8SFailed, errors.New("cluster not deleted"))
-	// }
-
-	// 상태 provioning(2), provisioned(3), failed(4)인 경우는 클러스터 삭제 진행
-	// 그외는 데이터 삭제
-	if *clusterTable.Status == 2 || *clusterTable.Status == 3 || *clusterTable.Status == 4 {
+	// 삭제 작업
+	if *clusterTable.Status == 5 {
+		// 삭제 중이면 종료
+		return response.WriteWithCode(c, nil, common.OpenstsackClusterAlreadyDeleting, nil)
+	} else if *clusterTable.Status == 2 || *clusterTable.Status == 3 || *clusterTable.Status == 4 {
+		// 상태 provioning(2), provisioned(3), failed(4)인 경우는 클러스터 삭제 진행
 		// 프로비젼 상태인 클러스터 삭제
 		err := kubemethod.RemoveOpenstackProvisioned(clusterId, *clusterTable.Name, *clusterTable.Namespace)
 		if err != nil {
 			return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterJobFailed, err)
 		}
-
-		// TODO: 삭제 상태 검증 (backgroup)
 
 		// Start. Transaction 얻어옴
 		txdb, err := a.Db.BeginTransaction()
@@ -329,6 +302,7 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 		}
 
+		// NodeSet 삭제
 		affectedRows, err := a.Db.DeleteNodeSets(*clusterTable.ClusterUid)
 		if err != nil {
 			txErr := txdb.Rollback()
@@ -345,6 +319,7 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, errors.New("cannot found nodesets"))
 		}
 
+		// Cluster Data 삭제
 		affectedRows, err = a.Db.DeleteOpenstackCluster(cloudId, clusterId)
 		if err != nil {
 			txErr := txdb.Rollback()
@@ -365,7 +340,7 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 		if txErr != nil {
 			logger.Info("DB commit Failed.", txErr)
 		}
-		// TODO: Delete Data (Cluster and NodeSets)
+
 		return response.WriteWithCode(c, nil, common.OpenstackClusterInfoDeleted, nil)
 	}
 }
