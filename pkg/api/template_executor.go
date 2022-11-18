@@ -71,7 +71,11 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 	}
 
 	// Provision 검증 작업 등록 (Backgroud)
-	job.InvokeProvisionCheck(worker, db, *cluster.CloudUid, *cluster.ClusterUid, *cluster.Name, *cluster.Namespace)
+	err = job.InvokeProvisionCheck(worker, db, *cluster.CloudUid, *cluster.ClusterUid, *cluster.Name, *cluster.Namespace)
+	if err != nil {
+		logger.WithError(err).Infof("Openstack Cluster [%s] provision check job failed.", cluster.Name)
+		return err
+	}
 
 	logger.Infof("Openstack Cluster [%s] provision submitted.", cluster.Name)
 	return nil

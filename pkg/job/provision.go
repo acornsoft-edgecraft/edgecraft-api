@@ -11,7 +11,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
-	"k8s.io/apimachinery/pkg/api/errors"
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -28,10 +28,10 @@ type TaskData struct {
 	Namespace   string
 }
 
-// checkKubeConfig - Provision 처리 중인 클러스터의 kubeconfig 정보 처리
-func checkKubeConfig(task string, taskData interface{}) {
+// checkProvisionKubeConfig - Provision 처리 중인 클러스터의 kubeconfig 정보 처리
+func checkProvisionKubeConfig(task string, taskData interface{}) {
 	data := taskData.(*TaskData)
-	retryTicker := time.NewTicker(10 * time.Second)
+	retryTicker := time.NewTicker(30 * time.Second)
 	count := 0
 	for range retryTicker.C {
 		// Get kubeconfig for workload cluster
@@ -51,30 +51,30 @@ func checkKubeConfig(task string, taskData interface{}) {
 		}
 
 		count += 1
-		if count > 30 {
+		if count > 120 {
 			retryTicker.Stop()
-			logger.WithField("task", task).Info("End the check of kubeconfig. exceeding the number of retries (30 times in 5 minues).")
+			logger.WithField("task", task).Info("End the check of kubeconfig. exceeding the number of retries (120 times in 1 hour).")
 			return
 		}
 	}
 }
 
-// checkRemovedKubeConfig - 삭제되는 클러스터의 kubeconfig 삭제 처리
-func checkRemovedKubeConfig(task string, taskData interface{}) {
+// checkDeletedKubeConfig - 삭제되는 클러스터의 kubeconfig 삭제 처리
+func checkDeletedKubeConfig(task string, taskData interface{}) {
 	data := taskData.(*TaskData)
-	retryTicker := time.NewTicker(10 * time.Second)
+	retryTicker := time.NewTicker(30 * time.Second)
 	count := 0
 
 	for range retryTicker.C {
 		// Get kubeconfig for workload cluster
 		_, err := kubemethod.GetKubeconfig(data.Namespace, data.ClusterName, "value")
 		if err != nil {
-			if errType, ok := err.(*errors.StatusError); ok {
+			if errType, ok := err.(*k8serrors.StatusError); ok {
 				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
 					// Remove cluster's kubeconfig
 					err = config.HostCluster.Remove(data.ClusterName)
 					if err != nil {
-						logger.WithField("task", task).WithError(err).Infof("Remove kubeconfig for (%s) from configmap failed.", data.ClusterName)
+						logger.WithField("task", task).WithError(err).Infof("Remove kubeconfig for (%s) from configmap or file failed.", data.ClusterName)
 					} else {
 						logger.WithField("task", task).Info("Checking kubeconfig and removed")
 						retryTicker.Stop()
@@ -86,16 +86,16 @@ func checkRemovedKubeConfig(task string, taskData interface{}) {
 		}
 
 		count += 1
-		if count > 30 {
+		if count > 120 {
 			retryTicker.Stop()
-			logger.WithField("task", task).Info("End the delete check of kubeconfig. exceeding the number of retries (30 times in 5 minues).")
+			logger.WithField("task", task).Info("End the delete check of kubeconfig. exceeding the number of retries (120 times in 1 hour).")
 			return
 		}
 	}
 }
 
-// checkProvisioned - Provision 처리 종료 여부
-func checkProvisioned(task string, taskData interface{}) {
+// checkProvisionCluster - Provision 처리 확인 및 후처리
+func checkProvisionCluster(task string, taskData interface{}) {
 	data := taskData.(*TaskData)
 	retryTicker := time.NewTicker(30 * time.Second)
 	count := 0
@@ -145,13 +145,48 @@ func checkProvisioned(task string, taskData interface{}) {
 	}
 }
 
-// checkDeleted - 클러스터의 삭제 여부 검증 및 후처리
-func checkDeleted(task string, taskData interface{}) {
+// checkDeleteCluster - 클러스터의 삭제 여부 검증 및 후처리
+func checkDeleteCluster(task string, taskData interface{}) {
+	data := taskData.(*TaskData)
+	retryTicker := time.NewTicker(30 * time.Second)
+	count := 0
+	for range retryTicker.C {
+		// Get phase for workload cluster
+		_, err := kubemethod.GetProvisionPhase(data.Namespace, data.ClusterName)
+		if err != nil {
+			if errType, ok := err.(*k8serrors.StatusError); ok {
+				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
+					// Deleted, update database. deleted
+					state := 6
+					affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, state)
+					if err != nil {
+						logger.WithField("task", task).WithError(err).Infof("Update deleted state (%d) for (%s) failed.", state, data.ClusterName)
+						retryTicker.Stop()
+						return
+					} else if affected != 1 {
+						logger.WithField("task", task).WithError(err).Infof("Close checking for delete state (%d) for (%s) failed. (data not found, check cloud/cluster id)", state, data.ClusterName)
+						retryTicker.Stop()
+						return
+					}
 
+					logger.WithField("task", task).Infof("Checking deleted and update to database [state: %d, cluster: %s]", state, data.ClusterName)
+					retryTicker.Stop()
+					return
+				}
+			}
+		}
+
+		count += 1
+		if count > 120 {
+			retryTicker.Stop()
+			logger.WithField("task", task).Info("Close checking provisioned. retry count (120 times in hour) over.")
+			return
+		}
+	}
 }
 
 // InvokeProvisionCheck - Providion 처리 중인 클러스터에 대한 진행 검증 작업
-func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) {
+func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) error {
 	taskData := &TaskData{
 		Database:    db,
 		CloudId:     cloudId,
@@ -162,16 +197,24 @@ func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, cluster
 
 	taskInfo := TaskInfo{
 		TaskData: taskData,
-		TaskFunc: checkKubeConfig,
+		TaskFunc: checkProvisionKubeConfig,
 	}
 
 	// check kubeconfig
-	(*worker).QueueTask("check-kubeconfig", zeroDuration, taskInfo)
+	err := (*worker).QueueTask("check-kubeconfig", zeroDuration, taskInfo)
+	if err != nil {
+		return err
+	}
 
-	taskInfo.TaskFunc = checkProvisioned
+	taskInfo.TaskFunc = checkProvisionCluster
 
 	// check provisioned
-	(*worker).QueueTask("check-provisioned", zeroDuration, taskInfo)
+	err = (*worker).QueueTask("check-provisioned", zeroDuration, taskInfo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // // InvokeProvisionCheck - Provision 정보를 확인하기 위한 작업 구동
@@ -216,7 +259,7 @@ func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, cluster
 // }
 
 // InvokeDeleteCheck - 프로비전된 클러스터의 삭제에 대한 진행 검증 작업
-func InvokeDeleteCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) {
+func InvokeDeleteCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) error {
 	taskData := &TaskData{
 		Database:    db,
 		CloudId:     cloudId,
@@ -227,16 +270,24 @@ func InvokeDeleteCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterNam
 
 	taskInfo := TaskInfo{
 		TaskData: taskData,
-		TaskFunc: checkRemovedKubeConfig,
+		TaskFunc: checkDeletedKubeConfig,
 	}
 
 	// check kubeconfig
-	(*worker).QueueTask("check-removed-kubeconfig", zeroDuration, taskInfo)
+	err := (*worker).QueueTask("check-deleted-kubeconfig", zeroDuration, taskInfo)
+	if err != nil {
+		return err
+	}
 
-	taskInfo.TaskFunc = checkDeleted
+	taskInfo.TaskFunc = checkDeleteCluster
 
 	// check provisioned
-	(*worker).QueueTask("check-deleted", zeroDuration, taskInfo)
+	err = (*worker).QueueTask("check-deleted-cluster", zeroDuration, taskInfo)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // // InvokeProvisionCheck - Provision 정보를 확인하기 위한 작업 구동
