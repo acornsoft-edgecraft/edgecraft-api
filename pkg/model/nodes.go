@@ -6,6 +6,7 @@ package model
 import (
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 )
@@ -128,7 +129,7 @@ func (ni *NodesInfo) FromTable(clusterTable *ClusterTable, nodes []*NodeTable) {
 		var nsi *NodeSpecificInfo = &NodeSpecificInfo{}
 		nsi.FromTable(node)
 
-		if *node.Type == 1 {
+		if *node.Type == common.NodeTypeMaster {
 			ni.MasterNodes = append(ni.MasterNodes, nsi)
 		} else {
 			ni.WorkerNodes = append(ni.WorkerNodes, nsi)

@@ -9,6 +9,7 @@ import (
 	"errors"
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
@@ -241,6 +242,7 @@ func (nsi *NodeSetInfo) FromTable(nodeSetTable *NodeSetTable) {
 	nsi.NodeCount = *nodeSetTable.NodeCount
 	nsi.Flavor = *nodeSetTable.Flavor
 	nsi.Labels = nodeSetTable.Labels
+	nsi.Nodes = []k8s.Node{}
 }
 
 // OpenstackNodeSetInfo - Data for Nodeset of openstack
@@ -285,7 +287,7 @@ func (osnsi *OpenstackNodeSetInfo) FromTable(clusterTable *OpenstackClusterTable
 		var nsi *NodeSetInfo = &NodeSetInfo{}
 		nsi.FromTable(nodeSetTable)
 
-		if *nodeSetTable.Type == 1 {
+		if *nodeSetTable.Type == common.NodeTypeMaster {
 			osnsi.MasterSets = append(osnsi.MasterSets, nsi)
 		} else {
 			osnsi.WorkerSets = append(osnsi.WorkerSets, nsi)

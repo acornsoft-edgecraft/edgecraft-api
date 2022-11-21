@@ -51,7 +51,7 @@ func (i *Instance) Start() {
 
 // Shutdown - Stops the server
 func (i *Instance) Shutdown() {
-	// Shutdown all dependencies
+	// close database connection
 	i.DB.CloseConnection()
 
 	// Shutdown workers

@@ -59,9 +59,10 @@
 "25003": "NodeSet 정보를 찾을 수 없습니다." # NodeSetNotFound
 
 "25100": "이미 생성된 클라우드는 수정할 수 없습니다." # CreatedCloudNoUpdatable
+"25101": "이미 생성된 클러스터는 수정할 수 없습니다." # CreatedClusterNoUpdatable
 
 "26000": "Provisioning은 저장 또는 삭제된 상태만 가능합니다." # ProvisioningOnlySavedOrDeleted
-"26001": "오픈 스택 클러스터 정보가 등록되었습니다." # OpenstackClusterRegistered
+"26001": "오픈 스택 클러스터 정보가 등록(갱신)되었습니다." # OpenstackClusterRegistered
 "26002": "오픈 스택 클러스터 Provision 처리 중입니다.(시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterProvisioning
 "26003": "오픈 스택 클러스터 Delete 처리 중입니다.(시간이 지난 후 상태를 확인하십시오.)" # OpenstackClusterDeleting
 "26004": "오픈 스택 클러스터 정보가 삭제되었습니다." # OpenstackClusterInfoDeleted
@@ -76,6 +77,7 @@
 ##############################################################
 
 "27000": "K8S API ERROR" # CodeFailedK8SAPI
+"27001": "Provision 처리되었으나 아직 Cluster 정보를 확인할 수 없습니다."
 
 ##############################################################
 # 그룹관리 메시지

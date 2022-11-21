@@ -5,6 +5,27 @@ package common
 
 const (
 	//############################################################
+	// 상태코드 (공통코드 연계용)
+	//############################################################
+	StatusSaved        = 1
+	StatusProvisioning = 2
+	StatusProvisioned  = 3
+	StatusFailed       = 4
+	StatusDeleting     = 5
+	StatusDeleted      = 6
+
+	//############################################################
+	// NodeType (공통코드 연계용)
+	//############################################################
+	NodeTypeMaster = 1
+	NodeTypeWorker = 2
+
+	//############################################################
+	// UserStatus (공통코드 연계용)
+	//############################################################
+	UserStatusActivated = 1
+
+	//############################################################
 	// 일반 메시지
 	//############################################################
 
@@ -101,6 +122,8 @@ const (
 
 	// CreatedCloudNoUpdatable -
 	CreatedCloudNoUpdatable = 25100
+	// CreatedClusterNoUpdatable -
+	CreatedClusterNoUpdatable = 25100
 
 	// ProvisioningOnlySavedOrDeleted
 	ProvisioningOnlySavedOrDeleted = 26000
@@ -126,8 +149,10 @@ const (
 	// K8S 관련 메시지
 	//############################################################
 
-	// DB fail -
+	// CodeFailedK8SAPI -
 	CodeFailedK8SAPI = 27000
+	// KubernetesNotYet -
+	KubernetesNotYet = 27001
 
 	//############################################################
 	// 태그 관련 메시지

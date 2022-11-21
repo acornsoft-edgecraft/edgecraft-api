@@ -11,10 +11,10 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/response"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/job"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
-	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
 	"github.com/labstack/echo/v4"
 )
 
@@ -88,45 +88,44 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 
 	openstackClusterSet.FromTable(clusterTable, nodeSets)
 
+	k8sFailed := false
+
 	// Provisioned 상태면 Kubernetes Node 정보 조회 및 설정
-	if *clusterTable.Status == 3 {
+	if *clusterTable.Status == common.StatusProvisioned {
 		nodeList, err := kubemethod.GetNodeList(*clusterTable.Name)
 		if err != nil {
-			return response.ErrorfReqRes(c, nil, common.CodeFailedK8SAPI, err)
-		}
-
-		// Add node info
-		for _, node := range nodeList {
-			find := false
-			for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
-				if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
-					nodeSet.Nodes = append(nodeSet.Nodes, node)
-					find = true
-					break
-				}
-			}
-
-			if !find {
-				for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
+			k8sFailed = true
+			logger.WithError(err).Warn("Provisioned, but cannot find kubeconfig yet.")
+		} else {
+			// Add node info
+			for _, node := range nodeList {
+				find := false
+				for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
 					if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
 						nodeSet.Nodes = append(nodeSet.Nodes, node)
+						find = true
 						break
+					}
+				}
+
+				if !find {
+					for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
+						if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
+							nodeSet.Nodes = append(nodeSet.Nodes, node)
+							break
+						}
 					}
 				}
 			}
 		}
-	} else {
-		// Initialize node info
-		for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
-			nodeSet.Nodes = []k8s.Node{}
-		}
-
-		for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
-			nodeSet.Nodes = []k8s.Node{}
-		}
 	}
 
-	return response.Write(c, nil, openstackClusterSet)
+	if k8sFailed {
+		return response.WriteWithCode(c, nil, common.KubernetesNotYet, openstackClusterSet)
+	} else {
+		return response.Write(c, nil, openstackClusterSet)
+	}
+
 }
 
 // SetClusterHandler - 클러스터 추가 (Openstack)
@@ -213,8 +212,83 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 // @Success     200                 {object} response.ReturnData
 // @Router      /clouds/{cloudId}/clusters/{clusterId} [put]
 func (a *API) UpdateClusterHandler(c echo.Context) error {
-	return nil
+	// TODO: 로그인 사용자 정보 활용 방법은?
+	cloudId := c.Param("cloudId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
+	}
 
+	clusterId := c.Param("clusterId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
+	}
+
+	var clusterSet model.OpenstackClusterSet
+	err := getRequestData(c.Request(), &clusterSet)
+	if err != nil {
+		return response.ErrorfReqRes(c, clusterSet, common.CodeInvalidData, err)
+	}
+
+	// 클러스터 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, nil, common.ClusterNotFound, err)
+	}
+
+	// 클러스터 상태 조회
+	if *clusterTable.Status != common.StatusSaved && *clusterTable.Status != common.StatusDeleted && *clusterTable.Status != common.StatusFailed {
+		return response.ErrorfReqRes(c, nil, common.CreatedCloudNoUpdatable, err)
+	}
+
+	// 수신된 변경 정보 구성
+	clusterTable, nodeSetTables := clusterSet.ToTable(cloudId, false, "system", time.Now())
+
+	// 트랜잭션 구간 처리
+	err = a.Db.TransactionScope(func(txDB db.DB) error {
+		// Cluster 등록
+		affectedRows, err := txDB.UpdateOpenstackCluster(clusterTable)
+		if err != nil {
+			return err
+		}
+		if affectedRows == 0 {
+			return errors.New("no data found (update)")
+		}
+
+		// 기존 NodeSet 삭제
+		_, err = txDB.DeleteNodeSets(clusterId)
+		if err != nil {
+			return err
+		}
+
+		// NodeSet 등록
+		for _, nodeSetTable := range nodeSetTables {
+			err = txDB.InsertNodeSet(nodeSetTable)
+			if err != nil {
+				return err
+			}
+		}
+
+		return nil
+	})
+	if err != nil {
+		return response.ErrorfReqRes(c, clusterTable, common.CodeFailedDatabase, err)
+	}
+
+	if !clusterSet.SaveOnly {
+		// Provisioning (background)
+		err = ProvisioningOpenstackCluster(a.Worker, a.Db, clusterTable, nodeSetTables, a.getCodeNameByKey("K8sVersions", *clusterTable.Version))
+		if err != nil {
+			return response.ErrorfReqRes(c, nil, common.ProvisioningCheckJobFailed, err)
+		}
+
+		return response.WriteWithCode(c, clusterSet, common.OpenstackClusterProvisioning, nil)
+	} else {
+		// Saved
+		return response.WriteWithCode(c, clusterSet, common.OpenstackClusterRegistered, nil)
+	}
 }
 
 // DeleteClusterHandler - 클러스터 삭제 (Openstack)
@@ -248,10 +322,10 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 	}
 
 	// 삭제 작업
-	if *clusterTable.Status == 5 {
+	if *clusterTable.Status == common.StatusDeleting {
 		// 삭제 중이면 종료
 		return response.WriteWithCode(c, nil, common.OpenstsackClusterAlreadyDeleting, nil)
-	} else if *clusterTable.Status == 2 || *clusterTable.Status == 3 || *clusterTable.Status == 4 {
+	} else if *clusterTable.Status == common.StatusProvisioning || *clusterTable.Status == common.StatusProvisioned || *clusterTable.Status == common.StatusFailed {
 		// 상태 provioning(2), provisioned(3), failed(4)인 경우는 클러스터 삭제 진행
 		// 프로비젼 상태인 클러스터 삭제
 		err := kubemethod.RemoveOpenstackProvisioned(clusterId, *clusterTable.Name, *clusterTable.Namespace)
@@ -376,7 +450,7 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 	}
 
 	// Cluster 상태 검증
-	if *clusterTable.Status != 1 && *clusterTable.Status != 6 {
+	if *clusterTable.Status != common.StatusSaved && *clusterTable.Status != common.StatusDeleted {
 		return response.ErrorfReqRes(c, clusterTable, common.ProvisioningOnlySavedOrDeleted, err)
 	}
 

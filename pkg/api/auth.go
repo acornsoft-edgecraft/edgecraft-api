@@ -42,7 +42,7 @@ func (a *API) LoginHandler(c echo.Context) error {
 		return response.Errorf(c, common.CodeInvalidUser, err)
 	}
 	// TODO: Check status codes
-	if user.Status == 2 {
+	if user.Status != common.UserStatusActivated {
 		return response.Errorf(c, common.CodeFaildStatusUser, nil)
 	}
 

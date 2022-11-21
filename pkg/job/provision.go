@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
@@ -105,19 +106,19 @@ func checkProvisionCluster(task string, taskData interface{}) {
 		if err != nil {
 			logger.WithField("task", task).WithError(err).Infof("Retrieve provision status for (%s) failed.", data.ClusterName)
 		} else {
-			var state int = 1
+			var state int = common.StatusSaved
 			var provisionState = strings.ToLower(phase)
 			if provisionState == "provisioned" {
-				state = 3
+				state = common.StatusProvisioned
 			} else if provisionState == "failed" || provisionState == "pending" || provisionState == "Unknown" {
-				state = 4
+				state = common.StatusFailed
 			} else if provisionState == "provisioning" {
-				state = 2
+				state = common.StatusProvisioning
 			}
 
 			logger.WithField("task", task).Infof("Checked state (%d), phase (%s), cluster (%s)", state, phase, data.ClusterName)
 
-			if phase != "" && phase != "Provisioning" {
+			if provisionState != "" && provisionState != "provisioning" {
 				// update database. provisioned
 				affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, state)
 				if err != nil {
@@ -157,19 +158,18 @@ func checkDeleteCluster(task string, taskData interface{}) {
 			if errType, ok := err.(*k8serrors.StatusError); ok {
 				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
 					// Deleted, update database. deleted
-					state := 6
-					affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, state)
+					affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, common.StatusDeleted)
 					if err != nil {
-						logger.WithField("task", task).WithError(err).Infof("Update deleted state (%d) for (%s) failed.", state, data.ClusterName)
+						logger.WithField("task", task).WithError(err).Infof("Update deleted state (%d) for (%s) failed.", common.StatusDeleted, data.ClusterName)
 						retryTicker.Stop()
 						return
 					} else if affected != 1 {
-						logger.WithField("task", task).WithError(err).Infof("Close checking for delete state (%d) for (%s) failed. (data not found, check cloud/cluster id)", state, data.ClusterName)
+						logger.WithField("task", task).WithError(err).Infof("Close checking for delete state (%d) for (%s) failed. (data not found, check cloud/cluster id)", common.StatusDeleted, data.ClusterName)
 						retryTicker.Stop()
 						return
 					}
 
-					logger.WithField("task", task).Infof("Checking deleted and update to database [state: %d, cluster: %s]", state, data.ClusterName)
+					logger.WithField("task", task).Infof("Checking deleted and update to database [state: %d, cluster: %s]", common.StatusDeleted, data.ClusterName)
 					retryTicker.Stop()
 					return
 				}
