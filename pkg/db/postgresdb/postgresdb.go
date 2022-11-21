@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	_ "github.com/lib/pq" // db driver for postgreSQL
 	"gopkg.in/gorp.v2"
@@ -88,6 +89,51 @@ func (db *DB) Rollback() error {
 		db.tx = nil
 	}
 	return err
+}
+
+// TransactionScope - 데이터베이스 처리를 위한 트랜잭션 Scope 실행
+func (db *DB) TransactionScope(stmts func(txDB db.DB) error) error {
+	rollbacked := false
+
+	// transaction start
+	tx, err := db.client.Begin()
+	if err != nil {
+		return err
+	}
+
+	// 종료할 때 Commit 처리
+	defer func() {
+		// rollback이 아닌 경우만 Commit 처리
+		if tx != nil && !rollbacked {
+			err := tx.Commit()
+			if err != nil {
+				logger.WithError(err).Info("Commit failed with error.")
+			}
+			logger.Info("Database changes commited.")
+		}
+	}()
+
+	txDB := &DB{
+		config: db.config,
+		client: db.client,
+		tx:     tx,
+	}
+
+	// 블럭 명령 실행
+	err = stmts(txDB)
+	if err != nil {
+		logger.WithError(err).Info("Database changes will be rollback")
+
+		txErr := txDB.Rollback()
+		if txErr != nil {
+			logger.WithError(txErr).Info("Rollback failed with error.")
+		}
+		rollbacked = true
+
+		return err
+	}
+
+	return nil
 }
 
 // GetClient DB 처리에 사용할 client를 반환한다. transaction 사용할때는 transaction 객체, 사용하지 않을때는 dbMap 객체를 리턴한다.

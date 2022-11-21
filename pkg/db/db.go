@@ -22,6 +22,7 @@ type DB interface {
 	// Connection manage
 	CloseConnection() error
 	BeginTransaction() (DB, error)
+	TransactionScope(func(txDB DB) error) error
 	Commit() error
 	Rollback() error
 	GetClient() SQLExecutor

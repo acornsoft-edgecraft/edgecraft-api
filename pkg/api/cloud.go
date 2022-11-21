@@ -426,7 +426,7 @@ func (a *API) GetCloudNodeListHandler(c echo.Context) error {
 		var nodeSpecInfo *model.NodeSpecificInfo = &model.NodeSpecificInfo{}
 		nodeSpecInfo.FromTable(node)
 
-		if *node.Type == 1 {
+		if *node.Type == common.NodeTypeMaster {
 			nodes.MasterNodes = append(nodes.MasterNodes, nodeSpecInfo)
 		} else {
 			nodes.WorkerNodes = append(nodes.WorkerNodes, nodeSpecInfo)
