@@ -117,6 +117,9 @@ func (dc *DynamicClient) OpenstackProvisionPost(payload io.Reader) (resources []
 			// No content or err
 			break
 		}
+		if data.Object == nil {
+			continue
+		}
 
 		// get version, kind
 		version := data.GetAPIVersion()

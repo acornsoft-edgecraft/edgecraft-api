@@ -204,7 +204,7 @@ type NodeSetInfo struct {
 	NodeCount  int        `json:"node_count" example:"1"`
 	Flavor     string     `json:"flavor" example:"m1.medium"`
 	Labels     *Labels    `json:"labels"`
-	Nodes      []k8s.Node `json:"nodes"` // 해당 클러스터의 GetNode 정보로 설정 필요.
+	Nodes      []k8s.Node `json:"nodes" swaggerignore:"true"` // 해당 클러스터의 GetNode 정보로 설정 필요.
 }
 
 // NewKey - Make new UUID V4

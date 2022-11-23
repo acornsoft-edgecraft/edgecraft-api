@@ -412,6 +412,224 @@ const docTemplate = `{
                 }
             }
         },
+        "/clouds/{cloudId}/clusters/{clusterId}/nodesets": {
+            "get": {
+                "description": "클러스터의 NodeSet 리스트 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster-NodeSet"
+                ],
+                "summary": "GetNodeSetList",
+                "operationId": "GetNodeSetList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "post": {
+                "description": "클러스터에 NodeSet 추가 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster-NodeSet"
+                ],
+                "summary": "SetNodeSet",
+                "operationId": "SetNodeSet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "NodeSet Info",
+                        "name": "NodeSet",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.NodeSetInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds/{cloudId}/clusters/{clusterId}/nodesets/{nodeSetId}": {
+            "get": {
+                "description": "클러스터의 NodeSet 상세 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster-NodeSet"
+                ],
+                "summary": "GetNodeSet",
+                "operationId": "GetNodeSet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "NodeSet ID",
+                        "name": "nodeSetId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "클러스터의 NodeSet 삭제 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster-NodeSet"
+                ],
+                "summary": "DeleteNodeSet",
+                "operationId": "DeleteNodeSet",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "NodeSet ID",
+                        "name": "nodeSetId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
+        "/clouds/{cloudId}/clusters/{clusterId}/nodesets/{nodeSetId}/{nodeCount}": {
+            "get": {
+                "description": "클러스터의 NodeSet에 NodeCount 갱신 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster-NodeSet"
+                ],
+                "summary": "UpdateNodeCount",
+                "operationId": "UpdateNodeCount",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "NodeSet ID",
+                        "name": "nodeSetId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "NodeCount",
+                        "name": "nodeCount",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
         "/clouds/{cloudId}/nodes": {
             "get": {
                 "description": "클라우드에 속한 노드 리스트 조회",
@@ -940,41 +1158,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "k8s.Node": {
-            "type": "object",
-            "properties": {
-                "age": {
-                    "type": "string"
-                },
-                "container_image": {
-                    "type": "string"
-                },
-                "external_ip": {
-                    "type": "string"
-                },
-                "internal_ip": {
-                    "type": "string"
-                },
-                "kernel_version": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "os_image": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "string"
-                },
-                "version": {
-                    "type": "string"
-                }
-            }
-        },
         "model.BaremetalHostInfo": {
             "type": "object",
             "properties": {
@@ -1295,13 +1478,6 @@ const docTemplate = `{
                 "node_count": {
                     "type": "integer",
                     "example": 1
-                },
-                "nodes": {
-                    "description": "해당 클러스터의 GetNode 정보로 설정 필요.",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/k8s.Node"
-                    }
                 },
                 "nodeset_uid": {
                     "type": "string",

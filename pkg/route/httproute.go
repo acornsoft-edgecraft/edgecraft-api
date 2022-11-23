@@ -93,11 +93,13 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	v1.DELETE("/clouds/:cloudId/clusters/:clusterId", api.DeleteClusterHandler)     // 클러스터 삭제
 	v1.POST("/clouds/:cloudId/clusters/:clusterId", api.ProvisioningClusterHandler) // 클러스터 Provisioning
 
-	// Cloud/Cluster - NodeSet
-	// v1.GET("/clouds/:cloudID/clusters/:clusterID/nodesets", api.GetCloudClusterNodeSetHandler)                  // 클러스터 상세 노드셋 정보 조회
-	// v1.POST("/clouds/:cloudID/clusters/:clusterID/nodesets", api.AddCloudClusterNodeSetHandler)                 // 클러스터 상세 노드셋 추가
-	// v1.PUT("/clouds/:cloudID/clusters/:clusterID/nodesets/:nodesetID", api.UpdateCloudClusterNodeSetHandler)    // 클러스터 상세 노드셋 수정
-	// v1.DELETE("/clouds/:cloudID/clusters/:clusterID/nodesets/:nodesetID", api.DeleteCloudClusterNodeSetHandler) // 클러스터 상세 노드셋 삭제
+	// Openstack Cluster - NodeSet
+	v1.GET("/clouds/:cloudId/clusters/:clusterId/nodesets", api.GetNodeSetListHandler)        // 클러스터 노드셋 목록 조회
+	v1.GET("/clouds/:cloudId/clusters/:clusterId/nodesets/:nodeSetId", api.GetNodeSetHandler) // 클러스터 노드셋 상세 조회
+	v1.POST("/clouds/:cloudId/clusters/:clusterId/nodesets", api.SetNodeSetHandler)           // 클러스터 노드셋 추가
+	//v1.PUT("/clouds/:cloudId/clusters/:clusterId/nodesets/:nodeSetId", api.UpdateNodeSetHandler)              // 클러스터 노드셋 수정
+	v1.DELETE("/clouds/:cloudId/clusters/:clusterId/nodesets/:nodeSetId", api.DeleteNodeSetHandler)           // 클러스터 노드셋 삭제
+	v1.GET("/clouds/:cloudId/clusters/:clusterId/nodesets/:nodeSetId/:nodeCount", api.UpdateNodeCountHandler) // 클러스터 노드셋의 노드 카운트 갱신
 
 	// Cloud/Cluster - App
 	// v1.GET("/clouds/:cloudID/clusters/:clusterID/apps", api.GetCloudClusterAppsHandler)                   // 클러스터 상세 애플리케이션 목록 조회

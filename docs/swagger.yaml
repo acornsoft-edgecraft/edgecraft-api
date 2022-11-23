@@ -1,28 +1,5 @@
 basePath: /api/v1
 definitions:
-  k8s.Node:
-    properties:
-      age:
-        type: string
-      container_image:
-        type: string
-      external_ip:
-        type: string
-      internal_ip:
-        type: string
-      kernel_version:
-        type: string
-      name:
-        type: string
-      os_image:
-        type: string
-      role:
-        type: string
-      status:
-        type: string
-      version:
-        type: string
-    type: object
   model.BaremetalHostInfo:
     properties:
       bmc_address:
@@ -250,11 +227,6 @@ definitions:
       node_count:
         example: 1
         type: integer
-      nodes:
-        description: 해당 클러스터의 GetNode 정보로 설정 필요.
-        items:
-          $ref: '#/definitions/k8s.Node'
-        type: array
       nodeset_uid:
         example: ""
         type: string
@@ -699,6 +671,155 @@ paths:
       summary: UpdateCluster
       tags:
       - Openstack-Cluster
+  /clouds/{cloudId}/clusters/{clusterId}/nodesets:
+    get:
+      description: 클러스터의 NodeSet 리스트 (Openstack)
+      operationId: GetNodeSetList
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetNodeSetList
+      tags:
+      - Openstack-Cluster-NodeSet
+    post:
+      description: 클러스터에 NodeSet 추가 (Openstack)
+      operationId: SetNodeSet
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: NodeSet Info
+        in: body
+        name: NodeSet
+        required: true
+        schema:
+          $ref: '#/definitions/model.NodeSetInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetNodeSet
+      tags:
+      - Openstack-Cluster-NodeSet
+  /clouds/{cloudId}/clusters/{clusterId}/nodesets/{nodeSetId}:
+    delete:
+      description: 클러스터의 NodeSet 삭제 (Openstack)
+      operationId: DeleteNodeSet
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: NodeSet ID
+        in: path
+        name: nodeSetId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteNodeSet
+      tags:
+      - Openstack-Cluster-NodeSet
+    get:
+      description: 클러스터의 NodeSet 상세 (Openstack)
+      operationId: GetNodeSet
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: NodeSet ID
+        in: path
+        name: nodeSetId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetNodeSet
+      tags:
+      - Openstack-Cluster-NodeSet
+  /clouds/{cloudId}/clusters/{clusterId}/nodesets/{nodeSetId}/{nodeCount}:
+    get:
+      description: 클러스터의 NodeSet에 NodeCount 갱신 (Openstack)
+      operationId: UpdateNodeCount
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: NodeSet ID
+        in: path
+        name: nodeSetId
+        required: true
+        type: string
+      - description: NodeCount
+        in: path
+        name: nodeCount
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateNodeCount
+      tags:
+      - Openstack-Cluster-NodeSet
   /clouds/{cloudId}/nodes:
     get:
       description: 클라우드에 속한 노드 리스트 조회
