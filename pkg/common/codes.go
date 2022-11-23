@@ -139,11 +139,24 @@ const (
 	OpenstackProvisionDeleted = 26005
 	// OpenstsackClusterAlreadyDeleting
 	OpenstsackClusterAlreadyDeleting = 26006
+	// OpenstackClusterNodeSetProvisioning
+	OpenstackClusterNodeSetProvisioning = 26007
+	// OpenstackClusterNodeSetDeleting
+	OpenstackClusterNodeSetDeleting = 26008
 
 	// ProvisioningCheckJobFailed -
 	ProvisioningCheckJobFailed = 26100
 	// DeleteProvisionedClusterJobFailed -
 	DeleteProvisionedClusterJobFailed = 26101
+
+	// NodeCountUpdateFailed -
+	NodeCountUpdateFailed = 26200
+	// NodeCountUpdated -
+	NodeCountUpdated = 26201
+	// ProvisioningNodeSetFailed -
+	ProvisioningNodeSetFailed = 26202
+	// ProvisionedNodeSetDeleteFailed
+	ProvisionedNodeSetDeleteFailed = 26203
 
 	//############################################################
 	// K8S 관련 메시지

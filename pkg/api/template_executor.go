@@ -6,7 +6,7 @@ package api
 import (
 	"bytes"
 	"errors"
-	"html/template"
+	"text/template"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
@@ -37,7 +37,7 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 		return err
 	}
 
-	logger.Infof("processed templating yaml (%s)", buff.String())
+	logger.Infof("processed cluster templating yaml (%s)", buff.String())
 
 	// 처리된 템플릿을 Kubernetes로 전송
 	err = kubemethod.Apply(*cluster.Name, buff.String())
@@ -78,5 +78,40 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 	}
 
 	logger.Infof("Openstack Cluster [%s] provision submitted.", cluster.Name)
+	return nil
+}
+
+// ProvisioningOpenstackNodeSet - 오픈스택 NodeSet Provisioning
+func ProvisioningOpenstackNodeSet(worker *job.IWorker, db db.DB, cluster *model.OpenstackClusterTable, nodeSets []*model.NodeSetTable, k8sVersion string) error {
+	// Make provision data
+	data := model.OpenstackClusterSet{}
+	data.FromTable(cluster, nodeSets)
+	data.K8s.VersionName = k8sVersion
+
+	// Processing template
+	temp, err := template.ParseFiles("./conf/templates/capi/openstack_nodeset.yaml")
+	if err != nil {
+		logger.Errorf("Template has errors. cause(%s)", err.Error())
+		return err
+	}
+
+	// TODO: 진행상황을 어떻게 클라이언트에 보여줄 것인가?
+	var buff bytes.Buffer
+	err = temp.Execute(&buff, data)
+	if err != nil {
+		logger.Errorf("Template execution failed. cause(%s)", err.Error())
+		return err
+	}
+
+	logger.Infof("processed nodeset templating yaml (%s)", buff.String())
+
+	// 처리된 템플릿을 Kubernetes로 전송
+	err = kubemethod.Apply(*cluster.Name, buff.String())
+	if err != nil {
+		logger.Errorf("NodeSet creation failed. (cause: %s)", err.Error())
+		return err
+	}
+
+	logger.Infof("Openstack Cluseter [%s] - NodeSet provision submitted.", cluster.Name)
 	return nil
 }

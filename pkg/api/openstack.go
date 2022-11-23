@@ -5,7 +5,6 @@ package api
 
 import (
 	"errors"
-	"strings"
 	"time"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
@@ -92,32 +91,7 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 
 	// Provisioned 상태면 Kubernetes Node 정보 조회 및 설정
 	if *clusterTable.Status == common.StatusProvisioned {
-		nodeList, err := kubemethod.GetNodeList(*clusterTable.Name)
-		if err != nil {
-			k8sFailed = true
-			logger.WithError(err).Warn("Provisioned, but cannot find kubeconfig yet.")
-		} else {
-			// Add node info
-			for _, node := range nodeList {
-				find := false
-				for _, nodeSet := range openstackClusterSet.Nodes.MasterSets {
-					if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
-						nodeSet.Nodes = append(nodeSet.Nodes, node)
-						find = true
-						break
-					}
-				}
-
-				if !find {
-					for _, nodeSet := range openstackClusterSet.Nodes.WorkerSets {
-						if strings.Contains(node.Name, "-"+nodeSet.Name+"-") {
-							nodeSet.Nodes = append(nodeSet.Nodes, node)
-							break
-						}
-					}
-				}
-			}
-		}
+		k8sFailed = kubemethod.ArrangeK8SNodesToNodeSetInfo(*clusterTable.Name, *openstackClusterSet.Nodes)
 	}
 
 	if k8sFailed {
@@ -125,7 +99,6 @@ func (a *API) GetClusterHandler(c echo.Context) error {
 	} else {
 		return response.Write(c, nil, openstackClusterSet)
 	}
-
 }
 
 // SetClusterHandler - 클러스터 추가 (Openstack)
@@ -469,44 +442,5 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nil, common.ProvisioningCheckJobFailed, err)
 	}
 
-	// // Get Pod List
-	// podList, err := kubemethod.GetPodList("os-cluster", "")
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	// // Get Node List
-	// nodeList, err := kubemethod.GetNodeList("os-cluster")
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	// // Get Kubeconfig
-	// data, err := kubemethod.GetKubeconfig(*clusterTable.Namespace, *clusterTable.Name, "value")
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	// // Add cluster's kubeconfig
-	// err = config.HostCluster.Add([]byte(data))
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	// // Remove cluster's kubeconfig
-	// err := config.HostCluster.Remove("os-cluster")
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	// Check workload cluster provisioning complete
-	// data, err := kubemethod.GetProvisioned(*clusterTable.Namespace, *clusterTable.Name,
-	// 	"infrastructure.cluster.x-k8s.io", "v1alpha3", "openstackclusters")
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
-	// }
-
-	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, data)
-	//return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, podList)
 	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
 }
