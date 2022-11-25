@@ -149,8 +149,8 @@ const (
 	// DeleteProvisionedClusterJobFailed -
 	DeleteProvisionedClusterJobFailed = 26101
 
-	// NodeCountUpdateFailed -
-	NodeCountUpdateFailed = 26200
+	// ProvisionNodeCountChangeFailed -
+	ProvisionNodeCountChangeFailed = 26200
 	// NodeCountUpdated -
 	NodeCountUpdated = 26201
 	// ProvisioningNodeSetFailed -

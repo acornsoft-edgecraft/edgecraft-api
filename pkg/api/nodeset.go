@@ -377,10 +377,36 @@ func (a *API) UpdateNodeCountHandler(c echo.Context) error {
 		return response.Errorf(c, common.NodeSetNotFound, err)
 	}
 
-	// Node count 변경
-	err = kubemethod.UpdateNodeCount(*clusterTable.Name, *nodeSetTable.Name, *clusterTable.Namespace, *nodeSetTable.Type, nodeCount)
+	// NodeSet에 NodeCount 반영
+	nodeSetTable.NodeCount = utils.IntPrt(nodeCount)
+
+	// 트랜잭션 구간 처리
+	k8sFailed := false
+	err = a.Db.TransactionScope(func(txDB db.DB) error {
+		// NodeSet 갱신
+		affectedRows, err := txDB.UpdateNodeSet(nodeSetTable)
+		if err != nil {
+			return err
+		}
+		if affectedRows == 0 {
+			return errors.New("cannot find noddeset for nodecount updating")
+		}
+
+		// Node count 변경
+		err = kubemethod.UpdateNodeCount(*clusterTable.Name, *nodeSetTable.Name, *clusterTable.Namespace, *nodeSetTable.Type, nodeCount)
+		if err != nil {
+			k8sFailed = true
+			return err
+		}
+
+		return nil
+	})
 	if err != nil {
-		return response.ErrorfReqRes(c, nodeCount, common.NodeCountUpdateFailed, err)
+		if k8sFailed {
+			return response.ErrorfReqRes(c, nodeSetTable, common.ProvisionNodeCountChangeFailed, err)
+		} else {
+			return response.ErrorfReqRes(c, nodeSetTable, common.CodeFailedDatabase, err)
+		}
 	}
 
 	return response.WriteWithCode(c, nil, common.NodeCountUpdated, nil)
