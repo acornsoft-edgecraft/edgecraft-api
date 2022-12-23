@@ -40,4 +40,6 @@
 ## Project workflow  
 ![Project Structure](./docs/images/Project-Structure.png)
 
+## Cluster API Workflow
 
+![Cluster API Workflow](./docs/images/edgecraft-capi-flow.png)
