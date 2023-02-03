@@ -175,6 +175,9 @@ definitions:
     type: object
   model.KubernetesInfo:
     properties:
+      bootstrap_provider:
+        example: 1
+        type: integer
       cp_kubeadm_extra_config:
         $ref: '#/definitions/model.ExtraConfig'
       pod_cidr:

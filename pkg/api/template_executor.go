@@ -15,6 +15,18 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 )
 
+// getTemplatePath - Bootstrap Provider 정보에 따라 처리할 템플릿 파일을 결정한다.
+func getTemplatePath(providerType *int) string {
+	switch *providerType {
+	case 2:
+		return "./conf/tempates/capi/openstack_mk8s_cluster.yaml"
+	case 3:
+		return "./conf/tempates/capi/openstack_k3s_cluster.yaml"
+	default:
+		return "./conf/templates/capi/openstack_cluster.yaml"
+	}
+}
+
 // ProvisioningOpenstackCluster - 오픈스택 클러스터 Provisioning
 func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.OpenstackClusterTable, nodeSets []*model.NodeSetTable, k8sVersion string) error {
 	// Make provision data
@@ -23,7 +35,7 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 	data.K8s.VersionName = k8sVersion
 
 	// Processing template
-	temp, err := template.ParseFiles("./conf/templates/capi/openstack_cluster.yaml")
+	temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider))
 	if err != nil {
 		logger.Errorf("Template has errors. cause(%s)", err.Error())
 		return err

@@ -15,6 +15,7 @@ CREATE TABLE "edgecraft"."tbl_cloud_cluster"
 	"cluster_uid"					  	CHAR(36)     						NOT NULL, 	-- 클라우드클러스터식별자
 		
 	-- K8S 정보	
+	"bootstrap_provider"				INTEGER		DEFAULT 1				NOT NULL,	-- 클라우드 Bootstrap Provider
 	"k8s_version"						INTEGER 	DEFAULT 1				NOT NULL,	-- 클라우드쿠버네티스버전 (Code - K8sVersions)
 	"pod_cidr"                			VARCHAR(30) 						NULL,     	-- 클라우드클러스터포드CIDR
 	"service_cidr"            			VARCHAR(30) 						NULL,     	-- 클라우드클러스터서비스CIDR
