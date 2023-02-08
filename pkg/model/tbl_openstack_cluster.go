@@ -15,6 +15,7 @@ type OpenstackClusterTable struct {
 	Credential *string `json:"credential" db:"credential"`
 
 	// K8s 정보
+	BootstrapProvider *int         `json:"bootstrap_provider" db:"bootstrap_provider"`
 	Version           *int         `json:"version" db:"version"`
 	PodCidr           *string      `json:"pod_cidr" db:"pod_cidr"`
 	SvcCidr           *string      `json:"svc_cidr" db:"service_cidr"`

@@ -8,6 +8,7 @@
 {{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
 {{$OpenstackCACertB64 := .Openstack.CACertB64 -}}
 {{$OpenstackLocalHostName := .Openstack.LocalHostName -}}
+{{$NodeName := "{{ ds.meta_data.local_hostname }}" -}}
 apiVersion: v1
 data:
   cacert: {{$OpenstackCACertB64}}
@@ -37,30 +38,15 @@ spec:
 ---
 {{range .Nodes.WorkerSets -}}
 apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
-kind: KubeadmConfigTemplate
+kind: KThreesConfigTemplate
 metadata:
   name: {{$ClusterName}}-{{.Name}}
   namespace: {{or $Namespace "default"}}
 spec:
   template:
     spec:
-      files:
-        - content: {{$OpenstackProviderConfB64}}
-          encoding: base64
-          owner: root
-          path: /etc/kubernetes/cloud.conf
-          permissions: "0600"
-        - content: {{$OpenstackCACertB64}}
-          encoding: base64
-          owner: root
-          path: /etc/certs/cacert
-          permissions: "0600"
-      joinConfiguration:
-        nodeRegistration:
-          kubeletExtraArgs:
-            cloud-config: /etc/kubernetes/cloud.conf
-            cloud-provider: openstack
-          name: "{{ $OpenstackLocalHostName }}"
+      agentConfig:
+        nodeName: "{{$NodeName}}"
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
 kind: OpenStackMachineTemplate
@@ -90,97 +76,49 @@ spec:
     matchLabels: null
   template:
     spec:
-      bootstrap:
-        configRef:
-          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
-          kind: KubeadmConfigTemplate
-          name: {{$ClusterName}}-{{.Name}}
       clusterName: {{$ClusterName}}
       failureDomain: {{or $FailureDomain "nova"}}
+      version: v{{$KubernetesVersion}}
+      bootstrap:
+        configRef:
+          name: {{$ClusterName}}-{{.Name}}
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KThreesConfigTemplate
       infrastructureRef:
+        name: {{$ClusterName}}-{{.Name}}
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
         kind: OpenStackMachineTemplate
-        name: {{$ClusterName}}-{{.Name}}
-      version: v{{$KubernetesVersion}}
 ---
-{{end}}
+{{- end}}
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
-kind: KubeadmControlPlane
+kind: KThreesControlPlane
 metadata:
   name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
   namespace: {{or $Namespace "default"}}
 spec:
-  kubeadmConfigSpec:
-    clusterConfiguration:
-      {{if eq true .EtcdStorage.Etcd.UseExternalEtcd}}
-      etcd:
-        external:"defaul"
-          endpoints:
-          {{with .EtcdStorage.Etcd.Endpoints}}
-            {{ range . }}
-            - https://{{.}} # - https://10.0.0.230:2379
-            {{ end}}
-          {{end}}
-          caFile: {{.EtcdStorage.Etcd.CAFile}} # /etc/kubernetes/pki/etcd/ca.crt
-          certFile: {{.EtcdStorage.Etcd.CertFile}} # /etc/kubernetes/pki/apiserver-etcd-client.crt
-          keyFile: {{.EtcdStorage.Etcd.KeyFile}} # /etc/kubernetes/pki/apiserver-etcd-client.key
-      {{end -}}  
-      apiServer:
-        extraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
-        extraVolumes:
-          - hostPath: /etc/kubernetes/cloud.conf
-            mountPath: /etc/kubernetes/cloud.conf
-            name: cloud
-            readOnly: true
-      controllerManager:
-        extraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
-        extraVolumes:
-          - hostPath: /etc/kubernetes/cloud.conf
-            mountPath: /etc/kubernetes/cloud.conf
-            name: cloud
-            readOnly: true
-          - hostPath: /etc/certs/cacert
-            mountPath: /etc/certs/cacert
-            name: cacerts
-            readOnly: true
-      imageRepository: k8s.gcr.io
+  infrastructureTemplate:
+    apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+    kind: OpenStackMachineTemplate
+    name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
+  kthreesConfigSpec:
+    serverConfig:
+        disableComponents:
+        - servicelb # not needed since we're using Infrastructure providers ex. load balancer (ccm: external)
+        - traefik
+        - flannel
+    agentConfig:
+        nodeName: "{{$NodeName}}"
     files:
       - content: {{$OpenstackProviderConfB64}}
         encoding: base64
         owner: root
         path: /etc/kubernetes/cloud.conf
-        permissions: "0600"
+        permissions: "0644" # reading permission to other users
       - content: {{$OpenstackCACertB64}}
         encoding: base64
         owner: root
         path: /etc/certs/cacert
         permissions: "0600"
-    initConfiguration:
-      nodeRegistration:
-        kubeletExtraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
-        name: "{{ $OpenstackLocalHostName }}"
-    joinConfiguration:
-      nodeRegistration:
-        kubeletExtraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
-        name: "{{ $OpenstackLocalHostName }}"
-    {{if .K8s.MasterExtraConfig.PostKubeadmCommands}}
-    # calico preinstall, notice if closed cloud environment
-    postKubeadmCommands:
-      - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
-    {{end}}
-  machineTemplate:
-    infrastructureRef:
-      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
-      kind: OpenStackMachineTemplate
-      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
   version: v{{$KubernetesVersion}}
 ---
@@ -190,17 +128,6 @@ metadata:
   name: {{$ClusterName}}
   namespace: {{or $Namespace "default"}}
 spec:
-  {{if eq true .Openstack.UseBastionHost}}
-  bastion:
-    enabled: true
-    instance:
-      flavor: {{.Openstack.BastionFlavor }}
-      image:  {{.Openstack.BastionImageName }}
-      sshKeyName: {{.Openstack.BastionSSHKeyName }}
-      {{if ne "" .Openstack.BastionFloatingIP}}
-      floatingIP: {{.Openstack.BastionFloatingIP}}
-      {{end}}
-  {{end -}}
   apiServerLoadBalancer:
     enabled: {{.Nodes.UseLoadbalancer}}
   cloudName: {{$OpenstackCloud}}
@@ -212,15 +139,19 @@ spec:
     name: {{$ClusterName}}-cloud-config
   managedSecurityGroups: true
   nodeCidr: {{.Openstack.NodeCidr}}
-  {{if ne "" .Openstack.APIServerFloatingIP}}
+  {{- if ne "" .Openstack.APIServerFloatingIP -}}
   apiServerFloatingIP: {{.Openstack.APIServerFloatingIP}}
-  {{end}}
+  {{- end}}
+  allowAllInClusterTraffic: true
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster
 metadata:
   name: {{$ClusterName}}
   namespace: {{or $Namespace "default"}}
+  labels:
+    ccm: external # labels for ccm
+    cni: calico # labels for cni
 spec:
   clusterNetwork:
     pods:
@@ -232,11 +163,11 @@ spec:
         - {{.K8s.SvcCidr}}
     {{end -}}
     serviceDomain: {{or .K8s.SvcDomain "cluster.local"}}
-  controlPlaneRef:
-    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
-    kind: KubeadmControlPlane
-    name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
   infrastructureRef:
     apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
     kind: OpenStackCluster
     name: {{$ClusterName}}
+  controlPlaneRef:
+    kind: KThreesControlPlane
+    apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+    name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}

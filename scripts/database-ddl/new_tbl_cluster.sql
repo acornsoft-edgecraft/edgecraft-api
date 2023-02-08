@@ -20,6 +20,7 @@ CREATE TABLE "edgecraft"."tbl_cluster"
 
 
 	-- K8s 정보
+	"bootstrap_provider"				INTEGER		DEFAULT 1				NOT NULL,	-- 클러스터 Bootstrap Provider
 	"version"               			INTEGER         DEFAULT 1           NOT NULL,   -- 클러스터버전 (Kubernetes)
 	"pod_cidr"              			VARCHAR(30)                         NULL,       -- 클러스터포드CIDR
 	"service_cidr"          			VARCHAR(30)                         NULL,       -- 클러스터서비스CIDR

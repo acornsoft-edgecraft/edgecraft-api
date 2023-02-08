@@ -1406,6 +1406,10 @@ const docTemplate = `{
         "model.KubernetesInfo": {
             "type": "object",
             "properties": {
+                "bootstrap_provider": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "cp_kubeadm_extra_config": {
                     "$ref": "#/definitions/model.ExtraConfig"
                 },

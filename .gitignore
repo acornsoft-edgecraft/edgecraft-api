@@ -95,3 +95,4 @@ __debug_bin
 edgecraft.env.md
 build/*
 log.log
+./log.log

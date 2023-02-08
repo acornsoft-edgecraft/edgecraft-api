@@ -12,8 +12,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/config"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
-	k8serrors "k8s.io/apimachinery/pkg/api/errors"
-	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 )
 
 const (
@@ -22,11 +21,24 @@ const (
 
 // TaskData - Provision에 사용할 클러스터 식별 데이터
 type TaskData struct {
-	Database    db.DB
-	CloudId     string
-	ClusterId   string
-	ClusterName string
-	Namespace   string
+	Database          db.DB
+	CloudId           string
+	ClusterId         string
+	ClusterName       string
+	Namespace         string
+	BootstrapProvider int
+}
+
+// adjustKubeconfigForMicroK8s - MicroK8s인 경우에 Kubeconfig 내용을 Cluster Name 기준으로 조정
+func adjustKubeconfigForMicroK8s(kubeconfig string, clusterName string) string {
+	// Replace cluster name microk8s-cluster to clusterName
+	kubeconfig = strings.Replace(kubeconfig, "microk8s-cluster", clusterName, -1)
+	// Replace user name admin to clusterName-admin
+	kubeconfig = strings.Replace(kubeconfig, "admin", clusterName+"-admin", -1)
+	// Replace context name microk8s to clusterName-admin@clusterName
+	kubeconfig = strings.Replace(kubeconfig, "microk8s", clusterName+"-admin@"+clusterName, -1)
+
+	return kubeconfig
 }
 
 // checkProvisionKubeConfig - Provision 처리 중인 클러스터의 kubeconfig 정보 처리
@@ -40,6 +52,12 @@ func checkProvisionKubeConfig(task string, taskData interface{}) {
 		if err != nil {
 			logger.WithField("task", task).WithError(err).Infof("Retrieve kubeconfig for (%s) failed.", data.ClusterName)
 		} else {
+			// FIX: MicroK8s Kubeconfig 조정
+			if data.BootstrapProvider == 2 {
+				kubeconfig = adjustKubeconfigForMicroK8s(kubeconfig, data.ClusterName)
+				logger.WithField("test", task).Info("Adjust microk8s kubeconfig for (%s-%d)", data.ClusterName, data.BootstrapProvider)
+			}
+
 			// Add cluster's kubeconfig
 			err = config.HostCluster.Add([]byte(kubeconfig))
 			if err != nil {
@@ -70,17 +88,15 @@ func checkDeletedKubeConfig(task string, taskData interface{}) {
 		// Get kubeconfig for workload cluster
 		_, err := kubemethod.GetKubeconfig(data.Namespace, data.ClusterName, "value")
 		if err != nil {
-			if errType, ok := err.(*k8serrors.StatusError); ok {
-				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
-					// Remove cluster's kubeconfig
-					err = config.HostCluster.Remove(data.ClusterName)
-					if err != nil {
-						logger.WithField("task", task).WithError(err).Infof("Remove kubeconfig for (%s) from configmap or file failed.", data.ClusterName)
-					} else {
-						logger.WithField("task", task).Info("Checking kubeconfig and removed")
-						retryTicker.Stop()
-						return
-					}
+			if utils.CheckK8sNotFound(err) {
+				// Remove cluster's kubeconfig
+				err = config.HostCluster.Remove(data.ClusterName)
+				if err != nil {
+					logger.WithField("task", task).WithError(err).Infof("Remove kubeconfig for (%s) from configmap or file failed.", data.ClusterName)
+				} else {
+					logger.WithField("task", task).Info("Checking kubeconfig and removed")
+					retryTicker.Stop()
+					return
 				}
 			}
 			logger.WithField("task", task).WithError(err).Infof("Retrieve kubeconfig for (%s) failed.", data.ClusterName)
@@ -155,24 +171,22 @@ func checkDeleteCluster(task string, taskData interface{}) {
 		// Get phase for workload cluster
 		_, err := kubemethod.GetProvisionPhase(data.Namespace, data.ClusterName)
 		if err != nil {
-			if errType, ok := err.(*k8serrors.StatusError); ok {
-				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
-					// Deleted, update database. deleted
-					affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, common.StatusDeleted)
-					if err != nil {
-						logger.WithField("task", task).WithError(err).Infof("Update deleted state (%d) for (%s) failed.", common.StatusDeleted, data.ClusterName)
-						retryTicker.Stop()
-						return
-					} else if affected != 1 {
-						logger.WithField("task", task).WithError(err).Infof("Close checking for delete state (%d) for (%s) failed. (data not found, check cloud/cluster id)", common.StatusDeleted, data.ClusterName)
-						retryTicker.Stop()
-						return
-					}
-
-					logger.WithField("task", task).Infof("Checking deleted and update to database [state: %d, cluster: %s]", common.StatusDeleted, data.ClusterName)
+			if utils.CheckK8sNotFound(err) {
+				// Deleted, update database. deleted
+				affected, err := data.Database.UpdateOpenstackClusterStatus(data.CloudId, data.ClusterId, common.StatusDeleted)
+				if err != nil {
+					logger.WithField("task", task).WithError(err).Infof("Update deleted state (%d) for (%s) failed.", common.StatusDeleted, data.ClusterName)
+					retryTicker.Stop()
+					return
+				} else if affected != 1 {
+					logger.WithField("task", task).WithError(err).Infof("Close checking for delete state (%d) for (%s) failed. (data not found, check cloud/cluster id)", common.StatusDeleted, data.ClusterName)
 					retryTicker.Stop()
 					return
 				}
+
+				logger.WithField("task", task).Infof("Checking deleted and update to database [state: %d, cluster: %s]", common.StatusDeleted, data.ClusterName)
+				retryTicker.Stop()
+				return
 			}
 		}
 
@@ -186,13 +200,14 @@ func checkDeleteCluster(task string, taskData interface{}) {
 }
 
 // InvokeProvisionCheck - Providion 처리 중인 클러스터에 대한 진행 검증 작업
-func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) error {
+func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string, bootstrapProvider int) error {
 	taskData := &TaskData{
-		Database:    db,
-		CloudId:     cloudId,
-		ClusterId:   clusterId,
-		ClusterName: clusterName,
-		Namespace:   namespace,
+		Database:          db,
+		CloudId:           cloudId,
+		ClusterId:         clusterId,
+		ClusterName:       clusterName,
+		BootstrapProvider: bootstrapProvider,
+		Namespace:         namespace,
 	}
 
 	taskInfo := TaskInfo{

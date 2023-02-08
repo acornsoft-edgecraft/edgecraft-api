@@ -14,6 +14,8 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"k8s.io/apimachinery/pkg/api/errors"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
 // getTypeString - 지정한 Go 형식을 Refelct를 이용해서 형식 문자열로 반환
@@ -291,4 +293,17 @@ func RemoveStringArrayItem(slice []string, val string) []string {
 	}
 
 	return slice[:sliceLastIndex]
+}
+
+// CheckK8sNotFound - Kubernetes NotFound오류 여부 검증
+func CheckK8sNotFound(err error) bool {
+	if err != nil {
+		if errType, ok := err.(*errors.StatusError); ok {
+			if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
+				return true
+			}
+		}
+	}
+
+	return false
 }

@@ -9,7 +9,7 @@ import (
 	"io"
 	"strings"
 
-	"k8s.io/apimachinery/pkg/api/errors"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -172,42 +172,23 @@ func (dc *DynamicClient) OpenstackProvisionPost(payload io.Reader) (resources []
 		//targetRes, err := di.Resource(dc.resource).Namespace(dc.namespace).Get(context.TODO(), data.GetName(), v1.GetOptions{})
 		_, err = di.Resource(dc.resource).Namespace(dc.namespace).Get(context.TODO(), data.GetName(), v1.GetOptions{})
 		if err != nil {
-			if errType, ok := err.(*errors.StatusError); ok {
-				if errType.ErrStatus.Reason == v1.StatusReasonNotFound {
-					// Create
-					if resource.Namespaced {
-						res, err = di.Resource(dc.resource).Namespace(dc.namespace).Create(context.TODO(), data, v1.CreateOptions{})
-						if err != nil {
-							return resources, err
-						}
-					} else {
-						res, err = di.Resource(dc.resource).Create(context.TODO(), data, v1.CreateOptions{})
-						if err != nil {
-							return resources, err
-						}
+			if utils.CheckK8sNotFound(err) {
+				// Create
+				if resource.Namespaced {
+					res, err = di.Resource(dc.resource).Namespace(dc.namespace).Create(context.TODO(), data, v1.CreateOptions{})
+					if err != nil {
+						return resources, err
 					}
 				} else {
-					return resources, nil
+					res, err = di.Resource(dc.resource).Create(context.TODO(), data, v1.CreateOptions{})
+					if err != nil {
+						return resources, err
+					}
 				}
 			} else {
 				return resources, nil
 			}
 		}
-		// else {
-		// 	// Update
-		// 	data.SetResourceVersion(targetRes.GetResourceVersion())
-		// 	if resource.Namespaced {
-		// 		res, err = di.Resource(dc.resource).Namespace(dc.namespace).Update(context.TODO(), data, v1.UpdateOptions{})
-		// 		if err != nil {
-		// 			return resources, err
-		// 		}
-		// 	} else {
-		// 		res, err = di.Resource(dc.resource).Update(context.TODO(), data, v1.UpdateOptions{})
-		// 		if err != nil {
-		// 			return resources, err
-		// 		}
-		// 	}
-		// }
 
 		resources = append(resources, res)
 	}
