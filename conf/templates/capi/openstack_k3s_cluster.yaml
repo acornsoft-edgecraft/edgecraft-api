@@ -5,9 +5,10 @@
 {{$OpenstackCloud := .Openstack.Cloud -}}
 {{$OpenstackImageName := .Openstack.ImageName -}}
 {{$OpenstackSSHKeyName := .Openstack.SSHKeyName -}}
-{{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64}}
-{{$OpenstackCACertB64 := .Openstack.CACertB64}}
-{{$OpenstackLocalHostName := .Openstack.LocalHostName}}
+{{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
+{{$OpenstackCACertB64 := .Openstack.CACertB64 -}}
+{{$OpenstackLocalHostName := .Openstack.LocalHostName -}}
+{{$NodeName := "{{ ds.meta_data.local_hostname }}" -}}
 apiVersion: v1
 data:
   cacert: {{$OpenstackCACertB64}}
@@ -45,7 +46,7 @@ spec:
   template:
     spec:
       agentConfig:
-        nodeName: "{{ ds.meta_data.local_hostname }}"
+        nodeName: "{{$NodeName}}"
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
 kind: OpenStackMachineTemplate
@@ -88,7 +89,7 @@ spec:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
         kind: OpenStackMachineTemplate
 ---
-{{end}}
+{{- end}}
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: KThreesControlPlane
 metadata:
@@ -106,7 +107,7 @@ spec:
         - traefik
         - flannel
     agentConfig:
-        nodeName: "{{ ds.meta_data.local_hostname }}"
+        nodeName: "{{$NodeName}}"
     files:
       - content: {{$OpenstackProviderConfB64}}
         encoding: base64
@@ -118,7 +119,7 @@ spec:
         owner: root
         path: /etc/certs/cacert
         permissions: "0600"
-  replicas: 1
+  replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
   version: v{{$KubernetesVersion}}
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
@@ -138,9 +139,9 @@ spec:
     name: {{$ClusterName}}-cloud-config
   managedSecurityGroups: true
   nodeCidr: {{.Openstack.NodeCidr}}
-  {{if ne "" .Openstack.APIServerFloatingIP}}
+  {{- if ne "" .Openstack.APIServerFloatingIP -}}
   apiServerFloatingIP: {{.Openstack.APIServerFloatingIP}}
-  {{end}}
+  {{- end}}
   allowAllInClusterTraffic: true
 ---
 apiVersion: cluster.x-k8s.io/v1beta1

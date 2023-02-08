@@ -14,6 +14,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/job"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/labstack/echo/v4"
 )
 
@@ -303,7 +304,9 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 		// 프로비젼 상태인 클러스터 삭제
 		err := kubemethod.RemoveOpenstackProvisioned(clusterId, *clusterTable.Name, *clusterTable.Namespace)
 		if err != nil {
-			return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterJobFailed, err)
+			if !utils.CheckK8sNotFound(err) {
+				return response.ErrorfReqRes(c, nil, common.DeleteProvisionedClusterJobFailed, err)
+			}
 		}
 
 		// Start. Transaction 얻어옴

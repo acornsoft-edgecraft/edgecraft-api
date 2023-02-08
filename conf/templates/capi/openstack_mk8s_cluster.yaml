@@ -5,9 +5,9 @@
 {{$OpenstackCloud := .Openstack.Cloud -}}
 {{$OpenstackImageName := .Openstack.ImageName -}}
 {{$OpenstackSSHKeyName := .Openstack.SSHKeyName -}}
-{{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64}}
-{{$OpenstackCACertB64 := .Openstack.CACertB64}}
-{{$OpenstackLocalHostName := .Openstack.LocalHostName}}
+{{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
+{{$OpenstackCACertB64 := .Openstack.CACertB64 -}}
+{{$OpenstackLocalHostName := .Openstack.LocalHostName -}}
 apiVersion: v1
 data:
   cacert: {{$OpenstackCACertB64}}
@@ -86,7 +86,7 @@ spec:
         name: {{$ClusterName}}-{{.Name}}
       version: v{{$KubernetesVersion}}
 ---
-{{end}}
+{{- end}}
 apiVersion: controlplane.cluster.x-k8s.io/v1beta1
 kind: MicroK8sControlPlane
 metadata:
@@ -124,6 +124,7 @@ spec:
       floatingIP: {{.Openstack.BastionFloatingIP}}
       {{end}}
   {{end -}}
+  allowAllInClusterTraffic: true
   apiServerLoadBalancer:
     enabled: {{.Nodes.UseLoadbalancer}}
   cloudName: {{$OpenstackCloud}}
@@ -135,9 +136,9 @@ spec:
     name: {{$ClusterName}}-cloud-config
   managedSecurityGroups: true
   nodeCidr: {{.Openstack.NodeCidr}}
-  {{if ne "" .Openstack.APIServerFloatingIP}}
+  {{- if ne "" .Openstack.APIServerFloatingIP}}
   apiServerFloatingIP: {{.Openstack.APIServerFloatingIP}}
-  {{end}}
+  {{- end}}
 ---
 apiVersion: cluster.x-k8s.io/v1beta1
 kind: Cluster

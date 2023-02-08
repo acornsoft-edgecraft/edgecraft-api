@@ -19,9 +19,9 @@ import (
 func getTemplatePath(providerType *int) string {
 	switch *providerType {
 	case 2:
-		return "./conf/tempates/capi/openstack_mk8s_cluster.yaml"
+		return "./conf/templates/capi/openstack_mk8s_cluster.yaml"
 	case 3:
-		return "./conf/tempates/capi/openstack_k3s_cluster.yaml"
+		return "./conf/templates/capi/openstack_k3s_cluster.yaml"
 	default:
 		return "./conf/templates/capi/openstack_cluster.yaml"
 	}
@@ -83,7 +83,7 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 	}
 
 	// Provision 검증 작업 등록 (Backgroud)
-	err = job.InvokeProvisionCheck(worker, db, *cluster.CloudUid, *cluster.ClusterUid, *cluster.Name, *cluster.Namespace)
+	err = job.InvokeProvisionCheck(worker, db, *cluster.CloudUid, *cluster.ClusterUid, *cluster.Name, *cluster.Namespace, *cluster.BootstrapProvider)
 	if err != nil {
 		logger.WithError(err).Infof("Openstack Cluster [%s] provision check job failed.", cluster.Name)
 		return err

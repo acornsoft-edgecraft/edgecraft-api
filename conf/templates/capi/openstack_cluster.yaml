@@ -5,9 +5,9 @@
 {{$OpenstackCloud := .Openstack.Cloud -}}
 {{$OpenstackImageName := .Openstack.ImageName -}}
 {{$OpenstackSSHKeyName := .Openstack.SSHKeyName -}}
-{{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64}}
-{{$OpenstackCACertB64 := .Openstack.CACertB64}}
-{{$OpenstackLocalHostName := .Openstack.LocalHostName}}
+{{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
+{{$OpenstackCACertB64 := .Openstack.CACertB64 -}}
+{{$OpenstackLocalHostName := .Openstack.LocalHostName -}}
 apiVersion: v1
 data:
   cacert: {{$OpenstackCACertB64}}
