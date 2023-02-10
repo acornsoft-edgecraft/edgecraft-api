@@ -25,10 +25,16 @@ const (
 	openstack_cluster_version   string = "v1alpha3"
 	openstack_cluster_resources string = "clusters"
 
-	openstack_controlplane_group     string = "controlplane.cluster.x-k8s.io"
-	openstack_controlplane_version   string = "v1alpha3"
-	openstack_controlplane_resources string = "kubeadmcontrolplanes"
+	// Maser, Controlplanes
+	openstack_controlplane_group          string = "controlplane.cluster.x-k8s.io"
+	openstack_controlplane_version        string = "v1alpha3"
+	openstack_controlplane_k3s_version    string = "v1beta1"
+	openstack_controlplane_mk8s_version   string = "v1beta1"
+	openstack_controlplane_resources      string = "kubeadmcontrolplanes"
+	openstack_controlplane_k3s_resources  string = "kthreescontrolplanes"
+	openstack_controlplane_mk8s_resources string = "microk8scontrolplanes"
 
+	// Worker, MachineDeployments
 	openstack_machinedeploy_group     string = "cluster.x-k8s.io"
 	openstack_machinedeploy_version   string = "v1alpha3"
 	openstack_machinedeploy_resources string = "machinedeployments"
@@ -227,11 +233,21 @@ func ArrangeK8SNodesToNodeSetInfo(clusterName string, openStackNodeSetInfo model
 }
 
 // UpdateNodeCount - 지정한 클러스터의 NodeCount 변경
-func UpdateNodeCount(clusterName, nodeSetName, namespace string, nodeSetType, nodeCount int) error {
+func UpdateNodeCount(clusterName, nodeSetName, namespace string, bootstrapProvider int, nodeSetType, nodeCount int) error {
 	objectName := clusterName + "-" + nodeSetName
 
 	if nodeSetType == common.NodeTypeMaster {
-		return patchNodeSetCount(objectName, namespace, openstack_controlplane_group, openstack_controlplane_version, openstack_controlplane_resources, nodeCount)
+		// Resolve version and resource by BootstrapProvider
+		resources := openstack_controlplane_resources
+		version := openstack_controlplane_version
+		if bootstrapProvider == 2 {
+			resources = openstack_controlplane_mk8s_resources
+			version = openstack_controlplane_mk8s_version
+		} else if bootstrapProvider == 3 {
+			resources = openstack_controlplane_k3s_resources
+			version = openstack_controlplane_k3s_version
+		}
+		return patchNodeSetCount(objectName, namespace, openstack_controlplane_group, version, resources, nodeCount)
 	} else {
 		return patchNodeSetCount(objectName, namespace, openstack_machinedeploy_group, openstack_machinedeploy_version, openstack_machinedeploy_resources, nodeCount)
 	}
