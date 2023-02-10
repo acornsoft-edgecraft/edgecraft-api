@@ -98,7 +98,7 @@ spec:
       addons:
         - dns
         - ingress
-      joinTokenTTLInSecs: 9000
+      #joinTokenTTLInSecs: 9000
   machineTemplate:
     infrastructureTemplate:
       apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
