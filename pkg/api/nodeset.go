@@ -393,7 +393,7 @@ func (a *API) UpdateNodeCountHandler(c echo.Context) error {
 		}
 
 		// Node count 변경
-		err = kubemethod.UpdateNodeCount(*clusterTable.Name, *nodeSetTable.Name, *clusterTable.Namespace, *nodeSetTable.Type, nodeCount)
+		err = kubemethod.UpdateNodeCount(*clusterTable.Name, *nodeSetTable.Name, *clusterTable.Namespace, *clusterTable.BootstrapProvider, *nodeSetTable.Type, nodeCount)
 		if err != nil {
 			k8sFailed = true
 			return err
