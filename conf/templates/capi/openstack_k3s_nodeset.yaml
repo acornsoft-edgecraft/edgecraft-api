@@ -1,0 +1,65 @@
+{{- $ClusterName := .Cluster.Name -}}
+{{- $Namespace := .Cluster.Namespace -}}
+{{- $FailureDomain := .Openstack.FailureDomain -}}
+{{- $KubernetesVersion := .K8s.VersionName -}}
+{{- $OpenstackCloud := .Openstack.Cloud -}}
+{{- $OpenstackImageName := .Openstack.ImageName -}}
+{{- $OpenstackSSHKeyName := .Openstack.SSHKeyName -}}
+{{- $OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
+{{- $OpenstackCACertB64 := .Openstack.CACertB64 -}}
+{{- $OpenstackLocalHostName := .Openstack.LocalHostName -}}
+{{$NodeName := "{{ ds.meta_data.local_hostname }}" -}}
+{{range .Nodes.WorkerSets }}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: KThreesConfigTemplate
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  template:
+    spec:
+      agentConfig:
+        nodeName: "{{$NodeName}}"
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+kind: OpenStackMachineTemplate
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  template:
+    spec:
+      cloudName: {{$OpenstackCloud}}
+      flavor: {{.Flavor}}
+      identityRef:
+        kind: Secret
+        name: {{$ClusterName}}-cloud-config
+      image: {{$OpenstackImageName}}
+      sshKeyName: {{$OpenstackSSHKeyName}}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  clusterName: {{$ClusterName}}
+  replicas: {{.NodeCount}}
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      clusterName: {{$ClusterName}}
+      failureDomain: {{or $FailureDomain "nova"}}
+      version: v{{$KubernetesVersion}}
+      bootstrap:
+        configRef:
+          name: {{$ClusterName}}-{{.Name}}
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: KThreesConfigTemplate
+      infrastructureRef:
+        name: {{$ClusterName}}-{{.Name}}
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+        kind: OpenStackMachineTemplate
+{{end}}

@@ -299,7 +299,7 @@ func (a *API) DeleteNodeSetHandler(c echo.Context) error {
 			return errors.New("cannot find noddeset for deleting")
 		}
 
-		err = kubemethod.RemoveNodeSet(*clusterTable.Name, *nodeSetTable.Name, *clusterTable.Namespace)
+		err = kubemethod.RemoveNodeSet(*clusterTable.Name, *nodeSetTable.Name, *clusterTable.Namespace, *clusterTable.BootstrapProvider)
 		if err != nil {
 			k8sFailed = true
 			logger.WithError(err).Info("Provioned NodeSet delete failed")

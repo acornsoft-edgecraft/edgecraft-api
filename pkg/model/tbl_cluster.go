@@ -5,6 +5,8 @@ package model
 
 import (
 	"time"
+
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 )
 
 // ClusterTable - Baremetal Cluster Table 정보
@@ -14,11 +16,11 @@ type ClusterTable struct {
 	ClusterUid *string `json:"cluster" db:"cluster_uid"`
 
 	// K8S 정보
-	BootstrapProvider *int    `json:"bootstrap_provider" db:"bootstrap_provider"`
-	Version           *int    `json:"version" db:"k8s_version"`
-	PodCidr           *string `json:"pod_cidr" db:"pod_cidr"`
-	SvcCidr           *string `json:"svc_cidr" db:"service_cidr"`
-	SvcDomain         *string `json:"svc_domain" db:"service_domain"`
+	BootstrapProvider *common.BootstrapProvider `json:"bootstrap_provider" db:"bootstrap_provider"`
+	Version           *int                      `json:"version" db:"k8s_version"`
+	PodCidr           *string                   `json:"pod_cidr" db:"pod_cidr"`
+	SvcCidr           *string                   `json:"svc_cidr" db:"service_cidr"`
+	SvcDomain         *string                   `json:"svc_domain" db:"service_domain"`
 
 	// Baremetal 정보
 	Namespace             *string      `json:"namespace" db:"namespace"`

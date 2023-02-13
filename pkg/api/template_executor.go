@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/job"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/logger"
@@ -16,14 +17,26 @@ import (
 )
 
 // getTemplatePath - Bootstrap Provider 정보에 따라 처리할 템플릿 파일을 결정한다.
-func getTemplatePath(providerType *int) string {
+func getTemplatePath(providerType *common.BootstrapProvider, templateType string) string {
 	switch *providerType {
-	case 2:
-		return "./conf/templates/capi/openstack_mk8s_cluster.yaml"
-	case 3:
-		return "./conf/templates/capi/openstack_k3s_cluster.yaml"
+	case common.MicroK8s:
+		if templateType == "cluster" {
+			return "./conf/templates/capi/openstack_mk8s_cluster.yaml"
+		} else {
+			return "./conf/templates/capi/openstack_mk8s_nodeset.yaml"
+		}
+	case common.K3s:
+		if templateType == "cluster" {
+			return "./conf/templates/capi/openstack_k3s_cluster.yaml"
+		} else {
+			return "./conf/templates/capi/openstack_k3s_nodeset.yaml"
+		}
 	default:
-		return "./conf/templates/capi/openstack_cluster.yaml"
+		if templateType == "cluster" {
+			return "./conf/templates/capi/openstack_cluster.yaml"
+		} else {
+			return "./conf/templates/capi/openstack_nodeset.yaml"
+		}
 	}
 }
 
@@ -35,7 +48,7 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 	data.K8s.VersionName = k8sVersion
 
 	// Processing template
-	temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider))
+	temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider, "cluster"))
 	if err != nil {
 		logger.Errorf("Template has errors. cause(%s)", err.Error())
 		return err
@@ -101,7 +114,7 @@ func ProvisioningOpenstackNodeSet(worker *job.IWorker, db db.DB, cluster *model.
 	data.K8s.VersionName = k8sVersion
 
 	// Processing template
-	temp, err := template.ParseFiles("./conf/templates/capi/openstack_nodeset.yaml")
+	temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider, "nodeset"))
 	if err != nil {
 		logger.Errorf("Template has errors. cause(%s)", err.Error())
 		return err

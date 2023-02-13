@@ -1,0 +1,62 @@
+{{- $ClusterName := .Cluster.Name -}}
+{{- $Namespace := .Cluster.Namespace -}}
+{{- $FailureDomain := .Openstack.FailureDomain -}}
+{{- $KubernetesVersion := .K8s.VersionName -}}
+{{- $OpenstackCloud := .Openstack.Cloud -}}
+{{- $OpenstackImageName := .Openstack.ImageName -}}
+{{- $OpenstackSSHKeyName := .Openstack.SSHKeyName -}}
+{{- $OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
+{{- $OpenstackCACertB64 := .Openstack.CACertB64 -}}
+{{- $OpenstackLocalHostName := .Openstack.LocalHostName -}}
+{{range .Nodes.WorkerSets }}
+---
+apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+kind: MicroK8sConfigTemplate
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  template:
+    spec: {}
+---
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+kind: OpenStackMachineTemplate
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  template:
+    spec:
+      cloudName: {{$OpenstackCloud}}
+      flavor: {{.Flavor}}
+      identityRef:
+        kind: Secret
+        name: {{$ClusterName}}-cloud-config
+      image: {{$OpenstackImageName}}
+      sshKeyName: {{$OpenstackSSHKeyName}}
+---
+apiVersion: cluster.x-k8s.io/v1beta1
+kind: MachineDeployment
+metadata:
+  name: {{$ClusterName}}-{{.Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  clusterName: {{$ClusterName}}
+  replicas: {{.NodeCount}}
+  selector:
+    matchLabels: null
+  template:
+    spec:
+      bootstrap:
+        configRef:
+          apiVersion: bootstrap.cluster.x-k8s.io/v1beta1
+          kind: MicroK8sConfigTemplate
+          name: {{$ClusterName}}-{{.Name}}
+      clusterName: {{$ClusterName}}
+      failureDomain: {{or $FailureDomain "nova"}}
+      infrastructureRef:
+        apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+        kind: OpenStackMachineTemplate
+        name: {{$ClusterName}}-{{.Name}}
+      version: v{{$KubernetesVersion}}
+{{end}}

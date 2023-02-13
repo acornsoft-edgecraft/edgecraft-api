@@ -26,7 +26,7 @@ type TaskData struct {
 	ClusterId         string
 	ClusterName       string
 	Namespace         string
-	BootstrapProvider int
+	BootstrapProvider common.BootstrapProvider
 }
 
 // adjustKubeconfigForMicroK8s - MicroK8s인 경우에 Kubeconfig 내용을 Cluster Name 기준으로 조정
@@ -53,7 +53,7 @@ func checkProvisionKubeConfig(task string, taskData interface{}) {
 			logger.WithField("task", task).WithError(err).Infof("Retrieve kubeconfig for (%s) failed.", data.ClusterName)
 		} else {
 			// FIX: MicroK8s Kubeconfig 조정
-			if data.BootstrapProvider == 2 {
+			if data.BootstrapProvider == common.MicroK8s {
 				kubeconfig = adjustKubeconfigForMicroK8s(kubeconfig, data.ClusterName)
 				logger.WithField("test", task).Info("Adjust microk8s kubeconfig for (%s-%d)", data.ClusterName, data.BootstrapProvider)
 			}
@@ -200,7 +200,7 @@ func checkDeleteCluster(task string, taskData interface{}) {
 }
 
 // InvokeProvisionCheck - Providion 처리 중인 클러스터에 대한 진행 검증 작업
-func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string, bootstrapProvider int) error {
+func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string, bootstrapProvider common.BootstrapProvider) error {
 	taskData := &TaskData{
 		Database:          db,
 		CloudId:           cloudId,

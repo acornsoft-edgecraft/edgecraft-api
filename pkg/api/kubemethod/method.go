@@ -39,6 +39,20 @@ const (
 	openstack_machinedeploy_version   string = "v1alpha3"
 	openstack_machinedeploy_resources string = "machinedeployments"
 
+	// Worker, MachineTemplate
+	openstack_machinetemplate_group     string = "infrastructure.cluster.x-k8s.io"
+	openstack_machinetemplate_version   string = "v1alpha3"
+	openstack_machinetemplate_resources string = "openstackmachinetemplates"
+
+	// Worker, ConfigTemplates
+	openstack_configtemplate_group          string = "bootstrap.cluster.x-k8s.io"
+	openstack_configtemplate_version        string = "v1alpha3"
+	openstack_configtemplate_resources      string = "kubeadmconfigtemplates"
+	openstack_configtemplate_k3s_version    string = "v1beta1"
+	openstack_configtemplate_k3s_resources  string = "kthreesconfigtemplates"
+	openstack_configtemplate_mk8s_version   string = "v1beta1"
+	openstack_configtemplate_mk8s_resources string = "microk8sconfigtemplates"
+
 	// openstack_machinesets_group     string = "machinesets.cluster.x-k8s.io"
 	// openstack_machinesets_version   string = "v1alpha3"
 	// openstack_machinesets_resources string = "machinesets"
@@ -94,6 +108,62 @@ func patchNodeSetCount(objectName, namespace, group, version, resources string, 
 	}
 
 	return nil
+}
+
+// deleteGVRObject - 지정한 GVR에 해당하는 Object를 삭제한다.
+func deleteGVRObject(objectName, namespace, group, version, resource string) error {
+	// Get kubernetes client
+	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", group, version, resource)
+	if err != nil {
+		return err
+	}
+
+	dynamicClient.SetNamespace(namespace)
+	err = dynamicClient.Delete(objectName, metaV1.DeleteOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// removeConfigTemplate - NodeSet에 연괸된 Config Template을 제거한다.
+func removeConfigTemplate(objectName, namespace string, bootstrapProvider common.BootstrapProvider) error {
+	// Get GVR
+	group := openstack_configtemplate_group
+	version := openstack_configtemplate_version
+	resource := openstack_configtemplate_resources
+
+	switch bootstrapProvider {
+	case common.MicroK8s:
+		version = openstack_configtemplate_mk8s_version
+		resource = openstack_configtemplate_mk8s_resources
+	case common.K3s:
+		version = openstack_configtemplate_k3s_version
+		resource = openstack_configtemplate_k3s_resources
+	}
+
+	return deleteGVRObject(objectName, namespace, group, version, resource)
+}
+
+// removeMachineTemplate - NedeSet에 연관된 Machine Template을 제거한다.
+func removeMachineTemplate(objectName, namespace string) error {
+	// Get GVR
+	group := openstack_machinetemplate_group
+	version := openstack_machinetemplate_version
+	resource := openstack_machinetemplate_resources
+
+	return deleteGVRObject(objectName, namespace, group, version, resource)
+}
+
+// removeMachineDeployment - NodeSet에 연관된 Machine Deployment를 제거한다.
+func removeMachineDeployment(objectName, namespace string) error {
+	// Get GVR
+	group := openstack_machinedeploy_group
+	version := openstack_machinedeploy_version
+	resource := openstack_machinedeploy_resources
+
+	return deleteGVRObject(objectName, namespace, group, version, resource)
 }
 
 // Apply - 지정한 YAML 문자열 정보를 Kubernetes에 적용
@@ -233,17 +303,17 @@ func ArrangeK8SNodesToNodeSetInfo(clusterName string, openStackNodeSetInfo model
 }
 
 // UpdateNodeCount - 지정한 클러스터의 NodeCount 변경
-func UpdateNodeCount(clusterName, nodeSetName, namespace string, bootstrapProvider int, nodeSetType, nodeCount int) error {
+func UpdateNodeCount(clusterName, nodeSetName, namespace string, bootstrapProvider common.BootstrapProvider, nodeSetType, nodeCount int) error {
 	objectName := clusterName + "-" + nodeSetName
 
 	if nodeSetType == common.NodeTypeMaster {
 		// Resolve version and resource by BootstrapProvider
 		resources := openstack_controlplane_resources
 		version := openstack_controlplane_version
-		if bootstrapProvider == 2 {
+		if bootstrapProvider == common.MicroK8s {
 			resources = openstack_controlplane_mk8s_resources
 			version = openstack_controlplane_mk8s_version
-		} else if bootstrapProvider == 3 {
+		} else if bootstrapProvider == common.K3s {
 			resources = openstack_controlplane_k3s_resources
 			version = openstack_controlplane_k3s_version
 		}
@@ -254,20 +324,31 @@ func UpdateNodeCount(clusterName, nodeSetName, namespace string, bootstrapProvid
 }
 
 // RemoveNodeSet - 지정한 클러스터의 NodeSet제거
-func RemoveNodeSet(clusterName, nodeSetName, namespace string) error {
+func RemoveNodeSet(clusterName, nodeSetName, namespace string, bootstrapProvider common.BootstrapProvider) error {
 	objectName := clusterName + "-" + nodeSetName
 
-	// Get kubernetes client
-	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", openstack_machinedeploy_group, openstack_machinedeploy_version, openstack_machinedeploy_resources)
+	// Remove ConfigTemplate
+	err := removeConfigTemplate(objectName, namespace, bootstrapProvider)
 	if err != nil {
 		return err
 	}
 
-	dynamicClient.SetNamespace(namespace)
-	err = dynamicClient.Delete(objectName, metaV1.DeleteOptions{})
+	// Remove MachineTemplate
+	err = removeMachineTemplate(objectName, namespace)
+	if err != nil {
+		return err
+	}
+
+	// Remove MachineDeployment
+	err = removeMachineDeployment(objectName, namespace)
 	if err != nil {
 		return err
 	}
 
 	return nil
 }
+
+// // removeConfigTemplate - NodeSet에 연관된 ConfigTemplate 제거
+// func removeConfigTemplate(objectName string, namespace string, BootstrapProviders) output {
+
+// }
