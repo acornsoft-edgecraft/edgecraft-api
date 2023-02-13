@@ -3,23 +3,27 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 */
 package model
 
-import "github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
+import (
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
+)
 
 // KubernetesInfo - Data for Kubernetes
 type KubernetesInfo struct {
-	BootstrapProvider int          `json:"bootstrap_provider" example:"1"`
-	Version           int          `json:"version" example:"3"`
-	VersionName       string       `json:"-"` // Template 처리시에 활용할 코드 값.
-	PodCidr           string       `json:"pod_cidr" example:"10.96.0.1/12"`
-	SvcCidr           string       `json:"svc_cidr" example:"10.96.0.0/12"`
-	SvcDomain         string       `json:"svc_domain" example:"cluster.local"`
-	MasterExtraConfig *ExtraConfig `json:"cp_kubeadm_extra_config"`
-	WorkerExtraConfig *ExtraConfig `json:"worker_kubeadm_extra_config"`
+	BootstrapProvider common.BootstrapProvider `json:"bootstrap_provider" example:"1"`
+	Version           int                      `json:"version" example:"3"`
+	VersionName       string                   `json:"-"` // Template 처리시에 활용할 코드 값.
+	PodCidr           string                   `json:"pod_cidr" example:"10.96.0.1/12"`
+	SvcCidr           string                   `json:"svc_cidr" example:"10.96.0.0/12"`
+	SvcDomain         string                   `json:"svc_domain" example:"cluster.local"`
+	MasterExtraConfig *ExtraConfig             `json:"cp_kubeadm_extra_config"`
+	WorkerExtraConfig *ExtraConfig             `json:"worker_kubeadm_extra_config"`
 }
 
 // ToTable - K8S 정보르 테이블로 설정
 func (ki *KubernetesInfo) ToTable(clusterTable *ClusterTable) {
-	clusterTable.BootstrapProvider = utils.IntPrt(ki.BootstrapProvider)
+	//clusterTable.BootstrapProvider = utils.IntPrt(*ki.BootstrapProvider)
+	clusterTable.BootstrapProvider = &ki.BootstrapProvider
 	clusterTable.Version = utils.IntPrt(ki.Version)
 	clusterTable.PodCidr = utils.StringPtr(ki.PodCidr)
 	clusterTable.SvcCidr = utils.StringPtr(ki.SvcCidr)
@@ -49,7 +53,8 @@ func (ki *KubernetesInfo) FromTable(clusterTable *ClusterTable) {
 
 // ToOpenstackTable - K8S 정보 Openstack 테이블로 설정
 func (ki *KubernetesInfo) ToOpenstackTable(clusterTable *OpenstackClusterTable) {
-	clusterTable.BootstrapProvider = utils.IntPrt(ki.BootstrapProvider)
+	//clusterTable.BootstrapProvider = utils.IntPrt(*ki.BootstrapProvider)
+	clusterTable.BootstrapProvider = &ki.BootstrapProvider
 	clusterTable.Version = utils.IntPrt(ki.Version)
 	clusterTable.PodCidr = utils.StringPtr(ki.PodCidr)
 	clusterTable.SvcCidr = utils.StringPtr(ki.SvcCidr)

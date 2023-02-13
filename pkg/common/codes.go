@@ -181,11 +181,3 @@ const (
 	// Session fail -
 	SessionNotFound = 29000
 )
-
-// ===== [ Types ] =====
-
-// ===== [ Implementations ] =====
-
-// ===== [ Private Functions ] =====
-
-// ===== [ Public Functions ] =====
