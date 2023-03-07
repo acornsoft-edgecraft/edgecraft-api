@@ -173,6 +173,13 @@ definitions:
         example: ""
         type: string
     type: object
+  model.K8sUpgradeInfo:
+    properties:
+      image:
+        type: string
+      version:
+        type: integer
+    type: object
   model.KubernetesInfo:
     properties:
       bootstrap_provider:
@@ -823,6 +830,37 @@ paths:
       summary: UpdateNodeCount
       tags:
       - Openstack-Cluster-NodeSet
+  /clouds/{cloudId}/clusters/{clusterId}/upgrade:
+    post:
+      description: 저장된 클러스터 정보를 이용해서 K8s Version Upgrade 처리 (Openstack)
+      operationId: UpgradeClusterK8sVersion
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: Openstack Cluster K8s Upgrade Info
+        in: body
+        name: K8sUpgradeInfo
+        required: true
+        schema:
+          $ref: '#/definitions/model.K8sUpgradeInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpgradeClusterK8sVersion
+      tags:
+      - Openstack-Cluster
   /clouds/{cloudId}/nodes:
     get:
       description: 클라우드에 속한 노드 리스트 조회

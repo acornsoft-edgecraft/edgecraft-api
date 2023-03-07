@@ -447,3 +447,63 @@ func (a *API) ProvisioningClusterHandler(c echo.Context) error {
 
 	return response.WriteWithCode(c, nil, common.OpenstackClusterProvisioning, nil)
 }
+
+// UpgradeClusterK8sVersionHandler - 클러스터 K8sVersion Upgrading (Openstack)
+// @Tags        Openstack-Cluster
+// @Summary     UpgradeClusterK8sVersion
+// @Description 저장된 클러스터 정보를 이용해서 K8s Version Upgrade 처리 (Openstack)
+// @ID          UpgradeClusterK8sVersion
+// @Produce     json
+// @Param       cloudId   		path     string true "Cloud ID"
+// @Param       clusterId 		path     string true "Cluster ID"
+// @Param       K8sUpgradeInfo 	body     model.K8sUpgradeInfo true "Openstack Cluster K8s Upgrade Info"
+// @Success     200       {object} response.ReturnData
+// @Router      /clouds/{cloudId}/clusters/{clusterId}/upgrade [post]
+func (a *API) UpgradeClusterK8sVersionHandler(c echo.Context) error {
+	cloudId := c.Param("cloudId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
+	}
+
+	clusterId := c.Param("clusterId")
+	if cloudId == "" {
+		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
+	}
+
+	var upgradeInfo model.K8sUpgradeInfo
+	err := getRequestData(c.Request(), &upgradeInfo)
+	if err != nil {
+		return response.ErrorfReqRes(c, upgradeInfo, common.CodeInvalidData, err)
+	}
+
+	// Cluster 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.ClusterNotFound, nil)
+	}
+
+	// Cluster 상태 검증
+	if *clusterTable.Status != common.StatusProvisioned {
+		return response.ErrorfReqRes(c, clusterTable, common.OpenstackClusterProvisioned, err)
+	}
+
+	// Node 정보 조회
+	nodeSets, err := a.Db.GetNodeSets(clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if len(nodeSets) == 0 {
+		return response.ErrorfReqRes(c, clusterTable, common.NodeSetNotFound, err)
+	}
+
+	// K8sUpgrade (background)
+	err = K8sVersionUpgradingOpenstackCluster(a.Worker, a.Db, clusterTable, nodeSets, a.getCodeNameByKey("K8sVersions", upgradeInfo.Version), &upgradeInfo)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.K8sUpgradeClusterJobFailed, err)
+	}
+
+	return response.WriteWithCode(c, nil, common.K8sVersionUpgrading, nil)
+}

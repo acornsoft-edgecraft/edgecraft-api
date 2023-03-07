@@ -6,6 +6,8 @@ package api
 import (
 	"bytes"
 	"errors"
+	"path"
+	"strings"
 	"text/template"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
@@ -16,24 +18,40 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 )
 
+// replace - 지정한 문자열에서 지정한 문자를 치환한다.
+func replace(input, from, to string) string {
+	return strings.Replace(input, from, to, -1)
+}
+
+// getFunctionalTemplate - 템플릿에 사용할 함수가 설정된 템플릿 반환
+func getFunctionalTemplate(filePath string) *template.Template {
+	return template.Must(template.New(path.Base(filePath)).Funcs(template.FuncMap{"replace": replace}).ParseFiles(filePath))
+}
+
 // getTemplatePath - Bootstrap Provider 정보에 따라 처리할 템플릿 파일을 결정한다.
 func getTemplatePath(providerType *common.BootstrapProvider, templateType string) string {
 	switch *providerType {
 	case common.MicroK8s:
 		if templateType == "cluster" {
 			return "./conf/templates/capi/openstack_mk8s_cluster.yaml"
+		} else if templateType == "upgrade" {
+			return "./conf/templates/capi/openstack_mk8s_upgrade.yaml"
 		} else {
 			return "./conf/templates/capi/openstack_mk8s_nodeset.yaml"
 		}
 	case common.K3s:
 		if templateType == "cluster" {
 			return "./conf/templates/capi/openstack_k3s_cluster.yaml"
+		} else if templateType == "upgrade" {
+			return "./conf/templates/capi/openstack_k3s_upgrade.yaml"
 		} else {
 			return "./conf/templates/capi/openstack_k3s_nodeset.yaml"
 		}
 	default:
 		if templateType == "cluster" {
 			return "./conf/templates/capi/openstack_cluster.yaml"
+		} else if templateType == "upgrade" {
+			return "./conf/templates/capi/openstack_upgrade.yaml"
 		} else {
 			return "./conf/templates/capi/openstack_nodeset.yaml"
 		}
@@ -138,5 +156,69 @@ func ProvisioningOpenstackNodeSet(worker *job.IWorker, db db.DB, cluster *model.
 	}
 
 	logger.Infof("Openstack Cluseter [%s] - NodeSet provision submitted.", cluster.Name)
+	return nil
+}
+
+// K8sVersionUpgradingOpenstackCluster - 오픈스택 클러스터 K8s Version Upgrading
+func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cluster *model.OpenstackClusterTable, nodeSets []*model.NodeSetTable, k8sVersion string, upgradeInfo *model.K8sUpgradeInfo) error {
+	// Make provision data
+	data := model.OpenstackClusterSet{}
+	data.FromTable(cluster, nodeSets)
+	data.K8s.VersionName = k8sVersion
+	data.Openstack.ImageName = upgradeInfo.Image
+
+	// Processing template
+	temp := getFunctionalTemplate(getTemplatePath(cluster.BootstrapProvider, "upgrade"))
+
+	// // Processing template
+	// fm := template.FuncMap{"replace": replace}
+	// tPath := getTemplatePath(cluster.BootstrapProvider, "upgrade")
+	// temp := template.Must(template.New(path.Base(tPath)).Funcs(fm).ParseFiles(tPath))
+	// temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider, "upgrade"))
+	// temp = temp.Funcs(template.FuncMap{"replace": replace})
+
+	// if err != nil {
+	// 	logger.Errorf("Template has errors. cause(%s)", err.Error())
+	// 	return err
+	// }
+
+	// TODO: 진행상황을 어떻게 클라이언트에 보여줄 것인가?
+	var buff bytes.Buffer
+	err := temp.Execute(&buff, data)
+	if err != nil {
+		logger.Errorf("Template execution failed. cause(%s)", err.Error())
+		return err
+	}
+
+	logger.Infof("processed cluster update templating yaml (%s)", buff.String())
+
+	// 템플릿 적용 (Kubernetes로 전송)
+	err = kubemethod.Apply(*cluster.Name, buff.String())
+	if err != nil {
+		logger.Errorf("Kubernetes version upgrade failed. (cause: %s)", err.Error())
+		return err
+	}
+
+	// // 데이터 갱신 (트랜잭션 구간)
+	// err = database.TransactionScope(func(txDB db.DB) error {
+	// 	// Version 정보 갱신
+	// 	cluster.Version = &upgradeInfo.Version
+	// 	cluster.OpenstackInfo.ImageName = upgradeInfo.Image
+
+	// 	affectedRows, err := txDB.UpdateOpenstackCluster(cluster)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	if affectedRows == 0 {
+	// 		return errors.New("no data found (update)")
+	// 	}
+
+	// 	return nil
+	// })
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
