@@ -167,56 +167,29 @@ func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cl
 	data.K8s.VersionName = k8sVersion
 	data.Openstack.ImageName = upgradeInfo.Image
 
-	// Processing template
-	temp := getFunctionalTemplate(getTemplatePath(cluster.BootstrapProvider, "upgrade"))
-
-	// // Processing template
-	// fm := template.FuncMap{"replace": replace}
-	// tPath := getTemplatePath(cluster.BootstrapProvider, "upgrade")
-	// temp := template.Must(template.New(path.Base(tPath)).Funcs(fm).ParseFiles(tPath))
-	// temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider, "upgrade"))
-	// temp = temp.Funcs(template.FuncMap{"replace": replace})
-
-	// if err != nil {
-	// 	logger.Errorf("Template has errors. cause(%s)", err.Error())
-	// 	return err
-	// }
-
-	// TODO: 진행상황을 어떻게 클라이언트에 보여줄 것인가?
-	var buff bytes.Buffer
-	err := temp.Execute(&buff, data)
+	// Processing Template for control plane
+	temp := getFunctionalTemplate(getTemplatePath(cluster.BootstrapProvider, "upgrade_controlplanes"))
+	var controlPlanesBuff bytes.Buffer
+	err := temp.Execute(&controlPlanesBuff, data)
 	if err != nil {
-		logger.Errorf("Template execution failed. cause(%s)", err.Error())
+		logger.Errorf("Template execution failed [upgrade controlplanes]. cause(%s)", err.Error())
 		return err
 	}
 
-	logger.Infof("processed cluster update templating yaml (%s)", buff.String())
-
-	// 템플릿 적용 (Kubernetes로 전송)
-	err = kubemethod.Apply(*cluster.Name, buff.String())
+	// Processing Template for workers
+	temp = getFunctionalTemplate(getTemplatePath(cluster.BootstrapProvider, "upgrade_workers"))
+	var workersBuff bytes.Buffer
+	err = temp.Execute(&workersBuff, data)
 	if err != nil {
-		logger.Errorf("Kubernetes version upgrade failed. (cause: %s)", err.Error())
+		logger.Errorf("Template execution failed [upgrade workers]. cause(%s)", err.Error())
 		return err
 	}
 
-	// // 데이터 갱신 (트랜잭션 구간)
-	// err = database.TransactionScope(func(txDB db.DB) error {
-	// 	// Version 정보 갱신
-	// 	cluster.Version = &upgradeInfo.Version
-	// 	cluster.OpenstackInfo.ImageName = upgradeInfo.Image
-
-	// 	affectedRows, err := txDB.UpdateOpenstackCluster(cluster)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	if affectedRows == 0 {
-	// 		return errors.New("no data found (update)")
-	// 	}
-
-	// 	return nil
-	// })
-
+	// K8sVersionUpgrade 실행 (Background)
+	masterSetName := data.Cluster.Name + "-" + data.Nodes.MasterSets[0].Name
+	err = job.InvokeK8sVersionUpgrade(worker, database, data.Cluster.Name, data.Cluster.Namespace, masterSetName, controlPlanesBuff.String(), workersBuff.String())
 	if err != nil {
+		logger.WithError(err).Infof("JOB::Upgrading kubernetest version on Openstack Cluster [%s] failed.", *cluster.Name)
 		return err
 	}
 

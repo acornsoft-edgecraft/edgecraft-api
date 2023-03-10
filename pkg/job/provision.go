@@ -27,6 +27,7 @@ type TaskData struct {
 	ClusterName       string
 	Namespace         string
 	BootstrapProvider common.BootstrapProvider
+	CustomData        interface{}
 }
 
 // adjustKubeconfigForMicroK8s - MicroK8s인 경우에 Kubeconfig 내용을 Cluster Name 기준으로 조정

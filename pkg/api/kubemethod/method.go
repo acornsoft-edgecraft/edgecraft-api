@@ -67,6 +67,23 @@ const (
 // 	return nil, nil
 // }
 
+// checkRollingUpdateCompleted - 전달된 unstructured 에서 Status/conditions/MachinesSpecUpToDate 검증
+func checkRollingUpdateCompleted(item *unstructured.Unstructured) (bool, error) {
+	val, exists, err := unstructured.NestedSlice(item.Object, "status", "conditions")
+	if err != nil {
+		return false, err
+	} else if !exists {
+		return false, nil
+	}
+
+	// checking conditions
+	for item := range val {
+		logger.Info(item)
+	}
+
+	return true, nil
+}
+
 // checkProvisioningPhase - 전달된 unstructured 에서 Statue/Ready 상태 검증
 func checkProvisioningPhase(item *unstructured.Unstructured) (string, error) {
 	val, exists, err := unstructured.NestedString(item.Object, "status", "phase")
@@ -222,6 +239,26 @@ func GetProvisionPhase(namespace, clusterName string) (string, error) {
 		return checkProvisioningPhase(data)
 	}
 	return "", nil
+}
+
+// GetControlPlaneUpdatePhase - 지정한 클러스터에 대한 Update Phase 검증.
+func GetControlPlaneUpdatePhase(namespace, masterSetName string) (bool, error) {
+	// Get kubernetes client
+	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", openstack_controlplane_group, openstack_controlplane_version, openstack_controlplane_resources)
+	if err != nil {
+		return false, err
+	}
+
+	// checking the clsuter ready
+	dynamicClient.SetNamespace(namespace)
+	data, err := dynamicClient.Get(masterSetName, metaV1.GetOptions{})
+	if err != nil {
+		return false, err
+	} else if data != nil {
+		// Checking upgrade completed
+		return checkRollingUpdateCompleted(data)
+	}
+	return false, nil
 }
 
 // GetPodList - description

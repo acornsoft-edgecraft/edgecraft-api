@@ -307,3 +307,13 @@ func CheckK8sNotFound(err error) bool {
 
 	return false
 }
+
+// JoinStrings - 지정한 연결 문자열로 지정한 문자열들을 연결한다.
+func JoinStrings(sep string, vals ...string) string {
+	return strings.Join(vals, sep)
+}
+
+// SplitStrings - 지정한 연결 문자열을 기준으로 지정한 문자열을 분리한다.
+func SplitString(sep, val string) []string {
+	return strings.Split(val, sep)
+}
