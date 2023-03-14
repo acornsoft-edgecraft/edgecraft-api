@@ -36,7 +36,9 @@ func main() {
 	//RegisterRuntimeClassCRD(config)
 	//CreateSampleRuntimeClasses(client)
 	//PrintRuntimeHandlers(client)
-	PrintResources(client)
+	PrintResources(client, "os-ka-upd")
+
+	PrintStatus(client, "default", "os-ka-upd-m", "controlplane.cluster.x-k8s.io", "v1alpha3", "kubeadmcontrolplanes")
 }
 
 // func RegisterRuntimeClassCRD(config *rest.Config) {
@@ -158,7 +160,7 @@ func main() {
 // 	}
 // }
 
-func PrintResources(client dynamic.Interface) {
+func PrintResources(client dynamic.Interface, clusterName string) {
 	gvr := schema.GroupVersionResource{Group: "infrastructure.cluster.x-k8s.io", Version: "v1alpha3", Resource: "openstackclusters"}
 	rs := fmt.Sprintf("%s/%s", gvr.Group, gvr.Resource)
 	log.Printf("Listing %s objects", rs)
@@ -166,7 +168,7 @@ func PrintResources(client dynamic.Interface) {
 	// log.Printf("Printing %s.%s", rs, "status.ready")
 
 	// 단일 정보
-	item, err := res.Get(context.TODO(), "os-test-1", metav1.GetOptions{})
+	item, err := res.Get(context.TODO(), clusterName, metav1.GetOptions{})
 	errExit("Failed to list "+rs+" objects", err)
 	fld, exists, err := unstructured.NestedBool(item.Object, "status", "ready")
 	if err != nil {
@@ -176,28 +178,45 @@ func PrintResources(client dynamic.Interface) {
 		fld = false
 	}
 	fmt.Printf("  %-10s  -->  %-10v\n", item.GetName(), fld)
+}
 
-	// 리스트 정보
-	// list, err := res.List(context.TODO(), metav1.ListOptions{})
-	// errExit("Failed to list "+rs+" objects", err)
-	// output := make(map[string]interface{})
-	// for _, item := range list.Items {
-	// 	name := item.GetName()
-	// 	log.Printf("resource name: %s", name)
-	// 	fld, exists, err := unstructured.NestedBool(item.Object, "status", "ready")
-	// 	if err != nil {
-	// 		log.Printf("Error reading %s for %s: %v", "status.ready", name, err)
-	// 		continue
-	// 	}
-	// 	if !exists {
-	// 		fld = false
-	// 	}
-	// 	output[name] = fld
-	// }
+// PrintStatus - Print Custom Resource Obejct's Status Info
+func PrintStatus(client dynamic.Interface, namespace, resourceName, group, version, resource string) {
+	gvr := schema.GroupVersionResource{Group: group, Version: version, Resource: resource}
+	rs := fmt.Sprintf("%s/%s", gvr.Group, gvr.Resource)
+	log.Printf("Listing %s objects", rs)
 
-	// for name, fld := range output {
-	// 	fmt.Printf("  %-10s  -->  %-10v\n", name, fld)
-	// }
+	res := client.Resource(gvr).Namespace(namespace)
+	item, err := res.Get(context.TODO(), resourceName, metav1.GetOptions{})
+	errExit("Failed to list "+rs+" objects", err)
+
+	flds, found, err := unstructured.NestedSlice(item.Object, "status", "conditions")
+	if err != nil {
+		log.Printf("Error reading %s for %s: %v", "status.conditions", item.GetName(), err)
+	} else if !found {
+		log.Printf("Not found %s for %s", "status.conditions", item.GetName())
+	}
+
+	for _, itemRaw := range flds {
+		item := itemRaw.(map[string]interface{})
+		value, found, err := unstructured.NestedString(item, "type")
+		if !found || err != nil {
+			log.Printf("Not found type or error: %v\n", err)
+			continue
+		}
+		fmt.Printf("Found type: %s\n", value)
+
+		status, found, err := unstructured.NestedString(item, "status")
+		if !found || err != nil {
+			log.Printf("Not found status or error: %v\n", err)
+			continue
+		}
+		fmt.Printf("Found status: %s\n", status)
+
+		if value == "MachinesSpecUpToDate" {
+			fmt.Printf("Target :: %s - %v\n", value, status)
+		}
+	}
 }
 
 func errExit(msg string, err error) {

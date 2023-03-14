@@ -5,6 +5,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"strings"
@@ -104,8 +105,8 @@ func (dc *DynamicClient) Delete(name string, opts v1.DeleteOptions) (err error) 
 	return
 }
 
-// OpenstackProvisionPost - 데이터 스트림과 갱신여부에 따른 POST 처리 (Multiple Resource)
-func (dc *DynamicClient) OpenstackProvisionPost(payload io.Reader) (resources []*unstructured.Unstructured, err error) {
+// MultiplePost - 데이터 스트림과 갱신여부에 따른 POST 처리 (Multiple Resource)
+func (dc *DynamicClient) MultiplePost(payload io.Reader) (resources []*unstructured.Unstructured, err error) {
 	// 데이터 스트림 Decode
 	decoder := yaml.NewYAMLOrJSONDecoder(payload, 4096)
 
@@ -169,7 +170,6 @@ func (dc *DynamicClient) OpenstackProvisionPost(payload io.Reader) (resources []
 
 		// Check resource
 		var res *unstructured.Unstructured
-		//targetRes, err := di.Resource(dc.resource).Namespace(dc.namespace).Get(context.TODO(), data.GetName(), v1.GetOptions{})
 		_, err = di.Resource(dc.resource).Namespace(dc.namespace).Get(context.TODO(), data.GetName(), v1.GetOptions{})
 		if err != nil {
 			if utils.CheckK8sNotFound(err) {
@@ -187,6 +187,16 @@ func (dc *DynamicClient) OpenstackProvisionPost(payload io.Reader) (resources []
 				}
 			} else {
 				return resources, nil
+			}
+		} else {
+			// Update
+			jsonData, err := json.Marshal(data)
+			if err != nil {
+				return resources, err
+			}
+			res, err = di.Resource(dc.resource).Namespace(dc.namespace).Patch(context.TODO(), data.GetName(), types.MergePatchType, jsonData, v1.PatchOptions{FieldManager: "server-side-apply"})
+			if err != nil {
+				return resources, err
 			}
 		}
 

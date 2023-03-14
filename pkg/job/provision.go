@@ -233,47 +233,6 @@ func InvokeProvisionCheck(worker *IWorker, db db.DB, cloudId, clusterId, cluster
 	return nil
 }
 
-// // InvokeProvisionCheck - Provision 정보를 확인하기 위한 작업 구동
-// func (w *worker) InvokeWorkerInvokeProvisionCheck(clusterId, clusterName string) error {
-// 	var provisionInfo = ProvisionInfo{
-// 		ClusterId:   clusterId,
-// 		ClusterName: clusterName,
-// 	}
-
-// 	time.After(0)
-// 	return w.QueueTask(clusterId, zeroDuration, provisionInfo)
-
-// 	// var input queueTaskInput
-// 	// if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
-// 	// 	logger.WithError(err).Info("failed to read POST body")
-// 	// 	renderResponse(w, http.StatusBadRequest, `{"error": "failed to read POST body"}`)
-// 	// 	return
-// 	// }
-// 	// defer req.Body.Close()
-
-// 	// // parse the work duration from the request body.
-// 	// workDuration, errParse := time.ParseDuration(input.WorkDuration)
-// 	// if errParse != nil {
-// 	// 	logger.WithError(errParse).Info("faile to parse work duration in request")
-// 	// 	renderResponse(w, http.StatusBadRequest, `{"error": "failed to parse work duration in request"}`)
-// 	// 	return
-// 	// }
-
-// 	// // queue the task in background task manager
-// 	// if err := h.worker.QueueTask(input.TaskID, workDuration); err != nil {
-// 	// 	logger.WithError(err).Info("failed to queue task")
-// 	// 	if err == job.ErrWorkerBusy {
-// 	// 		w.Header().Set("Retry-After", "60")
-// 	// 		renderResponse(w, http.StatusServiceUnavailable, `{"error": "workers are busy, try again later"}`)
-// 	// 		return
-// 	// 	}
-// 	// 	renderResponse(w, http.StatusInternalServerError, `{"error": "failed to queue task"}`)
-// 	// 	return
-// 	// }
-
-// 	// renderResponse(w, http.StatusAccepted, `{"status": "task queued successfully"}`)
-// }
-
 // InvokeDeleteCheck - 프로비전된 클러스터의 삭제에 대한 진행 검증 작업
 func InvokeDeleteCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, namespace string) error {
 	taskData := &TaskData{
@@ -305,44 +264,3 @@ func InvokeDeleteCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterNam
 
 	return nil
 }
-
-// // InvokeProvisionCheck - Provision 정보를 확인하기 위한 작업 구동
-// func (w *worker) InvokeWorkerInvokeProvisionCheck(clusterId, clusterName string) error {
-// 	var provisionInfo = ProvisionInfo{
-// 		ClusterId:   clusterId,
-// 		ClusterName: clusterName,
-// 	}
-
-// 	time.After(0)
-// 	return w.QueueTask(clusterId, zeroDuration, provisionInfo)
-
-// 	// var input queueTaskInput
-// 	// if err := json.NewDecoder(req.Body).Decode(&input); err != nil {
-// 	// 	logger.WithError(err).Info("failed to read POST body")
-// 	// 	renderResponse(w, http.StatusBadRequest, `{"error": "failed to read POST body"}`)
-// 	// 	return
-// 	// }
-// 	// defer req.Body.Close()
-
-// 	// // parse the work duration from the request body.
-// 	// workDuration, errParse := time.ParseDuration(input.WorkDuration)
-// 	// if errParse != nil {
-// 	// 	logger.WithError(errParse).Info("faile to parse work duration in request")
-// 	// 	renderResponse(w, http.StatusBadRequest, `{"error": "failed to parse work duration in request"}`)
-// 	// 	return
-// 	// }
-
-// 	// // queue the task in background task manager
-// 	// if err := h.worker.QueueTask(input.TaskID, workDuration); err != nil {
-// 	// 	logger.WithError(err).Info("failed to queue task")
-// 	// 	if err == job.ErrWorkerBusy {
-// 	// 		w.Header().Set("Retry-After", "60")
-// 	// 		renderResponse(w, http.StatusServiceUnavailable, `{"error": "workers are busy, try again later"}`)
-// 	// 		return
-// 	// 	}
-// 	// 	renderResponse(w, http.StatusInternalServerError, `{"error": "failed to queue task"}`)
-// 	// 	return
-// 	// }
-
-// 	// renderResponse(w, http.StatusAccepted, `{"status": "task queued successfully"}`)
-// }

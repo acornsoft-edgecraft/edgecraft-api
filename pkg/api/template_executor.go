@@ -34,24 +34,30 @@ func getTemplatePath(providerType *common.BootstrapProvider, templateType string
 	case common.MicroK8s:
 		if templateType == "cluster" {
 			return "./conf/templates/capi/openstack_mk8s_cluster.yaml"
-		} else if templateType == "upgrade" {
-			return "./conf/templates/capi/openstack_mk8s_upgrade.yaml"
+		} else if templateType == "upgrade_controlplanes" {
+			return "./conf/templates/capi/openstack_mk8s_upgrade_controlplane.yaml"
+		} else if templateType == "upgrade_workers" {
+			return "./conf/templates/capi/openstack_mk8s_upgrade_worker.yaml"
 		} else {
 			return "./conf/templates/capi/openstack_mk8s_nodeset.yaml"
 		}
 	case common.K3s:
 		if templateType == "cluster" {
 			return "./conf/templates/capi/openstack_k3s_cluster.yaml"
-		} else if templateType == "upgrade" {
-			return "./conf/templates/capi/openstack_k3s_upgrade.yaml"
+		} else if templateType == "upgrade_controlplanes" {
+			return "./conf/templates/capi/openstack_k3s_upgrade_controlplane.yaml"
+		} else if templateType == "upgrade_workers" {
+			return "./conf/templates/capi/openstack_k3s_upgrade_worker.yaml"
 		} else {
 			return "./conf/templates/capi/openstack_k3s_nodeset.yaml"
 		}
 	default:
 		if templateType == "cluster" {
 			return "./conf/templates/capi/openstack_cluster.yaml"
-		} else if templateType == "upgrade" {
-			return "./conf/templates/capi/openstack_upgrade.yaml"
+		} else if templateType == "upgrade_controlplanes" {
+			return "./conf/templates/capi/openstack_upgrade_controlplane.yaml"
+		} else if templateType == "upgrade_workers" {
+			return "./conf/templates/capi/openstack_upgrade_worker.yaml"
 		} else {
 			return "./conf/templates/capi/openstack_nodeset.yaml"
 		}
@@ -175,6 +181,7 @@ func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cl
 		logger.Errorf("Template execution failed [upgrade controlplanes]. cause(%s)", err.Error())
 		return err
 	}
+	logger.Infof("processed control-plane upgrade templating yaml (%s)", controlPlanesBuff.String())
 
 	// Processing Template for workers
 	temp = getFunctionalTemplate(getTemplatePath(cluster.BootstrapProvider, "upgrade_workers"))
@@ -184,6 +191,7 @@ func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cl
 		logger.Errorf("Template execution failed [upgrade workers]. cause(%s)", err.Error())
 		return err
 	}
+	logger.Infof("processed worker upgrade templating yaml (%s)", workersBuff.String())
 
 	// K8sVersionUpgrade 실행 (Background)
 	masterSetName := data.Cluster.Name + "-" + data.Nodes.MasterSets[0].Name
