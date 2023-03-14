@@ -143,11 +143,17 @@ const (
 	OpenstackClusterNodeSetProvisioning = 26007
 	// OpenstackClusterNodeSetDeleting
 	OpenstackClusterNodeSetDeleting = 26008
+	// OpenstackClusterProvisioned
+	OpenstackClusterProvisioned = 26009
+	// K8sVersionUpgrading
+	K8sVersionUpgrading = 26010
 
 	// ProvisioningCheckJobFailed -
 	ProvisioningCheckJobFailed = 26100
 	// DeleteProvisionedClusterJobFailed -
 	DeleteProvisionedClusterJobFailed = 26101
+	// K8sUpgradeClusterJobFailed -
+	K8sUpgradeClusterJobFailed = 26102
 
 	// ProvisionNodeCountChangeFailed -
 	ProvisionNodeCountChangeFailed = 26200

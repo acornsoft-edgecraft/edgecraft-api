@@ -86,12 +86,13 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	// v1.GET("/clouds/:cloudID/kore-board", api.GetCloudKoreBoardHandler)
 
 	// Openstack Cluster
-	v1.GET("/clouds/:cloudId/clusters", api.GetClusterListHandler)                  // 클러스터 목록 조회
-	v1.GET("/clouds/:cloudId/clusters/:clusterId", api.GetClusterHandler)           // 클러스터 상세 기본 정보 조회
-	v1.POST("/clouds/:cloudId/clusters", api.SetClusterHandler)                     // 클러스터 등록/생성
-	v1.PUT("/clouds/:cloudId/clusters/:clusterId", api.UpdateClusterHandler)        // 클러스터 등록 정보 수정
-	v1.DELETE("/clouds/:cloudId/clusters/:clusterId", api.DeleteClusterHandler)     // 클러스터 삭제
-	v1.POST("/clouds/:cloudId/clusters/:clusterId", api.ProvisioningClusterHandler) // 클러스터 Provisioning
+	v1.GET("/clouds/:cloudId/clusters", api.GetClusterListHandler)                  				// 클러스터 목록 조회
+	v1.GET("/clouds/:cloudId/clusters/:clusterId", api.GetClusterHandler)           				// 클러스터 상세 기본 정보 조회
+	v1.POST("/clouds/:cloudId/clusters", api.SetClusterHandler)                     				// 클러스터 등록/생성
+	v1.PUT("/clouds/:cloudId/clusters/:clusterId", api.UpdateClusterHandler)        				// 클러스터 등록 정보 수정
+	v1.DELETE("/clouds/:cloudId/clusters/:clusterId", api.DeleteClusterHandler)     				// 클러스터 삭제
+	v1.POST("/clouds/:cloudId/clusters/:clusterId", api.ProvisioningClusterHandler) 				// 클러스터 Provisioning
+	v1.POST("/clouds/:cloudId/clusters/:clusterId/upgrade", api.UpgradeClusterK8sVersionHandler)	// 클러스터 K8s 업그레이드
 
 	// Openstack Cluster - NodeSet
 	v1.GET("/clouds/:cloudId/clusters/:clusterId/nodesets", api.GetNodeSetListHandler)        // 클러스터 노드셋 목록 조회

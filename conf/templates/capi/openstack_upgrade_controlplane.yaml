@@ -1,0 +1,105 @@
+{{$ClusterName := .Cluster.Name -}}
+{{$Namespace := .Cluster.Namespace -}}
+{{$FailureDomain := .Openstack.FailureDomain -}}
+{{$KubernetesVersion := .K8s.VersionName -}}
+{{$OpenstackCloud := .Openstack.Cloud -}}
+{{$OpenstackImageName := .Openstack.ImageName -}}
+{{$OpenstackSSHKeyName := .Openstack.SSHKeyName -}}
+{{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
+{{$OpenstackCACertB64 := .Openstack.CACertB64 -}}
+{{$OpenstackLocalHostName := .Openstack.LocalHostName -}}
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+kind: OpenStackMachineTemplate
+metadata:
+  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  template:
+    spec:
+      cloudName: {{$OpenstackCloud}}
+      flavor: {{(index .Nodes.MasterSets 0).Flavor}}
+      identityRef:
+        kind: Secret
+        name: {{$ClusterName}}-cloud-config
+      image: {{$OpenstackImageName}}
+      sshKeyName: {{$OpenstackSSHKeyName}}
+---
+apiVersion: controlplane.cluster.x-k8s.io/v1beta1
+kind: KubeadmControlPlane
+metadata:
+  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}
+  namespace: {{or $Namespace "default"}}
+spec:
+  kubeadmConfigSpec:
+    clusterConfiguration:
+      {{if eq true .EtcdStorage.Etcd.UseExternalEtcd}}
+      etcd:
+        external:"defaul"
+          endpoints:
+          {{with .EtcdStorage.Etcd.Endpoints}}
+            {{ range . }}
+            - https://{{.}} # - https://10.0.0.230:2379
+            {{ end}}
+          {{end}}
+          caFile: {{.EtcdStorage.Etcd.CAFile}} # /etc/kubernetes/pki/etcd/ca.crt
+          certFile: {{.EtcdStorage.Etcd.CertFile}} # /etc/kubernetes/pki/apiserver-etcd-client.crt
+          keyFile: {{.EtcdStorage.Etcd.KeyFile}} # /etc/kubernetes/pki/apiserver-etcd-client.key
+      {{end -}}  
+      apiServer:
+        extraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        extraVolumes:
+          - hostPath: /etc/kubernetes/cloud.conf
+            mountPath: /etc/kubernetes/cloud.conf
+            name: cloud
+            readOnly: true
+      controllerManager:
+        extraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        extraVolumes:
+          - hostPath: /etc/kubernetes/cloud.conf
+            mountPath: /etc/kubernetes/cloud.conf
+            name: cloud
+            readOnly: true
+          - hostPath: /etc/certs/cacert
+            mountPath: /etc/certs/cacert
+            name: cacerts
+            readOnly: true
+      imageRepository: k8s.gcr.io
+    files:
+      - content: {{$OpenstackProviderConfB64}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/cloud.conf
+        permissions: "0600"
+      - content: {{$OpenstackCACertB64}}
+        encoding: base64
+        owner: root
+        path: /etc/certs/cacert
+        permissions: "0600"
+    initConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        name: "{{ $OpenstackLocalHostName }}"
+    joinConfiguration:
+      nodeRegistration:
+        kubeletExtraArgs:
+          cloud-config: /etc/kubernetes/cloud.conf
+          cloud-provider: openstack
+        name: "{{ $OpenstackLocalHostName }}"
+    {{if .K8s.MasterExtraConfig.PostKubeadmCommands -}}
+    # calico preinstall, notice if closed cloud environment
+    postKubeadmCommands:
+      - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
+    {{- end}}
+  machineTemplate:
+    infrastructureRef:
+      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+      kind: OpenStackMachineTemplate
+      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+  replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
+  version: v{{$KubernetesVersion}}

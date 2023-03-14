@@ -7,6 +7,8 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
+	"strconv"
 	"strings"
 
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
@@ -52,20 +54,49 @@ const (
 	openstack_configtemplate_k3s_resources  string = "kthreesconfigtemplates"
 	openstack_configtemplate_mk8s_version   string = "v1beta1"
 	openstack_configtemplate_mk8s_resources string = "microk8sconfigtemplates"
-
-	// openstack_machinesets_group     string = "machinesets.cluster.x-k8s.io"
-	// openstack_machinesets_version   string = "v1alpha3"
-	// openstack_machinesets_resources string = "machinesets"
 )
 
-// // findNodeSetByName - 조회된 NodeSet CR 정보에 대한 이름 기반 검색
-// func findNodeSetByName(list *unstructured.UnstructuredList, clusterName, nodeSetName string) (*unstructured.Unstructured, error) {
-// 	for _, item := range list.Items {
-// 		if strings.Contains(item.GetName(), clusterName+"-"+name)
-// 		if item.GetName() == utils.ArrayContains()
-// 	}
-// 	return nil, nil
-// }
+// getCRConditionsStatus - 전달된 unstructured 에서 Status/conditions/type 의 status 검증
+func getCRConditionsStatus(item *unstructured.Unstructured, typeName string) (bool, error) {
+	// find conditions
+	conds, found, err := unstructured.NestedSlice(item.Object, "status", "conditions")
+	if err != nil {
+		return false, err
+	} else if !found {
+		return false, errors.New("Not found [status/conditions] fields in CR [" + item.GetName() + "] Object")
+	}
+
+	// find type condition
+	for _, cond := range conds {
+		item := cond.(map[string]interface{})
+		typeVal, found, err := unstructured.NestedString(item, "type")
+		if !found {
+			logger.Warn("Not found [type] fields")
+			continue
+		} else if err != nil {
+			logger.WithError(err).Warn("Can not read [type] fields")
+			continue
+		}
+		if typeVal == typeName {
+			statusVal, found, err := unstructured.NestedString(item, "status")
+			if !found {
+				logger.Warn("Not found [status] fields")
+				continue
+			} else if err != nil {
+				logger.WithError(err).Warn("Can not read [status] fields")
+				continue
+			}
+
+			boolVal, err := strconv.ParseBool(statusVal)
+			if err != nil {
+				return false, err
+			}
+			return boolVal, nil
+		}
+	}
+
+	return false, errors.New("Not found [" + typeName + "] type in CR [" + item.GetName() + "] Object")
+}
 
 // checkProvisioningPhase - 전달된 unstructured 에서 Statue/Ready 상태 검증
 func checkProvisioningPhase(item *unstructured.Unstructured) (string, error) {
@@ -174,12 +205,10 @@ func Apply(clusterName, yaml string) error {
 		return err
 	}
 
-	res, err := dynamicClient.OpenstackProvisionPost(strings.NewReader(yaml))
+	_, err = dynamicClient.MultiplePost(strings.NewReader(yaml))
 	if err != nil {
 		return err
 	}
-
-	logger.Infof("Dynamic Apply processed: %v", res)
 
 	return nil
 }
@@ -222,6 +251,26 @@ func GetProvisionPhase(namespace, clusterName string) (string, error) {
 		return checkProvisioningPhase(data)
 	}
 	return "", nil
+}
+
+// GetControlPlaneUpdatePhase - 지정한 클러스터에 대한 Update Phase 검증.
+func GetControlPlaneUpdatePhase(namespace, masterSetName string) (bool, error) {
+	// Get kubernetes client
+	dynamicClient, err := config.HostCluster.GetDynamicClientWithSchema("", openstack_controlplane_group, openstack_controlplane_version, openstack_controlplane_resources)
+	if err != nil {
+		return false, err
+	}
+
+	// checking the cluster ready
+	dynamicClient.SetNamespace(namespace)
+	data, err := dynamicClient.Get(masterSetName, metaV1.GetOptions{})
+	if err != nil {
+		return false, err
+	} else if data != nil {
+		// Checking upgrade completed
+		return getCRConditionsStatus(data, "MachinesSpecUpToDate")
+	}
+	return false, nil
 }
 
 // GetPodList - description
@@ -347,8 +396,3 @@ func RemoveNodeSet(clusterName, nodeSetName, namespace string, bootstrapProvider
 
 	return nil
 }
-
-// // removeConfigTemplate - NodeSet에 연관된 ConfigTemplate 제거
-// func removeConfigTemplate(objectName string, namespace string, BootstrapProviders) output {
-
-// }

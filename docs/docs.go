@@ -630,6 +630,52 @@ const docTemplate = `{
                 }
             }
         },
+        "/clouds/{cloudId}/clusters/{clusterId}/upgrade": {
+            "post": {
+                "description": "저장된 클러스터 정보를 이용해서 K8s Version Upgrade 처리 (Openstack)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster"
+                ],
+                "summary": "UpgradeClusterK8sVersion",
+                "operationId": "UpgradeClusterK8sVersion",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Openstack Cluster K8s Upgrade Info",
+                        "name": "K8sUpgradeInfo",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.K8sUpgradeInfo"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            }
+        },
         "/clouds/{cloudId}/nodes": {
             "get": {
                 "description": "클라우드에 속한 노드 리스트 조회",
@@ -1400,6 +1446,17 @@ const docTemplate = `{
                 "users": {
                     "type": "string",
                     "example": ""
+                }
+            }
+        },
+        "model.K8sUpgradeInfo": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "type": "string"
+                },
+                "version": {
+                    "type": "integer"
                 }
             }
         },
