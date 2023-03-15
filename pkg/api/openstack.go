@@ -505,5 +505,22 @@ func (a *API) UpgradeClusterK8sVersionHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nil, common.K8sUpgradeClusterJobFailed, err)
 	}
 
+	// 데이터베이스에 버전 정보 갱신 (트랜잭션 구간)
+	err = a.Db.TransactionScope(func(txDB db.DB) error {
+		// Cluster 갱신
+		affectedRows, err := txDB.UpdateOpenstackCluster(clusterTable)
+		if err != nil {
+			return err
+		}
+		if affectedRows == 0 {
+			return errors.New("no data found (update)")
+		}
+
+		return nil
+	})
+	if err != nil {
+		return response.ErrorfReqRes(c, clusterTable, common.CodeFailedDatabase, err)
+	}
+
 	return response.WriteWithCode(c, nil, common.K8sVersionUpgrading, nil)
 }
