@@ -86,13 +86,13 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	// v1.GET("/clouds/:cloudID/kore-board", api.GetCloudKoreBoardHandler)
 
 	// Openstack Cluster
-	v1.GET("/clouds/:cloudId/clusters", api.GetClusterListHandler)                  				// 클러스터 목록 조회
-	v1.GET("/clouds/:cloudId/clusters/:clusterId", api.GetClusterHandler)           				// 클러스터 상세 기본 정보 조회
-	v1.POST("/clouds/:cloudId/clusters", api.SetClusterHandler)                     				// 클러스터 등록/생성
-	v1.PUT("/clouds/:cloudId/clusters/:clusterId", api.UpdateClusterHandler)        				// 클러스터 등록 정보 수정
-	v1.DELETE("/clouds/:cloudId/clusters/:clusterId", api.DeleteClusterHandler)     				// 클러스터 삭제
-	v1.POST("/clouds/:cloudId/clusters/:clusterId", api.ProvisioningClusterHandler) 				// 클러스터 Provisioning
-	v1.POST("/clouds/:cloudId/clusters/:clusterId/upgrade", api.UpgradeClusterK8sVersionHandler)	// 클러스터 K8s 업그레이드
+	v1.GET("/clouds/:cloudId/clusters", api.GetClusterListHandler)                               // 클러스터 목록 조회
+	v1.GET("/clouds/:cloudId/clusters/:clusterId", api.GetClusterHandler)                        // 클러스터 상세 기본 정보 조회
+	v1.POST("/clouds/:cloudId/clusters", api.SetClusterHandler)                                  // 클러스터 등록/생성
+	v1.PUT("/clouds/:cloudId/clusters/:clusterId", api.UpdateClusterHandler)                     // 클러스터 등록 정보 수정
+	v1.DELETE("/clouds/:cloudId/clusters/:clusterId", api.DeleteClusterHandler)                  // 클러스터 삭제
+	v1.POST("/clouds/:cloudId/clusters/:clusterId", api.ProvisioningClusterHandler)              // 클러스터 Provisioning
+	v1.POST("/clouds/:cloudId/clusters/:clusterId/upgrade", api.UpgradeClusterK8sVersionHandler) // 클러스터 K8s 업그레이드
 
 	// Openstack Cluster - NodeSet
 	v1.GET("/clouds/:cloudId/clusters/:clusterId/nodesets", api.GetNodeSetListHandler)        // 클러스터 노드셋 목록 조회
@@ -109,6 +109,11 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	// v1.PUT("/clouds/:cloudID/clusters/:clusterID/apps/:appID", api.UpdateCloudClusterAppsHandler)         // 클러스터 상세 애플리케이션 업데이트
 	// v1.DELETE("/clouds/:cloudID/clusters/:clusterID/apps/:appID", api.DeleteCloudClusterAppsHandler)      // 클러스터 상세 애플리케이션 삭제
 	// v1.GET("/clouds/:cloudID/clusters/:clusterID/template/apps", api.GetCloudClusterAvailableAppsHandler) // 클러스터에 설치 가능한 애플리케이션 목록
+
+	// Openstack Cluster - CIS Benchmarks
+	v1.POST("/clouds/:cloudId/clusters/:clusterId/benchmarks", api.SetBenchmarksHandler)              // 클러스터 벤치마크 실행
+	v1.GET("/clouds/:cloudId/clusters/:clusterId/benchmarks", api.GetBenchmarksListHandler)           // 클러스터 벤치마크 결과 목록 조회
+	v1.GET("/clouds/:cloudId/clusters/:clusterId/benchmarks/:benchmarksId", api.GetBenchmarksHandler) // 클러스터 벤치마크 결과 상세 조회
 
 	// Cloud/Cluster - Security Verification
 	// v1.GET("/clouds/:cloudID/clusters/:clusterID/securities", api.GetCloudClusterVCResultsHandler)            // 클러스터 보안검증 결과 목록 조회

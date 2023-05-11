@@ -1,0 +1,30 @@
+{
+  "Description": "plugins for CIS benchmarks",
+  "ResultsDir": "/tmp/sonobuoy",
+  "Resources": [],
+  "Filters": {
+    "Namespaces": ".*",
+    "LabelSelector": ""
+  },
+  "Server": {
+    "bindaddress": "0.0.0.0",
+    "bindport": 443,
+    "advertiseaddress": "{{.advertiseAddress}}",
+    "timeoutseconds": 21600
+  },
+  "Plugins": [
+    {
+      "name": "edge-kube-bench-master"
+    }, 
+    {
+      "name": "edge-kube-bench-node"
+    }
+  ],
+  "PluginSearchPath": [
+    "./plugins.d"
+  ],
+  "Namespace": "{{.namespace}}",
+  "WorkerImage": "{{.sonobuoyImage}}:{{.sonobuoyVersion}}",
+  "Version": "{{.sonobuoyVersion}}",
+  "ServiceAccountName": "{{.serviceAccountName}}"
+}
