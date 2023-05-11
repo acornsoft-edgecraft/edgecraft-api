@@ -119,6 +119,8 @@ const (
 	NodeNotFound = 25002
 	// NodeSetNotFound -
 	NodeSetNotFound = 25003
+	// ClusterBenchmarksNotFound
+	ClusterBenchmarksNotFound = 25004
 
 	// CreatedCloudNoUpdatable -
 	CreatedCloudNoUpdatable = 25100
@@ -163,6 +165,13 @@ const (
 	ProvisioningNodeSetFailed = 26202
 	// ProvisionedNodeSetDeleteFailed
 	ProvisionedNodeSetDeleteFailed = 26203
+
+	// BenchmarksOnlyProvisioned
+	BenchmarksOnlyProvisioned = 26400
+	// BenchmarksSetFailed
+	BenchmarksSetFailed = 26401
+	// BenchmarksExecuing
+	BenchmarksExecuing = 26402
 
 	//############################################################
 	// K8S 관련 메시지

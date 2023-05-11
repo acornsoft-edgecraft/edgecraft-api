@@ -1,5 +1,15 @@
 basePath: /api/v1
 definitions:
+  common.BootstrapProvider:
+    enum:
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - Kubeadm
+    - MicroK8s
+    - K3s
   model.BaremetalHostInfo:
     properties:
       bmc_address:
@@ -183,8 +193,9 @@ definitions:
   model.KubernetesInfo:
     properties:
       bootstrap_provider:
+        allOf:
+        - $ref: '#/definitions/common.BootstrapProvider'
         example: 1
-        type: integer
       cp_kubeadm_extra_config:
         $ref: '#/definitions/model.ExtraConfig'
       pod_cidr:
@@ -681,6 +692,85 @@ paths:
       summary: UpdateCluster
       tags:
       - Openstack-Cluster
+  /clouds/{cloudId}/clusters/{clusterId}/benchmarks:
+    get:
+      description: 클러스터 Benchmarks 결과 리스트 (Openstack)
+      operationId: GetBenchmarksList
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetBenchmarksList
+      tags:
+      - Openstack-Cluster-Benchmarks
+    post:
+      description: 클러스터에 CIS Benchmarks 실행 (Openstack)
+      operationId: SetBenchmarks
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetBenchmarks
+      tags:
+      - Openstack-Cluster-Benchmarks
+  /clouds/{cloudId}/clusters/{clusterId}/benchmarks/{benchmarksId}:
+    get:
+      description: 클러스터 Benchmarks 결과 상세 조회 (Openstack)
+      operationId: GetBenchmarks
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: Benchmarks ID
+        in: path
+        name: benchmarksId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetBenchmarks
+      tags:
+      - Openstack-Cluster-Benchmarks
   /clouds/{cloudId}/clusters/{clusterId}/nodesets:
     get:
       description: 클러스터의 NodeSet 리스트 (Openstack)

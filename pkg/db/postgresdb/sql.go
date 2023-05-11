@@ -177,3 +177,25 @@ FROM "edgecraft"."tbl_nodeset" A
 WHERE
 	A.cluster_uid = $1
 `
+
+/***************************************
+ * Cloud - Cluster - Benchmarks (Openstack)
+ ****************************************/
+
+const getOpenstackBenchmarksListSQL = `
+SELECT 
+	A.cloud_uid,
+	A.cluster_uid,
+	A.benchmarks_uid,
+	A.cis_version,
+	A.totals,
+	A.success_yn,
+	A.reason,
+	A.created_at
+FROM 
+	"edgecraft"."tbl_cluster_benchmarks" A
+WHERE
+		A.cloud_uid = $1
+AND		cluster_uid = $2
+ORDER BY A.created_at DESC
+`

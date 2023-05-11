@@ -70,6 +70,11 @@ type DB interface {
 	DeleteNodeSet(string, string) (int64, error)
 	DeleteNodeSets(string) (int64, error)
 
+	// tbl_cluster_benchmarks (Openstack)
+	GetOpenstackBenchmarksList(string, string) ([]model.OpenstackBenchmarksSet, error)
+	GetOpenstackBenchmarks(string, string, string) (*model.OpenstackBenchmarksTable, error)
+	InsertOpenstackBenchmarks(*model.OpenstackBenchmarksTable) error
+
 	// tbl_code_group
 	GetCodeGroupList() ([]*model.CodeGroupTable, error)
 	GetCodeGroup(string) (*model.CodeGroupTable, error)

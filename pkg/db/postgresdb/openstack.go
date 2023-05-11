@@ -136,3 +136,36 @@ func (db *DB) DeleteNodeSets(clusterId string) (int64, error) {
 	}
 	return result.RowsAffected()
 }
+
+/***********************
+ * Benchmarks
+ ***********************/
+
+// GetOpenstackBenchmarksList - Query all Openstack Benchmarks
+func (db *DB) GetOpenstackBenchmarksList(cloudId, clusterId string) ([]model.OpenstackBenchmarksSet, error) {
+	var list []model.OpenstackBenchmarksSet
+	_, err := db.GetClient().Select(&list, getOpenstackBenchmarksListSQL, cloudId, clusterId)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+// GetOpenstackBenchmarks - Query a Openstack Benchmarks
+func (db *DB) GetOpenstackBenchmarks(cloudId, clusterId, benchmarkId string) (*model.OpenstackBenchmarksTable, error) {
+	obj, err := db.GetClient().Get(&model.OpenstackBenchmarksTable{}, cloudId, clusterId, benchmarkId)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.OpenstackBenchmarksTable)
+		return res, nil
+	}
+	return nil, nil
+}
+
+// InsertOpenstackCluster - Insert a new Openstack Cluster
+func (db *DB) InsertOpenstackBenchmarks(benchmarks *model.OpenstackBenchmarksTable) error {
+	return db.GetClient().Insert(benchmarks)
+}

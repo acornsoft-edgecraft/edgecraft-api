@@ -21,16 +21,25 @@ const (
 
 // ApiConfig - Represents the API Server configuration
 type ApiConfig struct {
-	Type        string   `yaml:"type"`
-	Port        string   `yaml:"port"`
-	Host        string   `yaml:"host"`
-	HomePageURL string   `yaml:"homePageUrl"`
-	Secret      string   `yaml:"secret"`
-	PathPrefix  string   `yaml:"pathPrefix"`
-	Langs       []string `yaml:"langs"`
-	LangPath    string   `yaml:"langPath"`
-	Mode        string   `yaml:"mode"`
+	Type        string      `yaml:"type"`
+	Port        string      `yaml:"port"`
+	Host        string      `yaml:"host"`
+	HomePageURL string      `yaml:"homePageUrl"`
+	Secret      string      `yaml:"secret"`
+	PathPrefix  string      `yaml:"pathPrefix"`
+	Langs       []string    `yaml:"langs"`
+	LangPath    string      `yaml:"langPath"`
+	Mode        string      `yaml:"mode"`
+	Benchmarks  *Benchmarks `yaml:"benchmarks"`
 	// EdgeDatabase postgresdb.Config `yaml:"edge_database"`
+}
+
+type Benchmarks struct {
+	Image           string `yaml:"image"`
+	Version         string `yaml:"version"`
+	SonobuoyImage   string `yaml:"sonobuoy_image"`
+	SonobuoyVersion string `yaml:"sonobuoy_version"`
+	Debug           string `yaml:"debug"`
 }
 
 // Config - Represents the configuration

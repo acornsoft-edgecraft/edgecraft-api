@@ -11,6 +11,12 @@ api:
     - 'en'
   langPath: './conf'
   mode: 'local' #local:개발자pc dev:kdtidc  prod:
+  benchmarks:
+    image: 'regi.k3.acornsoft.io/edgecraft/edge-benchmarks'
+    version: '0.2.1'
+    sonobuoy_image: 'regi.k3.acornsoft.io/sonobuoy/sonobuoy'
+    sonobuoy_version: 'v0.56.15'
+    debug: 'true'
 
 auth:
   RESET_PASSWORD: 'edgecraft@@'
