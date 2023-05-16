@@ -10,6 +10,16 @@ import (
 	"github.com/gofrs/uuid"
 )
 
+type OpenstackBenchmarksList struct {
+	CloudUid      *string    `json:"cloud_uid" db:"cloud_uid"`
+	ClusterUid    *string    `json:"cluster_uid" db:"cluster_uid"`
+	BenchmarksUid *string    `json:"benchmarks_uid" db:"benchmarks_uid"`
+	Totals        *string    `json:"totals" db:"totals"`
+	SuccessYn     *bool      `json:"success_yn" db:"success_yn"`
+	Reason        *string    `json:"reason" db:"reason"`
+	Created       *time.Time `json:"created" db:"created_at"`
+}
+
 type OpenstackBenchmarksSet struct {
 	CloudUid        string    `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid      string    `json:"cluster_uid" db:"cluster_uid"`
