@@ -142,8 +142,8 @@ func (db *DB) DeleteNodeSets(clusterId string) (int64, error) {
  ***********************/
 
 // GetOpenstackBenchmarksList - Query all Openstack Benchmarks
-func (db *DB) GetOpenstackBenchmarksList(cloudId, clusterId string) ([]model.OpenstackBenchmarksSet, error) {
-	var list []model.OpenstackBenchmarksSet
+func (db *DB) GetOpenstackBenchmarksList(cloudId, clusterId string) ([]model.OpenstackBenchmarksList, error) {
+	var list []model.OpenstackBenchmarksList
 	_, err := db.GetClient().Select(&list, getOpenstackBenchmarksListSQL, cloudId, clusterId)
 	if err != nil {
 		return nil, err
