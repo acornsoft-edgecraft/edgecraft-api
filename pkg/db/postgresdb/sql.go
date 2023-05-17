@@ -187,7 +187,6 @@ SELECT
 	A.cloud_uid,
 	A.cluster_uid,
 	A.benchmarks_uid,
-	A.cis_version,
 	A.totals,
 	A.success_yn,
 	A.reason,

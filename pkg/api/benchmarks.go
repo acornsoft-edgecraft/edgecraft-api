@@ -52,7 +52,7 @@ func (a *API) SetBenchmarksHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nil, common.BenchmarksOnlyProvisioned, err)
 	}
 
-	var benchmarksSet model.OpenstackBenchmarksSet
+	benchmarksSet := &model.OpenstackBenchmarksSet{}
 	benchmarksSet.NewKey()
 
 	// benchmarks 실행
