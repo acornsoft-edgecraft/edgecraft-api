@@ -75,6 +75,13 @@ type DB interface {
 	GetOpenstackBenchmarks(string, string, string) (*model.OpenstackBenchmarksTable, error)
 	InsertOpenstackBenchmarks(*model.OpenstackBenchmarksTable) error
 
+	// tbl_cluster_backres
+	GetBackupList(string) ([]model.BackResTable, error)
+	GetBackup(string, string, string) (*model.BackResTable, error)
+	GetRestoreList(string) ([]model.BackResTable, error)
+	GetRestore(string, string, string) (*model.BackResTable, error)
+	InsertBackRes(*model.BackResTable) error
+
 	// tbl_code_group
 	GetCodeGroupList() ([]*model.CodeGroupTable, error)
 	GetCodeGroup(string) (*model.CodeGroupTable, error)

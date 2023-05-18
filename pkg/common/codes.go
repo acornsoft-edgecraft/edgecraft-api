@@ -173,6 +173,15 @@ const (
 	// BenchmarksExecuing
 	BenchmarksExecuing = 26402
 
+	// BackResOnlyProvisioned
+	BackResOnlyProvisioned = 26500
+	// BackResFailed
+	BackResFailed = 26501
+	// BackResExecuing
+	BackResExecuing = 26502
+	// BackupNotAvailable
+	BackupNotAvailable = 26503
+
 	//############################################################
 	// K8S 관련 메시지
 	//############################################################

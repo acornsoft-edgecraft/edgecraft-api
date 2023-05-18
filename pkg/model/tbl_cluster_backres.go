@@ -7,8 +7,8 @@ import (
 	"time"
 )
 
-// OpenstackBackResTable - 클러스터 백업/복원 테이블 정보 (Openstack)
-type OpenstackBackResTable struct {
+// BackResTable - 클러스터 백업/복원 테이블 정보 (Openstack)
+type BackResTable struct {
 	CloudUid   *string    `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid *string    `json:"cluster_uid" db:"cluster_uid"`
 	BackResUid *string    `json:"backres_uid" db:"backres_uid"`

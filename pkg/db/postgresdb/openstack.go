@@ -169,3 +169,60 @@ func (db *DB) GetOpenstackBenchmarks(cloudId, clusterId, benchmarkId string) (*m
 func (db *DB) InsertOpenstackBenchmarks(benchmarks *model.OpenstackBenchmarksTable) error {
 	return db.GetClient().Insert(benchmarks)
 }
+
+/***********************
+ * Backup / Restore
+ ***********************/
+
+// GetBackupList - Query all backups belong to cloud
+func (db *DB) GetBackupList(cloudId string) ([]model.BackResTable, error) {
+	var list []model.BackResTable
+	_, err := db.GetClient().Select(&list, getBackupListSQL, cloudId)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+// GetBackup - Query a backup
+func (db *DB) GetBackup(cloudId, clusterId, backresId string) (*model.BackResTable, error) {
+	obj, err := db.GetClient().Get(&model.BackResTable{}, cloudId, clusterId, backresId)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.BackResTable)
+		return res, nil
+	}
+	return nil, nil
+}
+
+// GetRestoreList - Query all restores belong to cloud
+func (db *DB) GetRestoreList(cloudId string) ([]model.BackResTable, error) {
+	var list []model.BackResTable
+	_, err := db.GetClient().Select(&list, getRestoreListSQL, cloudId)
+	if err != nil {
+		return nil, err
+	}
+
+	return list, nil
+}
+
+// GetRestore - Query a restore
+func (db *DB) GetRestore(cloudId, clusterId, backresId string) (*model.BackResTable, error) {
+	obj, err := db.GetClient().Get(&model.BackResTable{}, cloudId, clusterId, backresId)
+	if err != nil {
+		return nil, err
+	}
+	if obj != nil {
+		res := obj.(*model.BackResTable)
+		return res, nil
+	}
+	return nil, nil
+}
+
+// InsertBackRes - Insert a new backup / restore data
+func (db *DB) InsertBackRes(backres *model.BackResTable) error {
+	return db.GetClient().Insert(backres)
+}

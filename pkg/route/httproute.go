@@ -115,6 +115,16 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	v1.GET("/clouds/:cloudId/clusters/:clusterId/benchmarks", api.GetBenchmarksListHandler)           // 클러스터 벤치마크 결과 목록 조회
 	v1.GET("/clouds/:cloudId/clusters/:clusterId/benchmarks/:benchmarksId", api.GetBenchmarksHandler) // 클러스터 벤치마크 결과 상세 조회
 
+	// Cloud/Cluster - Backup
+	v1.POST("/clouds/:cloudId/clusters/:clusterId/backup", api.SetBackupHandler)      // 클러스터 백업
+	v1.GET("/clouds/:cloudId/backup", api.GetBackupListHandler)                       // 클러스터 백업 목록 조회
+	v1.DELETE("/clouds/:cloudId/clusters/:clusterId/backup", api.DeleteBackupHandler) // 클러스터 백업 삭제
+
+	// Cloud/Cluster - Restore
+	v1.POST("/clouds/:cloudId/clusters/:clusterId/restore", api.SetRestoreHandler)      // 클러스터 복원
+	v1.GET("/clouds/:cloudId/restore", api.GetRestoreListHandler)                       // 클러스터 복원 목록 조회
+	v1.DELETE("/clouds/:cloudId/clusters/:clusterId/restore", api.DeleteRestoreHandler) // 클러스터 복원 삭제
+
 	// Cloud/Cluster - Security Verification
 	// v1.GET("/clouds/:cloudID/clusters/:clusterID/securities", api.GetCloudClusterVCResultsHandler)            // 클러스터 보안검증 결과 목록 조회
 	// v1.GET("/clouds/:cloudID/clusters/:clusterID/securities/:securityID", api.GetCloudClusterVCResultHandler) // 클러스터 보안검증 결과 상세 정보 조회
