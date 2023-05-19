@@ -16,9 +16,9 @@ CREATE TABLE "edgecraft"."tbl_cluster_benchmarks"
 	"benchmarks_uid"           			CHAR(36)                            NOT NULL,   -- 클러스터벤치마크식별자
 	"cis_version"						VARCHAR(30)							NULL,		-- cis benchmarks version
 	"detected_version"					VARCHAR(30)							NULL,		-- kubernetes version
+	"state"                     		INTEGER      	DEFAULT 1			NULL,     	-- 실행상태 (Code - BenchmarksStatus)
 	"results"     						JSON         						NULL,     	-- 실행결과
 	"totals"     						JSON         						NULL,     	-- 실행결과
-	"success_yn"						BOOLEAN      	DEFAULT FALSE		NULL, 		-- 성공 여부
 	"reason"							VARCHAR(200)						NULL,		-- 실패 이유
 	"creator"               			VARCHAR(30)     DEFAULT 'system'    NOT NULL,   -- 생성자
 	"created_at"            			TIMESTAMP       DEFAULT NOW()       NOT NULL,   -- 생성일시
@@ -43,3 +43,10 @@ ALTER TABLE "edgecraft"."tbl_cluster_benchmarks"
 	PRIMARY KEY
 	USING INDEX "PK_tbl_cluster_benchmarks"
 	NOT DEFERRABLE;
+
+-- 실행상태 공통 코드
+INSERT INTO "edgecraft"."tbl_code_group" ("group_id", "description")
+VALUES ('BenchmarksStatus', 'Status of Benchmarks')
+
+INSERT INTO "edgecraft"."tbl_code" ("group_id", "code", "name", "display_order", "description")
+VALUES ('BenchmarksStatus', 1, 'In Progress', 1, 'In Progress status'), ('BenchmarksStatus', 2, 'Completed', 2, 'Completed status'), ('BenchmarksStatus', 3, 'Failed', 3, 'Failed status')
