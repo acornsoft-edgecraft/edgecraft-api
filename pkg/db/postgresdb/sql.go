@@ -217,8 +217,7 @@ const getBackupListSQL = `
 	 "edgecraft"."tbl_cluster_backres" A
  WHERE
 		A.cloud_uid = $1
- AND	A.cluster_uid = $2
- AND	A.type = "B"
+ AND	A.type = 'B'
  ORDER BY A.created_at DESC
  `
 
@@ -236,7 +235,6 @@ const getRestoreListSQL = `
 	 "edgecraft"."tbl_cluster_backres" A
  WHERE
 		A.cloud_uid = $1
- AND	A.cluster_uid = $2
- AND	A.type = "R"
+ AND	A.type = 'R'
  ORDER BY A.created_at DESC
  `

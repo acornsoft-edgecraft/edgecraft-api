@@ -15,7 +15,7 @@ type BackResTable struct {
 	Name       *string    `json:"name" db:"name"`
 	Type       *string    `json:"type" db:"type"`
 	Status     *string    `json:"status" db:"status"`
-	Reason     *string    `json:"reasen" db:"reaseon"`
+	Reason     *string    `json:"reason" db:"reason"`
 	Creator    *string    `json:"creator" db:"creator"`
 	Created    *time.Time `json:"created_at" db:"created_at"`
 	Updater    *string    `json:"updater" db:"updater"`

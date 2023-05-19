@@ -152,6 +152,7 @@ metadata:
   labels:
     ccm: external # labels for ccm
     cni: calico # labels for cni
+    dashboardChart: enabled
 spec:
   clusterNetwork:
     pods:
