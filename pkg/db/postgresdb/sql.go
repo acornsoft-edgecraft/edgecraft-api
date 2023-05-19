@@ -188,14 +188,14 @@ SELECT
 	A.cluster_uid,
 	A.benchmarks_uid,
 	A.totals,
-	A.success_yn,
+	A.state,
 	A.reason,
 	A.created_at
 FROM 
 	"edgecraft"."tbl_cluster_benchmarks" A
 WHERE
 		A.cloud_uid = $1
-AND		cluster_uid = $2
+AND		A.cluster_uid = $2
 ORDER BY A.created_at DESC
 `
 

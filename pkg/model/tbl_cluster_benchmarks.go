@@ -19,7 +19,7 @@ type OpenstackBenchmarksTable struct {
 	DetectedVersion *string    `json:"detected_version" db:"detected_version"`
 	Results         *Outputs   `json:"results" db:"results"`
 	Totals          *Totals    `json:"totals" db:"totals"`
-	SuccessYn       *bool      `json:"success_yn" db:"success_yn"`
+	Status          *int       `json:"status" db:"state"`
 	Reason          *string    `json:"reason" db:"reason"`
 	Creator         *string    `json:"creator" db:"creator"`
 	Created         *time.Time `json:"created_at" db:"created_at"`
