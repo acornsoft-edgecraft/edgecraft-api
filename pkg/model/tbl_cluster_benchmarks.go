@@ -12,7 +12,6 @@ import (
 
 // OpenstackBenchmarksTable - 클러스터 Benchmarks 테이블 정보 (Openstack)
 type OpenstackBenchmarksTable struct {
-	CloudUid        *string    `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid      *string    `json:"cluster_uid" db:"cluster_uid"`
 	BenchmarksUid   *string    `json:"benchmarks_uid" db:"benchmarks_uid"`
 	CisVersion      *string    `json:"cis_version" db:"cis_version"`

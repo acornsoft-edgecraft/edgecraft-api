@@ -11,7 +11,6 @@ DROP TABLE IF EXISTS "edgecraft"."tbl_cluster_benchmarks";
 -- 오픈스택 클러스터 벤치마크
 CREATE TABLE "edgecraft"."tbl_cluster_benchmarks"
 (
-    "cloud_uid"             			CHAR(36)                            NOT NULL,   -- 클라우드식별자
 	"cluster_uid"           			CHAR(36)                            NOT NULL,   -- 클러스터식별자
 	"benchmarks_uid"           			CHAR(36)                            NOT NULL,   -- 클러스터벤치마크식별자
 	"cis_version"						VARCHAR(30)							NULL,		-- cis benchmarks version
@@ -33,7 +32,8 @@ OIDS=false
 CREATE UNIQUE INDEX "PK_tbl_cluster_benchmarks"
 	ON "edgecraft"."tbl_cluster_benchmarks"
 	( -- 오픈스택 클러스터 벤치마크
-		"benchmarks_uid" ASC -- 클러스터벤치마크식별자
+  		"cluster_uid" 		ASC, 	-- 클러스터식별자
+		"benchmarks_uid" 	ASC 	-- 클러스터벤치마크식별자
 	);
 
 -- 오픈스택 클러스터 벤치마크
