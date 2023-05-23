@@ -184,7 +184,6 @@ WHERE
 
 const getOpenstackBenchmarksListSQL = `
 SELECT 
-	A.cloud_uid,
 	A.cluster_uid,
 	A.benchmarks_uid,
 	A.totals,
@@ -194,7 +193,6 @@ SELECT
 FROM 
 	"edgecraft"."tbl_cluster_benchmarks" A
 WHERE
-		A.cloud_uid = $1
-AND		A.cluster_uid = $2
+		A.cluster_uid = $1
 ORDER BY A.created_at DESC
 `

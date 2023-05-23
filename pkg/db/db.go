@@ -71,8 +71,8 @@ type DB interface {
 	DeleteNodeSets(string) (int64, error)
 
 	// tbl_cluster_benchmarks (Openstack)
-	GetOpenstackBenchmarksList(string, string) ([]model.OpenstackBenchmarksList, error)
-	GetOpenstackBenchmarks(string, string, string) (*model.OpenstackBenchmarksTable, error)
+	GetOpenstackBenchmarksList(string) ([]model.OpenstackBenchmarksList, error)
+	GetOpenstackBenchmarks(string, string) (*model.OpenstackBenchmarksTable, error)
 	InsertOpenstackBenchmarks(*model.OpenstackBenchmarksTable) error
 
 	// tbl_code_group

@@ -13,7 +13,7 @@ api:
   mode: 'local' #local:개발자pc dev:kdtidc  prod:
   benchmarks:
     image: 'vlatte/edge-benchmarks'
-    version: '0.1.1'
+    version: '0.2.2'
     sonobuoy_image: 'vlatte/sonobuoy'
     sonobuoy_version: 'v0.56.15'
     debug: 'false'

@@ -6,12 +6,12 @@ package model
 import (
 	"time"
 
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/utils"
 	"github.com/gofrs/uuid"
 )
 
 type OpenstackBenchmarksList struct {
-	CloudUid      *string    `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid    *string    `json:"cluster_uid" db:"cluster_uid"`
 	BenchmarksUid *string    `json:"benchmarks_uid" db:"benchmarks_uid"`
 	Totals        *Totals    `json:"totals" db:"totals"`
@@ -20,8 +20,20 @@ type OpenstackBenchmarksList struct {
 	Created       *time.Time `json:"created" db:"created_at"`
 }
 
+type OpenstackBenchmarksInfo struct {
+	ClusterInfo OsClusterInfo             `json:"cluster"`
+	List        []OpenstackBenchmarksList `json:"list"`
+}
+
+type OsClusterInfo struct {
+	Namespace         *string                   `json:"namespace"`
+	Name              *string                   `json:"name"`
+	Status            *int                      `json:"status"`
+	BootstrapProvider *common.BootstrapProvider `json:"bootstrap_provider"`
+	Version           *int                      `json:"version"`
+}
+
 type OpenstackBenchmarksSet struct {
-	CloudUid        string    `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid      string    `json:"cluster_uid" db:"cluster_uid"`
 	BenchmarksUid   string    `json:"benchmarks_uid" db:"benchmarks_uid"`
 	CisVersion      string    `json:"cis_version" db:"cis_version"`
@@ -37,9 +49,8 @@ func (ob *OpenstackBenchmarksSet) NewKey() {
 	ob.BenchmarksUid = uuid.Must(uuid.NewV4()).String()
 }
 
-func (ob *OpenstackBenchmarksSet) ToTable(cloudId *string, clusterId *string, user string, at time.Time) (benchmarksTable *OpenstackBenchmarksTable) {
+func (ob *OpenstackBenchmarksSet) ToTable(clusterId *string, user string, at time.Time) (benchmarksTable *OpenstackBenchmarksTable) {
 	benchmarksTable = &OpenstackBenchmarksTable{
-		CloudUid:      cloudId,
 		ClusterUid:    clusterId,
 		BenchmarksUid: utils.StringPtr(ob.BenchmarksUid),
 		Status:        utils.IntPrt(1),

@@ -61,7 +61,7 @@ func (a *API) SetBenchmarksHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterTable, common.BenchmarksSetFailed, err)
 	}
 
-	benchmarksTable := benchmarksSet.ToTable(clusterTable.CloudUid, clusterTable.ClusterUid, "system", time.Now())
+	benchmarksTable := benchmarksSet.ToTable(clusterTable.ClusterUid, "system", time.Now())
 
 	// 트랜잭션 구간 처리
 	err = a.Db.TransactionScope(func(txDB db.DB) error {
@@ -100,12 +100,29 @@ func (a *API) GetBenchmarksListHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
 	}
 
-	result, err := a.Db.GetOpenstackBenchmarksList(cloudId, clusterId)
+	// 클러스터 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.ClusterNotFound, nil)
+	}
+
+	osBenchmarksInfo := &model.OpenstackBenchmarksInfo{}
+	osBenchmarksInfo.ClusterInfo.Name = clusterTable.Name
+	osBenchmarksInfo.ClusterInfo.Namespace = clusterTable.Namespace
+	osBenchmarksInfo.ClusterInfo.Status = clusterTable.Status
+	osBenchmarksInfo.ClusterInfo.BootstrapProvider = clusterTable.BootstrapProvider
+	osBenchmarksInfo.ClusterInfo.Version = clusterTable.Version
+
+	result, err := a.Db.GetOpenstackBenchmarksList(clusterId)
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
+	osBenchmarksInfo.List = result
 
-	return response.Write(c, nil, result)
+	return response.Write(c, nil, osBenchmarksInfo)
 }
 
 // GetBenchmarksHandler - 클러스터 Benchmarks 결과 상세 조회 (Openstack)
@@ -136,7 +153,7 @@ func (a *API) GetBenchmarksHandler(c echo.Context) error {
 	}
 
 	// Cluster Benchmarks 정보 조회
-	benchmarksTable, err := a.Db.GetOpenstackBenchmarks(cloudId, clusterId, benchmarksId)
+	benchmarksTable, err := a.Db.GetOpenstackBenchmarks(clusterId, benchmarksId)
 	if err != nil {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	}

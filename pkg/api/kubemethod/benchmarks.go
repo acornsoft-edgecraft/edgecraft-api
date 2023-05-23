@@ -478,52 +478,65 @@ func setClusterRoleBinding(clientSet *kubernetes.Clientset) error {
 
 func setConfigCM(clientset *kubernetes.Clientset, bootstrapProvider common.BootstrapProvider) error {
 	_, err := clientset.CoreV1().ConfigMaps(NS).Get(context.TODO(), configCmName, metaV1.GetOptions{})
-	if errors.IsNotFound(err) {
-		logger.Infof("ConfigMap \"%s\" not found", configCmName)
+	if err == nil {
+		logger.Infof("ConfigMap \"%s\" already exists, delete ConfigMap", configCmName)
 
-		data, err := getTemplateParsing(fmt.Sprintf("./conf/templates/cis/%s-cm.data", CM_Config), getConfigCMData())
-		if err != nil {
-			return err
+		e := clientset.CoreV1().ConfigMaps(NS).Delete(context.TODO(), configCmName, metaV1.DeleteOptions{})
+		if e != nil {
+			logger.Errorf("Configmap \"%s\" deletion failed. %v", configCmName, e)
 		}
-		cm := newConfigCM(data)
-		_, err = clientset.CoreV1().ConfigMaps(NS).Create(context.TODO(), cm, metaV1.CreateOptions{})
-		if err != nil {
-			return err
-		}
-		logger.Infof("ConfigMap \"%s\" has created", configCmName)
-		return nil
+	}
+	if errors.IsNotFound(err) {
+		logger.Infof("ConfigMap \"%s\" not found. create ConfigMap", configCmName)
 	} else if err != nil {
 		return err
 	}
-	logger.Infof("ConfigMap \"%s\" already exists", configCmName)
+
+	data, err := getTemplateParsing(fmt.Sprintf("./conf/templates/cis/%s-cm.data", CM_Config), getConfigCMData())
+	if err != nil {
+		return err
+	}
+	cm := newConfigCM(data)
+	_, err = clientset.CoreV1().ConfigMaps(NS).Create(context.TODO(), cm, metaV1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	logger.Infof("ConfigMap \"%s\" has created", configCmName)
 	return nil
 }
 
 func setPluginsCM(clientset *kubernetes.Clientset, bootstrapProvider common.BootstrapProvider) error {
 	_, err := clientset.CoreV1().ConfigMaps(NS).Get(context.TODO(), pluginsCmName, metaV1.GetOptions{})
-	if errors.IsNotFound(err) {
-		logger.Infof("ConfigMap \"%s\" not found", pluginsCmName)
+	if err == nil {
+		logger.Infof("ConfigMap \"%s\" already exists, delete ConfigMap", pluginsCmName)
 
-		templatePath := fmt.Sprintf("./conf/templates/cis/%s-cm.data", CM_Plugins)
-		masterData, err := getTemplateParsing(templatePath, getConfigPluginsData(role_Master, bootstrapProvider))
-		if err != nil {
-			return err
+		e := clientset.CoreV1().ConfigMaps(NS).Delete(context.TODO(), pluginsCmName, metaV1.DeleteOptions{})
+		if e != nil {
+			logger.Errorf("Configmap \"%s\" deletion failed. %v", pluginsCmName, e)
 		}
-		nodeData, err := getTemplateParsing(templatePath, getConfigPluginsData(role_Node, bootstrapProvider))
-		if err != nil {
-			return err
-		}
-		cm := newPluginsCM(masterData, nodeData)
-		_, err = clientset.CoreV1().ConfigMaps(NS).Create(context.TODO(), cm, metaV1.CreateOptions{})
-		if err != nil {
-			return err
-		}
-		logger.Infof("ConfigMap \"%s\" has created", pluginsCmName)
-		return nil
+	}
+
+	if errors.IsNotFound(err) {
+		logger.Infof("ConfigMap \"%s\" not found. create ConfigMap", pluginsCmName)
 	} else if err != nil {
 		return err
 	}
-	logger.Infof("ConfigMap \"%s\" already exists", pluginsCmName)
+
+	templatePath := fmt.Sprintf("./conf/templates/cis/%s-cm.data", CM_Plugins)
+	masterData, err := getTemplateParsing(templatePath, getConfigPluginsData(role_Master, bootstrapProvider))
+	if err != nil {
+		return err
+	}
+	nodeData, err := getTemplateParsing(templatePath, getConfigPluginsData(role_Node, bootstrapProvider))
+	if err != nil {
+		return err
+	}
+	cm := newPluginsCM(masterData, nodeData)
+	_, err = clientset.CoreV1().ConfigMaps(NS).Create(context.TODO(), cm, metaV1.CreateOptions{})
+	if err != nil {
+		return err
+	}
+	logger.Infof("ConfigMap \"%s\" has created", pluginsCmName)
 	return nil
 }
 
