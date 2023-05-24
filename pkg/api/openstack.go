@@ -352,8 +352,21 @@ func (a *API) DeleteClusterHandler(c echo.Context) error {
 			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 		}
 
+		// Benchmarks 삭제
+		affectedRows, err := a.Db.DeleteOpenstackBenchmarks(*clusterTable.ClusterUid)
+		if err != nil {
+			txErr := txdb.Rollback()
+			if txErr != nil {
+				logger.Info("DB rollback Failed.", txErr)
+			}
+			return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+		}
+		if affectedRows == 0 {
+			logger.Info("Openstack Benchmarks does not exists")
+		}
+
 		// NodeSet 삭제
-		affectedRows, err := a.Db.DeleteNodeSets(*clusterTable.ClusterUid)
+		affectedRows, err = a.Db.DeleteNodeSets(*clusterTable.ClusterUid)
 		if err != nil {
 			txErr := txdb.Rollback()
 			if txErr != nil {

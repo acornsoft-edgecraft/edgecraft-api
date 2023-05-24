@@ -196,3 +196,10 @@ WHERE
 		A.cluster_uid = $1
 ORDER BY A.created_at DESC
 `
+
+const deleteOpenstackBenchmarksSQL = `
+DELETE 
+FROM "edgecraft"."tbl_cluster_benchmarks" A
+WHERE
+	A.cluster_uid = $1
+`
