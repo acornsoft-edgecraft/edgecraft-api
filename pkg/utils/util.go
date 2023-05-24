@@ -264,6 +264,16 @@ func EndWithOnArray(arr []string, str string) string {
 	return ""
 }
 
+// StartEndWithOnArray - 지정한 배열내의 값들 중에서 Prefix&Suffix에 해당하는 값이 있는지 검증
+func StartEndWithOnArray(arr []string, str string) string {
+	for _, s := range arr {
+		if strings.HasSuffix(s, str) && strings.HasPrefix(s, str) {
+			return s
+		}
+	}
+	return ""
+}
+
 // FindIndex - 지정된 Slice에서 지정한 값에 해당하는 인덱스 반환
 func FindIndex[T any](slice []T, matchFunc func(T) bool) int {
 	for index, elem := range slice {

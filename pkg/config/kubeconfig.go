@@ -234,7 +234,7 @@ func newKubeCluster(conf *strategyInfo) (*kubeCluster, error) {
 
 	// Get client by context
 	kc.Client = func(context string) (*ClientSet, error) {
-		val := utils.EndWithOnArray(kc.ClusterNames, context)
+		val := utils.StartEndWithOnArray(kc.ClusterNames, context)
 		if val == "" {
 			//if !utils.ArrayContains(kc.ClusterNames, context) {
 			if context == IN_CLUSTER_NAME && kc.InCluster != nil {
