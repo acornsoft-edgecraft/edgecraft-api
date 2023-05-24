@@ -177,6 +177,7 @@ func (db *DB) DeleteOpenstackBenchmarks(clusterId string) (int64, error) {
 		return -1, err
 	}
 	return result.RowsAffected()
+}
 
 /***********************
  * Backup / Restore
