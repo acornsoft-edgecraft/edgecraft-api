@@ -203,3 +203,43 @@ FROM "edgecraft"."tbl_cluster_benchmarks" A
 WHERE
 	A.cluster_uid = $1
 `
+
+/***************************************
+ * Cloud - Cluster - Backup
+ ****************************************/
+
+const getBackupListSQL = `
+ SELECT 
+	 A.cloud_uid,
+	 A.cluster_uid,
+	 A.backres_uid,
+	 A.name,
+	 A.type,
+	 A.status,
+	 A.reason,
+	 A.created_at
+ FROM 
+	 "edgecraft"."tbl_cluster_backres" A
+ WHERE
+		A.cloud_uid = $1
+ AND	A.type = 'B'
+ ORDER BY A.created_at DESC
+ `
+
+const getRestoreListSQL = `
+ SELECT 
+	 A.cloud_uid,
+	 A.cluster_uid,
+	 A.backres_uid,
+	 A.name,
+	 A.type,
+	 A.status,
+	 A.reason,
+	 A.created_at
+ FROM 
+	 "edgecraft"."tbl_cluster_backres" A
+ WHERE
+		A.cloud_uid = $1
+ AND	A.type = 'R'
+ ORDER BY A.created_at DESC
+ `

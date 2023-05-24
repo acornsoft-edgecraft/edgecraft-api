@@ -221,6 +221,8 @@ kind: Cluster
 metadata:
   name: {{$ClusterName}}
   namespace: {{or $Namespace "default"}}
+  labels:
+    dashboardChart: enabled
 spec:
   clusterNetwork:
     pods:
