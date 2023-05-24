@@ -165,10 +165,18 @@ func (db *DB) GetOpenstackBenchmarks(clusterId, benchmarkId string) (*model.Open
 	return nil, nil
 }
 
-// InsertOpenstackCluster - Insert a new Openstack Cluster
+// InsertOpenstackCluster - Insert a new Openstack Benchmarks
 func (db *DB) InsertOpenstackBenchmarks(benchmarks *model.OpenstackBenchmarksTable) error {
 	return db.GetClient().Insert(benchmarks)
 }
+
+// DeleteOpenstackBenchmarks - Delete all Openstack Benchmarks
+func (db *DB) DeleteOpenstackBenchmarks(clusterId string) (int64, error) {
+	result, err := db.GetClient().Exec(deleteOpenstackBenchmarksSQL, clusterId)
+	if err != nil {
+		return -1, err
+	}
+	return result.RowsAffected()
 
 /***********************
  * Backup / Restore
