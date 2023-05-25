@@ -43,7 +43,9 @@ metadata:
   namespace: {{or $Namespace "default"}}
 spec:
   template:
-    spec: {}
+    spec: 
+      clusterConfiguration:
+        portCompatibilityRemap: true
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
 kind: OpenStackMachineTemplate
@@ -99,6 +101,8 @@ spec:
         - dns
         - ingress
       #joinTokenTTLInSecs: 9000
+    clusterConfiguration:
+      portCompatibilityRemap: true
   machineTemplate:
     infrastructureTemplate:
       apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5

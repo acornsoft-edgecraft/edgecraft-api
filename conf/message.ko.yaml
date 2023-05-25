@@ -87,10 +87,13 @@
 "26401": "Benchmarks 실행 시 오류가 발생하였습니다." # BenchmarksSetFailed
 "26402": "Benchmarks가 실행 중입니다. (시간이 지난 후 결과를 확인하십시오.)" # BenchmarksExecuing
 
-"26500": "Backrup/Restore 실행은 Provisioned 상태만 가능합니다." # BackResOnlyProvisioned
+"26500": "Backup/Restore 실행은 Provisioned 상태만 가능합니다." # BackResOnlyProvisioned
 "26501": "Backup/Restore 실행 시 오류가 발생하였습니다." # BackResFailed
 "26502": "Backup/Restore가 실행 중입니다. (시간이 지난 후 결과를 확인하십시오.)" # BackResExecuing
 "26503": "지정한 Backup을 사용할 수 없습니다. (삭제 또는 오류)" #BackupNotAvailable
+"26504": "지정한 Backup 정보를 찾을 수 없습니다." #BackupNotFound
+"26505": "Backup/Restore Provision 작업을 진행할 수 없습니다." #BackResJobFailed
+"26506": "Backup/Restore 이름이 이미 존재합니다. (다른 이름을 지정하세요.)" #BackResDuplicated
 
 ##############################################################
 # k8s api 메시지

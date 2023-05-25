@@ -469,11 +469,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "Name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
+                        "description": "BackResParam",
+                        "name": "backresParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.BackResParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -484,7 +486,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/clouds/{cloudId}/clusters/{clusterId}/backup/{backresId}": {
             "delete": {
                 "description": "클러스터의 백업 삭제",
                 "produces": [
@@ -889,18 +893,13 @@ const docTemplate = `{
                         "required": true
                     },
                     {
-                        "type": "string",
-                        "description": "BackRes ID",
-                        "name": "backresId",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Name",
-                        "name": "name",
-                        "in": "path",
-                        "required": true
+                        "description": "BackResParam",
+                        "name": "backresParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.BackResParam"
+                        }
                     }
                 ],
                 "responses": {
@@ -911,7 +910,9 @@ const docTemplate = `{
                         }
                     }
                 }
-            },
+            }
+        },
+        "/clouds/{cloudId}/clusters/{clusterId}/restore/{backresId}": {
             "delete": {
                 "description": "클러스터의 복원 삭제",
                 "produces": [
@@ -1559,6 +1560,17 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.BackResParam": {
+            "type": "object",
+            "properties": {
+                "backresId": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "model.BaremetalHostInfo": {
             "type": "object",
             "properties": {

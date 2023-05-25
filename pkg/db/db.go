@@ -78,10 +78,13 @@ type DB interface {
 
 	// tbl_cluster_backres
 	GetBackupList(string) ([]model.BackResTable, error)
-	GetBackup(string, string, string) (*model.BackResTable, error)
+	GetBackup(string) (*model.BackResTable, error)
 	GetRestoreList(string) ([]model.BackResTable, error)
 	GetRestore(string, string, string) (*model.BackResTable, error)
+	CheckBackResDuplicate(string) (bool, error)
 	InsertBackRes(*model.BackResTable) error
+	DeleteBackRes(string, string, string) (int64, error)
+	UpdateBackResStatus(string, string, string, string) (int64, error)
 
 	// tbl_code_group
 	GetCodeGroupList() ([]*model.CodeGroupTable, error)

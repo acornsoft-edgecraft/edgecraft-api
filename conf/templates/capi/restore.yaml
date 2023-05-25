@@ -1,0 +1,26 @@
+apiVersion: velero.io/v1
+kind: Restore
+metadata:
+  name: {{.RestoreName}}
+  namespace: velero
+spec:
+  backupName: {{.BackupName}}
+  excludedResources:
+    - nodes
+    - events
+    - events.events.k8s.io
+    - backups.velero.io
+    - restores.velero.io
+    - resticrepositories.velero.io
+    - csinodes.storage.k8s.io
+    - volumeattachments.storage.k8s.io
+    - backuprepositories.velero.io
+  hooks: {}
+  excludedNamespaces:
+    - kube-system
+    - kube-node-lease
+    - kube-public
+    - kubernetes-dashboard
+    - velero
+  itemOperationTimeout: 1h0m0s
+  preserveNodePorts: true

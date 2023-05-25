@@ -200,7 +200,7 @@ func removeMachineDeployment(objectName, namespace string) error {
 // Apply - 지정한 YAML 문자열 정보를 Kubernetes에 적용
 func Apply(clusterName, yaml string) error {
 	// Get kubernetes client
-	dynamicClient, err := config.HostCluster.GetDynamicClient("")
+	dynamicClient, err := config.HostCluster.GetDynamicClient(clusterName)
 	if err != nil {
 		return err
 	}

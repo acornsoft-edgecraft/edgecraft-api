@@ -14,8 +14,9 @@ type BackResTable struct {
 	BackResUid *string    `json:"backres_uid" db:"backres_uid"`
 	Name       *string    `json:"name" db:"name"`
 	Type       *string    `json:"type" db:"type"`
-	Status     *string    `json:"status" db:"status"`
+	Status     *string    `json:"status" db:"status"` // 'R' - Running, 'C' - Completed, 'F' - Failed, 'P' - PartiallyFailed
 	Reason     *string    `json:"reason" db:"reason"`
+	BackupName *string    `json:"backup_name" db:"backup_name"` // Restore인 경우만 사용
 	Creator    *string    `json:"creator" db:"creator"`
 	Created    *time.Time `json:"created_at" db:"created_at"`
 	Updater    *string    `json:"updater" db:"updater"`

@@ -1,5 +1,12 @@
 basePath: /api/v1
 definitions:
+  model.BackResParam:
+    properties:
+      backresId:
+        type: string
+      name:
+        type: string
+    type: object
   model.BaremetalHostInfo:
     properties:
       bmc_address:
@@ -702,6 +709,37 @@ paths:
       tags:
       - Openstack-Cluster
   /clouds/{cloudId}/clusters/{clusterId}/backup:
+    post:
+      description: 클러스터의 백업 실행 (Velero)
+      operationId: SetBackup
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: BackResParam
+        in: body
+        name: backresParam
+        required: true
+        schema:
+          $ref: '#/definitions/model.BackResParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetBackup
+      tags:
+      - Openstack-Cluster-Backup
+  /clouds/{cloudId}/clusters/{clusterId}/backup/{backresId}:
     delete:
       description: 클러스터의 백업 삭제
       operationId: DeleteBackup
@@ -729,35 +767,6 @@ paths:
           schema:
             $ref: '#/definitions/response.ReturnData'
       summary: DeleteBackup
-      tags:
-      - Openstack-Cluster-Backup
-    post:
-      description: 클러스터의 백업 실행 (Velero)
-      operationId: SetBackup
-      parameters:
-      - description: Cloud ID
-        in: path
-        name: cloudId
-        required: true
-        type: string
-      - description: Cluster ID
-        in: path
-        name: clusterId
-        required: true
-        type: string
-      - description: Name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.ReturnData'
-      summary: SetBackup
       tags:
       - Openstack-Cluster-Backup
   /clouds/{cloudId}/clusters/{clusterId}/benchmarks:
@@ -989,6 +998,37 @@ paths:
       tags:
       - Openstack-Cluster-NodeSet
   /clouds/{cloudId}/clusters/{clusterId}/restore:
+    post:
+      description: 클러스터의 복원 실행 (Velero)
+      operationId: SetRestore
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      - description: BackResParam
+        in: body
+        name: backresParam
+        required: true
+        schema:
+          $ref: '#/definitions/model.BackResParam'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetRestore
+      tags:
+      - Openstack-Cluster-Restore
+  /clouds/{cloudId}/clusters/{clusterId}/restore/{backresId}:
     delete:
       description: 클러스터의 복원 삭제
       operationId: DeleteRestore
@@ -1016,40 +1056,6 @@ paths:
           schema:
             $ref: '#/definitions/response.ReturnData'
       summary: DeleteRestore
-      tags:
-      - Openstack-Cluster-Restore
-    post:
-      description: 클러스터의 복원 실행 (Velero)
-      operationId: SetRestore
-      parameters:
-      - description: Cloud ID
-        in: path
-        name: cloudId
-        required: true
-        type: string
-      - description: Cluster ID
-        in: path
-        name: clusterId
-        required: true
-        type: string
-      - description: BackRes ID
-        in: path
-        name: backresId
-        required: true
-        type: string
-      - description: Name
-        in: path
-        name: name
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.ReturnData'
-      summary: SetRestore
       tags:
       - Openstack-Cluster-Restore
   /clouds/{cloudId}/clusters/{clusterId}/upgrade:

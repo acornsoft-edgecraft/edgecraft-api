@@ -18,6 +18,7 @@ CREATE TABLE "edgecraft"."tbl_cluster_backres"
 	"type"				CHAR(1)			DEFAULT 'B'			NOT NULL,	-- Backup ('B') / Restore ('R') 구분자
 	"status"			CHAR(1)			DEFAULT 'R'			NOT NULL,	-- Running ('R') / Completed ('C') / Failed ('F') / PartiallyFailed ('P') 상태 구분자 
 	"reason"			VARCHAR(200)						NULL,		-- 실패 이유
+	"backup_name"		VARCHAR(200)						NULL,		-- 복원 시 사용할 백업 명
 	"creator"           VARCHAR(30)     DEFAULT 'system'    NOT NULL,   -- 생성자
 	"created_at"        TIMESTAMP       DEFAULT NOW()       NOT NULL,   -- 생성일시
 	"updater"           VARCHAR(30)                         NULL,       -- 수정자

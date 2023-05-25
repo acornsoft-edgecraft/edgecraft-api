@@ -217,6 +217,8 @@ const getBackupListSQL = `
 	 A.type,
 	 A.status,
 	 A.reason,
+	 A.backup_name,
+	 A.creator,
 	 A.created_at
  FROM 
 	 "edgecraft"."tbl_cluster_backres" A
@@ -224,7 +226,26 @@ const getBackupListSQL = `
 		A.cloud_uid = $1
  AND	A.type = 'B'
  ORDER BY A.created_at DESC
- `
+`
+
+const getBackupSQL = `
+ SELECT 
+	 A.cloud_uid,
+	 A.cluster_uid,
+	 A.backres_uid,
+	 A.name,
+	 A.type,
+	 A.status,
+	 A.reason,
+	 A.backup_name,
+	 A.creator,
+	 A.created_at
+ FROM 
+	 "edgecraft"."tbl_cluster_backres" A
+ WHERE
+		A.backres_uid = $1
+ AND	A.type = 'B'
+`
 
 const getRestoreListSQL = `
  SELECT 
@@ -235,6 +256,8 @@ const getRestoreListSQL = `
 	 A.type,
 	 A.status,
 	 A.reason,
+	 A.backup_name,
+	 A.creator,
 	 A.created_at
  FROM 
 	 "edgecraft"."tbl_cluster_backres" A
@@ -242,4 +265,27 @@ const getRestoreListSQL = `
 		A.cloud_uid = $1
  AND	A.type = 'R'
  ORDER BY A.created_at DESC
- `
+`
+
+const deleteBackResSQL = `
+DELETE
+FROM 
+	"edgecraft"."tbl_cluster_backres" A
+WHERE
+	A.cloud_uid = $1
+AND A.cluster_uid = $2
+AND A.backres_uid = $3
+`
+
+const updateBackRresStatusSQL = `
+UPDATE	"edgecraft"."tbl_cluster_backres"
+   SET	status = $4
+WHERE
+		cloud_uid = $1
+AND		cluster_uid = $2
+AND		backres_uid = $3
+`
+
+const getBackResDuplicate = `
+SELECT EXISTS(SELECT 1 FROM "edgecraft"."tbl_cluster_backres" WHERE name = $1)
+`

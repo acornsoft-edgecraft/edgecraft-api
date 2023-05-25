@@ -3,7 +3,9 @@ Copyright 2022 Acornsoft Authors. All right reserved.
 */
 package postgresdb
 
-import "github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+import (
+	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+)
 
 /***********************
  * Openstack Cluster
@@ -195,16 +197,18 @@ func (db *DB) GetBackupList(cloudId string) ([]model.BackResTable, error) {
 }
 
 // GetBackup - Query a backup
-func (db *DB) GetBackup(cloudId, clusterId, backresId string) (*model.BackResTable, error) {
-	obj, err := db.GetClient().Get(&model.BackResTable{}, cloudId, clusterId, backresId)
+func (db *DB) GetBackup(backresId string) (*model.BackResTable, error) {
+	var list []model.BackResTable
+	_, err := db.GetClient().Select(&list, getBackupSQL, backresId)
 	if err != nil {
 		return nil, err
 	}
-	if obj != nil {
-		res := obj.(*model.BackResTable)
-		return res, nil
+
+	if len(list) == 0 {
+		return nil, nil
 	}
-	return nil, nil
+
+	return &list[0], nil
 }
 
 // GetRestoreList - Query all restores belong to cloud
@@ -231,7 +235,36 @@ func (db *DB) GetRestore(cloudId, clusterId, backresId string) (*model.BackResTa
 	return nil, nil
 }
 
+// CheckBackResDuplicate - Check Backup / Restore duplicated
+func (db *DB) CheckBackResDuplicate(name string) (bool, error) {
+	var exists bool
+
+	err := db.GetClient().QueryRow(getBackResDuplicate, name).Scan(&exists)
+	if err != nil {
+		return false, err
+	}
+	return exists, nil
+}
+
 // InsertBackRes - Insert a new backup / restore data
 func (db *DB) InsertBackRes(backres *model.BackResTable) error {
 	return db.GetClient().Insert(backres)
+}
+
+// DeleteBackRes - Delete backup / restore data
+func (db *DB) DeleteBackRes(cloudId, clusterId, backresId string) (int64, error) {
+	result, err := db.GetClient().Exec(deleteBackResSQL, cloudId, clusterId, backresId)
+	if err != nil {
+		return -1, err
+	}
+	return result.RowsAffected()
+}
+
+// UpdateBackResStatus - Update status of backup / restore
+func (db *DB) UpdateBackResStatus(cloudId, clusterId, backresId, state string) (int64, error) {
+	result, err := db.GetClient().Exec(updateBackRresStatusSQL, cloudId, clusterId, backresId, state)
+	if err != nil {
+		return -1, err
+	}
+	return result.RowsAffected()
 }

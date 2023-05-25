@@ -51,7 +51,8 @@ func checkControlPlaneUpgraded(task string, taskData interface{}) {
 
 	// Upgrade worker version
 	if err == nil {
-		err = kubemethod.Apply(data.ClusterName, vals[1])
+		//err = kubemethod.Apply(data.ClusterName, vals[1])
+		err = kubemethod.Apply("", vals[1])
 		if err != nil {
 			logger.Errorf("Upgrading Control Plane Kubernetes version failed. (cause: %s)", err.Error())
 		} else {
@@ -63,7 +64,8 @@ func checkControlPlaneUpgraded(task string, taskData interface{}) {
 // InvokeK8sVersionUpgrade - 클러스터의 Kubernetes Version Upgrade 처리
 func InvokeK8sVersionUpgrade(worker *IWorker, db db.DB, clusterName, namespace, masterSetName, controlPlanesManifest, workersManifest string) error {
 	// 컨트롤 플레인 버전 업그레이드 적용 (Kubernetes로 전송)
-	err := kubemethod.Apply(clusterName, controlPlanesManifest)
+	//err := kubemethod.Apply(clusterName, controlPlanesManifest)
+	err := kubemethod.Apply("", controlPlanesManifest)
 	if err != nil {
 		logger.Errorf("Upgrading Control Plane Kubernetes version failed. (cause: %s)", err.Error())
 		return err

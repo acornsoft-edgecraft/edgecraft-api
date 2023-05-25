@@ -10,44 +10,10 @@ import (
 	"github.com/gofrs/uuid"
 )
 
-// type OpenstackBackResList struct {
-// 	CloudUid      *string    `json:"cloud_uid" db:"cloud_uid"`
-// 	ClusterUid    *string    `json:"cluster_uid" db:"cluster_uid"`
-// 	BenchmarksUid *string    `json:"benchmarks_uid" db:"benchmarks_uid"`
-// 	Totals        *string    `json:"totals" db:"totals"`
-// 	SuccessYn     *bool      `json:"success_yn" db:"success_yn"`
-// 	Reason        *string    `json:"reason" db:"reason"`
-// 	Created       *time.Time `json:"created" db:"created_at"`
-// }
-
-// type OpenstackBackResSet struct {
-// 	CloudUid        string    `json:"cloud_uid" db:"cloud_uid"`
-// 	ClusterUid      string    `json:"cluster_uid" db:"cluster_uid"`
-// 	BenchmarksUid   string    `json:"benchmarks_uid" db:"benchmarks_uid"`
-// 	CisVersion      string    `json:"cis_version" db:"cis_version"`
-// 	DetectedVersion string    `json:"detected_version" db:"detected_version"`
-// 	Results         string    `json:"results" db:"results"`
-// 	Totals          string    `json:"totals" db:"totals"`
-// 	SuccessYn       bool      `json:"success_yn" db:"success_yn"`
-// 	Reason          string    `json:"reason" db:"reason"`
-// 	Created         time.Time `json:"created" db:"created_at"`
-// }
-
-// func (ob *OpenstackBackResSet) NewKey() {
-// 	ob.BackResUidBenchmarksUid = uuid.Must(uuid.NewV4()).String()
-// }
-
-// func (ob *OpenstackBenchmarksSet) ToTable(cloudId *string, clusterId *string, user string, at time.Time) (benchmarksTable *OpenstackBenchmarksTable) {
-// 	benchmarksTable = &OpenstackBenchmarksTable{
-// 		CloudUid:      cloudId,
-// 		ClusterUid:    clusterId,
-// 		BenchmarksUid: utils.StringPtr(ob.BenchmarksUid),
-// 		SuccessYn:     utils.BoolPtr(false),
-// 		Creator:       utils.StringPtr(user),
-// 		Created:       utils.TimePtr(at),
-// 	}
-// 	return
-// }
+type BackResParam struct {
+	BackResId string `json:"backresId"`
+	Name      string `json:"name"`
+}
 
 type BackResInfo struct {
 	CloudUid   string    `json:"cloud_uid" db:"cloud_uid"`
@@ -57,6 +23,7 @@ type BackResInfo struct {
 	Type       string    `json:"type" db:"type"`
 	Status     string    `json:"status" db:"status"`
 	Reason     string    `json:"reasen" db:"reaseon"`
+	BackupName string    `json:"backup_name" db:"backup_name"` // Restore인 경우 사용할 Backup 명
 	Created    time.Time `json:"created_at" db:"created_at"`
 }
 
@@ -75,17 +42,22 @@ func (bri *BackResInfo) ToTable(user string, at time.Time) *BackResTable {
 		Type:       utils.StringPtr(bri.Type),
 		Status:     utils.StringPtr(bri.Status),
 		Reason:     utils.StringPtr(bri.Reason),
+		BackupName: utils.StringPtr(bri.BackupName),
 		Creator:    utils.StringPtr(user),
 		Created:    utils.TimePtr(at),
 	}
 }
 
 // NewBackResInfo - 지정된 클러스터 정보로 백업/복원 정보를 생성한다.
-func NewBackResInfo(cloudId string, clusterId string, name string, isBackup bool) *BackResInfo {
+func NewBackResInfo(cloudId, clusterId, name, backupName string, isBackup bool) *BackResInfo {
 	backresInfo := &BackResInfo{
 		CloudUid:   cloudId,
 		ClusterUid: clusterId,
 		Name:       name,
+	}
+
+	if backupName != "" {
+		backresInfo.BackupName = backupName
 	}
 
 	if isBackup {
@@ -95,6 +67,8 @@ func NewBackResInfo(cloudId string, clusterId string, name string, isBackup bool
 	}
 
 	backresInfo.NewKey()
+
+	backresInfo.Status = "R"
 
 	return backresInfo
 }

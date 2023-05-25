@@ -181,6 +181,12 @@ const (
 	BackResExecuing = 26502
 	// BackupNotAvailable
 	BackupNotAvailable = 26503
+	// BackupNotFound
+	BackupNotFound = 26504
+	// BackResJobFailed
+	BackResJobFailed = 26505
+	// BackResDuplicated
+	BackResDuplicated = 26506
 
 	//############################################################
 	// K8S 관련 메시지

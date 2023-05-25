@@ -25,7 +25,7 @@ func replace(input, from, to string) string {
 
 // getFunctionalTemplate - 템플릿에 사용할 함수가 설정된 템플릿 반환
 func getFunctionalTemplate(filePath string) *template.Template {
-	return template.Must(template.New(path.Base(filePath)).Funcs(template.FuncMap{"replace": replace}).ParseFiles(filePath))
+	return template.Must(template.New(path.Base(filePath)).Funcs(template.FuncMap{"replace": replace, "ToLower": strings.ToLower, "ToUpper": strings.ToUpper}).ParseFiles(filePath))
 }
 
 // getTemplatePath - Bootstrap Provider 정보에 따라 처리할 템플릿 파일을 결정한다.
@@ -89,7 +89,8 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 	logger.Infof("processed cluster templating yaml (%s)", buff.String())
 
 	// 처리된 템플릿을 Kubernetes로 전송
-	err = kubemethod.Apply(*cluster.Name, buff.String())
+	//err = kubemethod.Apply(*cluster.Name, buff.String())
+	err = kubemethod.Apply("", buff.String())
 	if err != nil {
 		logger.Errorf("Workload cluster creation failed. (cause: %s)", err.Error())
 		return err
@@ -155,7 +156,8 @@ func ProvisioningOpenstackNodeSet(worker *job.IWorker, db db.DB, cluster *model.
 	logger.Infof("processed nodeset templating yaml (%s)", buff.String())
 
 	// 처리된 템플릿을 Kubernetes로 전송
-	err = kubemethod.Apply(*cluster.Name, buff.String())
+	//err = kubemethod.Apply(*cluster.Name, buff.String())
+	err = kubemethod.Apply("", buff.String())
 	if err != nil {
 		logger.Errorf("NodeSet creation failed. (cause: %s)", err.Error())
 		return err
@@ -198,6 +200,35 @@ func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cl
 	err = job.InvokeK8sVersionUpgrade(worker, database, data.Cluster.Name, data.Cluster.Namespace, masterSetName, controlPlanesBuff.String(), workersBuff.String())
 	if err != nil {
 		logger.WithError(err).Infof("JOB::Upgrading kubernetest version on Openstack Cluster [%s] failed.", *cluster.Name)
+		return err
+	}
+
+	return nil
+}
+
+// ProvisionaingBackRes - 지정한 정보를 기준으로 백업/복원 Provisionting
+func ProvisioningBackRes(worker *job.IWorker, database db.DB, clusterName, namespace string, backresInfo *model.BackResInfo) error {
+	// Processing Template for backup / restore
+	path := "./conf/templates/capi/"
+	if backresInfo.Type == "B" {
+		path += "backup.yaml"
+	} else {
+		path += "restore.yaml"
+	}
+
+	temp := getFunctionalTemplate(path)
+	var backresBuff bytes.Buffer
+	err := temp.Execute(&backresBuff, backresInfo)
+	if err != nil {
+		logger.Errorf("Template execution failed [Backup/Restore]. cause(%s)", err.Error())
+		return err
+	}
+	logger.Infof("processed backup / restore templating yaml (%s)", backresBuff.String())
+
+	// Backup / Restore 실행 (Background)
+	err = job.InvokeBackRes(worker, database, clusterName, namespace, backresInfo, backresBuff.String())
+	if err != nil {
+		logger.WithError(err).Infof("JOB::Backup / Restore on Openstack Cluster [%s] failed.", clusterName)
 		return err
 	}
 
