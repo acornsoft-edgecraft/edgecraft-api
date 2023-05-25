@@ -165,7 +165,7 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.AddTableWithName(model.OpenstackClusterTable{}, "tbl_cluster").SetKeys(false, "cloud_uid", "cluster_uid")
 	dbmap.AddTableWithName(model.NodeSetTable{}, "tbl_nodeset").SetKeys(false, "cluster_uid", "nodeset_uid")
 	dbmap.AddTableWithName(model.OpenstackBenchmarksTable{}, "tbl_cluster_benchmarks").SetKeys(false, "cloud_uid", "cluster_uid", "benchmarks_uid")
-	dbmap.AddTableWithName(model.BackResTable{}, "tbl_cluster_backres").SetKeys(false, "cloud_uid", "cluster_uid", "backres_uid")
+	dbmap.AddTableWithName(model.BackResTable{}, "tbl_cluster_backres").SetKeys(false, "cluster_uid", "backres_uid")
 
 	// // SetKeys(isAutoIncr bool, fieldNames ...string)
 	// // SetKeys(true) means we have a auto increment primary key, which
