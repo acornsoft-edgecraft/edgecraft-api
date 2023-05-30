@@ -38,17 +38,18 @@ func checkBackResProcessed(task string, taskData interface{}) {
 
 		if phase != "" {
 			logger.WithField("task", task).Infof("Close checking Backup/Restore for (%s) checked. (%s) state", backresInfo.Name, phase)
+			if phase == "C" || phase == "F" || phase == "P" {
+				// update database. backup/restore
+				affected, err := data.Database.UpdateBackResStatus(backresInfo.CloudUid, backresInfo.ClusterUid, backresInfo.BackResUid, phase)
+				if err != nil {
+					logger.WithField("task", task).WithError(err).Infof("Update backup/restore state (%s) for (%s) failed.", phase, backresInfo.Name)
+				} else if affected != 1 {
+					logger.WithField("task", task).WithError(err).Infof("Close checking for backup/restore state (%s) for (%s) failed. (data not found, check cloud/cluster/backres ids)", phase, backresInfo.Name)
+				}
 
-			// update database. backup/restore
-			affected, err := data.Database.UpdateBackResStatus(backresInfo.CloudUid, backresInfo.ClusterUid, backresInfo.BackResUid, phase)
-			if err != nil {
-				logger.WithField("task", task).WithError(err).Infof("Update backup/restore state (%s) for (%s) failed.", phase, backresInfo.Name)
-			} else if affected != 1 {
-				logger.WithField("task", task).WithError(err).Infof("Close checking for backup/restore state (%s) for (%s) failed. (data not found, check cloud/cluster/backres ids)", phase, backresInfo.Name)
+				retryTicker.Stop()
+				return
 			}
-
-			retryTicker.Stop()
-			return
 		} else {
 			logger.WithField("task", task).Infof("Backup/Restore checking for (%s) processing... wait", backresInfo.Name)
 		}

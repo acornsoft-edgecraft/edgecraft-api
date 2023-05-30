@@ -94,6 +94,7 @@
 "26504": "지정한 Backup 정보를 찾을 수 없습니다." #BackupNotFound
 "26505": "Backup/Restore Provision 작업을 진행할 수 없습니다." #BackResJobFailed
 "26506": "Backup/Restore 이름이 이미 존재합니다. (다른 이름을 지정하세요.)" #BackResDuplicated
+"26507": "지정한 백업을 삭제할 수 없습니다." #DeleteBackupFailed
 
 ##############################################################
 # k8s api 메시지

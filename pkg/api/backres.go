@@ -145,14 +145,37 @@ func (a *API) DeleteBackupHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, backresId, common.CodeInvalidParm, nil)
 	}
 
-	// 백업 CR 삭제
-	// err = kubemethod.ApplyBackup(backresInfo)
-	// if err != nil {
-	// 	return response.ErrorfReqRes(c, clusterTable, common.BackResFailed, err)
-	// }
+	// 클러스터 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.ClusterNotFound, nil)
+	}
+
+	// 클러스터 상태 조회
+	if *clusterTable.Status != common.StatusProvisioned {
+		return response.ErrorfReqRes(c, nil, common.BackResOnlyProvisioned, err)
+	}
+
+	// 백업 정보 검증
+	backupTable, err := a.Db.GetBackup(backresId)
+	if err != nil {
+		return response.ErrorfReqRes(c, backresId, common.BackupNotAvailable, err)
+	}
+	if backupTable == nil {
+		return response.ErrorfReqRes(c, backresId, common.BackupNotFound, nil)
+	}
+
+	// 백업 삭제
+	err = DeleteBackup(a.Worker, a.Db, *clusterTable.Name, "velero", *backupTable.Name)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.DeleteBackupFailed, err)
+	}
 
 	// 데이터베이스 삭제
-	err := a.Db.TransactionScope(func(txDB db.DB) error {
+	err = a.Db.TransactionScope(func(txDB db.DB) error {
 		cnt, err := txDB.DeleteBackRes(cloudId, clusterId, backresId)
 		if err != nil {
 			return err

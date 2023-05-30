@@ -234,3 +234,25 @@ func ProvisioningBackRes(worker *job.IWorker, database db.DB, clusterName, names
 
 	return nil
 }
+
+// DeleteBackup - 지정한 정보를 기준으로 백업 삭제
+func DeleteBackup(worker *job.IWorker, database db.DB, clusterName, namespace, backupName string) error {
+	// Processing Template for delete backup
+	temp := getFunctionalTemplate("./conf/templates/capi/delete_backup.yaml")
+	var deleteBuff bytes.Buffer
+	err := temp.Execute(&deleteBuff, backupName)
+	if err != nil {
+		logger.Errorf("Template execution failed [Delete Backup]. cause(%s)", err.Error())
+		return err
+	}
+	logger.Infof("processed delete backup templating yaml (%s)", deleteBuff.String())
+
+	// Delete backup
+	err = kubemethod.Apply(clusterName, deleteBuff.String())
+	if err != nil {
+		logger.Errorf("delete backup failed. (cause: %s)", err.Error())
+		return err
+	}
+
+	return nil
+}

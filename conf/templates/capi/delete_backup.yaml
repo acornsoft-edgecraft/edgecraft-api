@@ -1,0 +1,7 @@
+apiVersion: velero.io/v1
+kind: DeleteBackupRequest
+metadata:
+  name: {{. | ToLower }}
+  namespace: velero
+spec:
+  backupName: {{. | ToLower }}

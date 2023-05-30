@@ -40,14 +40,13 @@ func GetBackResStatusPhase(clusterName, namespace, backresName string, isBackup 
 	if err != nil {
 		return "", err
 	} else if data != nil {
-		items, found, err := unstructured.NestedSlice(data.Object, "status", "phase")
+		phase, found, err := unstructured.NestedString(data.Object, "status", "phase")
 		if err != nil {
 			return "", err
 		} else if !found {
 			return "", errors.New("Not found [status/phase] fields in CR [" + data.GetName() + "] Object")
 		}
 
-		phase := items[0].(string)
 		return string(phase[0]), nil
 	}
 	return "", errors.New("Unknown [status/phase] fields in CR [" + data.GetName() + "] Object")

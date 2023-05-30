@@ -187,6 +187,8 @@ const (
 	BackResJobFailed = 26505
 	// BackResDuplicated
 	BackResDuplicated = 26506
+	// DeleteBackupFailed
+	DeleteBackupFailed = 26507
 
 	//############################################################
 	// K8S 관련 메시지
