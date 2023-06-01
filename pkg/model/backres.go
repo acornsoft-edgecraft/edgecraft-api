@@ -63,7 +63,7 @@ func NewBackResInfo(cloudId, clusterId, name, backupName string, isBackup bool) 
 	if isBackup {
 		backresInfo.Type = "B"
 	} else {
-		backresInfo.Type = "C"
+		backresInfo.Type = "R"
 	}
 
 	backresInfo.NewKey()
