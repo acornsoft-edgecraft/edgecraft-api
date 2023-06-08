@@ -1,5 +1,9 @@
 {
-  "workbench.colorCustomizations": {},
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#022A67",
+    "titleBar.activeBackground": "#033B90",
+    "titleBar.activeForeground": "#FBFCFF"
+  },
   "prettier.bracketSpacing": false
 }
 // // "workbench.colorCustomizations": {
