@@ -442,3 +442,12 @@ GRANT ALL ON FUNCTION edgecraft.uuid_ns_x500() TO postgres;
 -- Permissions
 
 GRANT ALL ON SCHEMA edgecraft TO edgecraft;
+
+
+-- Add UUID extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- Set timezone
+-- For more information, please visit:
+-- https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+SET TIMEZONE="Asia/Seoul";

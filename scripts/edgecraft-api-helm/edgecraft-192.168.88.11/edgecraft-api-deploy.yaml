@@ -1,0 +1,47 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: edgecraft-api
+  namespace: edgecraft
+  labels:
+    app: edgecraft-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: edgecraft-api
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: edgecraft-api
+    spec:
+      serviceAccountName: edgecraft
+      containers:
+      - name: edgecraft-api
+        image: ghcr.io/acornsoft-edgecraft/edgecraft-api:latest
+        imagePullPolicy: Always
+        ports:
+          - containerPort: 8100
+        resources:
+        volumeMounts:
+        - name: edgecraft-api-conf
+          mountPath: /conf/config.yml
+          subPath: config.yml
+        securityContext:
+          privileged: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: false
+          allowPrivilegeEscalation: false
+      volumes:
+      - name: edgecraft-api-conf
+        configMap:
+          name: edgecraft-conf
+          items:
+          - key: config.yml
+            path: config.yml

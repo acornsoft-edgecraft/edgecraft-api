@@ -1,0 +1,52 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: edgecraft-conf
+  namespace: edgecraft
+data:
+  config.yml: |-
+    # Server for front-end
+    api:
+      type: 'echo'
+      port: 8100
+      host: '0.0.0.0'
+      homePageUrl: 'https://edgecraft.k3.acornsoft.io' # URL 셋팅 필요
+      pathPrefix: '/api/v1'
+      secret: 'test_secret'
+      langs:
+        - 'ko'
+        - 'en'
+      langPath: './conf'
+      mode: 'local' #local:개발자pc dev:kdtidc  prod:
+      benchmarks:
+        image: 'vlatte/edge-benchmarks'
+        version: '0.2.2'
+        sonobuoy_image: 'vlatte/sonobuoy'
+        sonobuoy_version: 'v0.56.15'
+        debug: 'false'
+
+    auth:
+      RESET_PASSWORD: 'edgecraft@@'
+
+    # Database
+    database:
+      type: 'postgres'
+      host: '192.168.88.201'
+      port: '31000'
+      database_name: 'edgecraft'
+      schema_name: 'edgecraft'
+      username: 'edgecraft'
+      password: 'trDksniESt'
+      max_idle_conns: 5
+      max_open_conns: 40
+    # Local Database
+    # database:
+    #   type: "postgres"
+    #   host: "localhost"
+    #   port: "5432"
+    #   database_name: "edgecraft"
+    #   schema_name: "edgecraft"
+    #   password: "edgecraft"
+    #   username: "edgecraft"
+    #   max_idle_conns: 5
+    #   max_open_conns: 40
