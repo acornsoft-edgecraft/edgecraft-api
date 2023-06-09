@@ -541,7 +541,7 @@ func setPluginsCM(clientset *kubernetes.Clientset, bootstrapProvider common.Boot
 }
 
 func setJob(clientSet *kubernetes.Clientset, benchmarksId string) error {
-	t := time.Now()
+	t := time.Now().UTC()
 	name := fmt.Sprintf("%s-%s", NS, t.Format("20060102150405"))
 	job := newJob(benchmarksId, name)
 

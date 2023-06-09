@@ -103,7 +103,7 @@ func (a *API) SetCloudHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, cloudSet, common.CodeInvalidData, err)
 	}
 
-	cloudTable, clusterTable, nodeTables := cloudSet.ToTable(false, "system", time.Now())
+	cloudTable, clusterTable, nodeTables := cloudSet.ToTable(false, "system", time.Now().UTC())
 
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()
@@ -169,7 +169,7 @@ func (a *API) UpdateCloudHandler(c echo.Context) error {
 	}
 
 	var cloudSet model.CloudSet
-	var at time.Time = time.Now()
+	var at time.Time = time.Now().UTC()
 
 	err := getRequestData(c.Request(), &cloudSet)
 	if err != nil {
@@ -509,7 +509,7 @@ func (a *API) SetCloudNodeHandler(c echo.Context) error {
 
 	// Node 정보 설정
 	var nodeTable *model.NodeTable = &model.NodeTable{}
-	node.ToTable(nodeTable, false, "system", time.Now())
+	node.ToTable(nodeTable, false, "system", time.Now().UTC())
 	nodeTable.CloudUid = &cloudId
 	nodeTable.ClusterUid = clusters[0].ClusterUid
 	nodeTable.Status = utils.IntPrt(1)
@@ -590,7 +590,7 @@ func (a *API) UpdateCloudNodeHandler(c echo.Context) error {
 	}
 
 	// Node 정보 설정
-	node.ToTable(nodeTable, true, "system", time.Now())
+	node.ToTable(nodeTable, true, "system", time.Now().UTC())
 
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()

@@ -15,6 +15,11 @@ type BackResParam struct {
 	Name      string `json:"name"`
 }
 
+type BackResResult struct {
+	ClusterInfo OsClusterInfo `json:"cluster"`
+	List        []BackResInfo `json:"list"`
+}
+
 type BackResInfo struct {
 	CloudUid   string    `json:"cloud_uid" db:"cloud_uid"`
 	ClusterUid string    `json:"cluster_uid" db:"cluster_uid"`
@@ -24,7 +29,7 @@ type BackResInfo struct {
 	Status     string    `json:"status" db:"status"`
 	Reason     string    `json:"reasen" db:"reaseon"`
 	BackupName string    `json:"backup_name" db:"backup_name"` // Restore인 경우 사용할 Backup 명
-	Created    time.Time `json:"created_at" db:"created_at"`
+	Created    time.Time `json:"created" db:"created_at"`
 }
 
 // NewKey - Backup/Restore Unique Key 생성
@@ -46,6 +51,19 @@ func (bri *BackResInfo) ToTable(user string, at time.Time) *BackResTable {
 		Creator:    utils.StringPtr(user),
 		Created:    utils.TimePtr(at),
 	}
+}
+
+// FromTable - Table정보를 Backup/Restore Info로 전환
+func (bri *BackResInfo) FromTable(tbl BackResTable) {
+	bri.CloudUid = *tbl.CloudUid
+	bri.ClusterUid = *tbl.ClusterUid
+	bri.BackResUid = *tbl.BackResUid
+	bri.Name = *tbl.Name
+	bri.Type = *tbl.Type
+	bri.Status = *tbl.Status
+	bri.Reason = *tbl.Reason
+	bri.BackupName = *tbl.BackupName
+	bri.Created = *tbl.Created
 }
 
 // NewBackResInfo - 지정된 클러스터 정보로 백업/복원 정보를 생성한다.

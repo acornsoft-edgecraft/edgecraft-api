@@ -61,7 +61,7 @@ func (a *API) SetBenchmarksHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterTable, common.BenchmarksSetFailed, err)
 	}
 
-	benchmarksTable := benchmarksSet.ToTable(clusterTable.ClusterUid, "system", time.Now())
+	benchmarksTable := benchmarksSet.ToTable(clusterTable.ClusterUid, "system", time.Now().UTC())
 
 	// 트랜잭션 구간 처리
 	err = a.Db.TransactionScope(func(txDB db.DB) error {

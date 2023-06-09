@@ -540,26 +540,6 @@ paths:
       summary: UpdateCloud
       tags:
       - Cloud
-  /clouds/{cloudId}/backup:
-    get:
-      description: 클러스터의 백업 리스트
-      operationId: GetBackupList
-      parameters:
-      - description: Cloud ID
-        in: path
-        name: cloudId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.ReturnData'
-      summary: GetBackupList
-      tags:
-      - Openstack-Cluster-Backup
   /clouds/{cloudId}/clusters:
     get:
       description: 전체 클러스터 리스트 (Openstack)
@@ -709,6 +689,30 @@ paths:
       tags:
       - Openstack-Cluster
   /clouds/{cloudId}/clusters/{clusterId}/backup:
+    get:
+      description: 클러스터의 백업 리스트
+      operationId: GetBackupList
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetBackupList
+      tags:
+      - Openstack-Cluster-Backup
     post:
       description: 클러스터의 백업 실행 (Velero)
       operationId: SetBackup
@@ -998,6 +1002,30 @@ paths:
       tags:
       - Openstack-Cluster-NodeSet
   /clouds/{cloudId}/clusters/{clusterId}/restore:
+    get:
+      description: 클러스터의 복원 리스트
+      operationId: GetRestoreList
+      parameters:
+      - description: Cloud ID
+        in: path
+        name: cloudId
+        required: true
+        type: string
+      - description: Cluster ID
+        in: path
+        name: clusterId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetRestoreList
+      tags:
+      - Openstack-Cluster-Restore
     post:
       description: 클러스터의 복원 실행 (Velero)
       operationId: SetRestore
@@ -1213,26 +1241,6 @@ paths:
       summary: UpdateCloudNode
       tags:
       - CloudNode
-  /clouds/{cloudId}/restore:
-    get:
-      description: 클러스터의 복원 리스트
-      operationId: GetRestoreList
-      parameters:
-      - description: Cloud ID
-        in: path
-        name: cloudId
-        required: true
-        type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/response.ReturnData'
-      summary: GetRestoreList
-      tags:
-      - Openstack-Cluster-Restore
   /codes:
     get:
       description: Get all code list

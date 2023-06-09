@@ -117,12 +117,12 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 
 	// Cloud/Cluster - Backup
 	v1.POST("/clouds/:cloudId/clusters/:clusterId/backup", api.SetBackupHandler)                 // 클러스터 백업
-	v1.GET("/clouds/:cloudId/backup", api.GetBackupListHandler)                                  // 클러스터 백업 목록 조회
+	v1.GET("/clouds/:cloudId/clusters/:clusterId/backup", api.GetBackupListHandler)              // 클러스터 백업 목록 조회
 	v1.DELETE("/clouds/:cloudId/clusters/:clusterId/backup/:backresId", api.DeleteBackupHandler) // 클러스터 백업 삭제
 
 	// Cloud/Cluster - Restore
 	v1.POST("/clouds/:cloudId/clusters/:clusterId/restore", api.SetRestoreHandler)                 // 클러스터 복원
-	v1.GET("/clouds/:cloudId/restore", api.GetRestoreListHandler)                                  // 클러스터 복원 목록 조회
+	v1.GET("/clouds/:cloudId/clusters/:clusterId/restore", api.GetRestoreListHandler)              // 클러스터 복원 목록 조회
 	v1.DELETE("/clouds/:cloudId/clusters/:clusterId/restore/:backresId", api.DeleteRestoreHandler) // 클러스터 복원 삭제
 
 	// Cloud/Cluster - Security Verification

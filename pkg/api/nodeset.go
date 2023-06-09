@@ -189,7 +189,7 @@ func (a *API) SetNodeSetHandler(c echo.Context) error {
 
 	// NodeSet 정보 구성
 	nodeSetTable := &model.NodeSetTable{}
-	nodeSet.ToTable(nodeSetTable, false, "system", time.Now())
+	nodeSet.ToTable(nodeSetTable, false, "system", time.Now().UTC())
 	nodeSetTable.ClusterUid = clusterTable.ClusterUid
 	nodeSetTable.Type = utils.IntPrt(common.NodeTypeWorker)
 

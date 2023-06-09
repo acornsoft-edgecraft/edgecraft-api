@@ -95,7 +95,7 @@ func (a *API) SetCodeGroupHandler(c echo.Context) error {
 	}
 
 	var codeGroupTable *model.CodeGroupTable = &model.CodeGroupTable{}
-	codeGroup.ToTable(codeGroupTable, false, "system", time.Now())
+	codeGroup.ToTable(codeGroupTable, false, "system", time.Now().UTC())
 
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()
@@ -147,7 +147,7 @@ func (a *API) UpdateCodeGroupHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, codeGroup, common.DatabaseCodeFalseData, err)
 	}
 
-	codeGroup.ToTable(codeGroupTable, true, "system", time.Now())
+	codeGroup.ToTable(codeGroupTable, true, "system", time.Now().UTC())
 
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()
@@ -355,7 +355,7 @@ func (a *API) SetCodeHandler(c echo.Context) error {
 	}
 
 	codeTable = &model.CodeTable{}
-	code.ToTable(codeTable, false, "system", time.Now())
+	code.ToTable(codeTable, false, "system", time.Now().UTC())
 
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()
@@ -408,7 +408,7 @@ func (a *API) UpdateCodeHandler(c echo.Context) error {
 	}
 
 	// 변경정보 갱신
-	code.ToTable(codeTable, true, "system", time.Now())
+	code.ToTable(codeTable, true, "system", time.Now().UTC())
 
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()

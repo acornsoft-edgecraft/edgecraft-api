@@ -63,12 +63,12 @@ func CustomLogger() echo.MiddlewareFunc {
 			req := c.Request()
 			res := c.Response()
 
-			start := time.Now()
+			start := time.Now().UTC()
 			// process next func
 			if err = next(c); err != nil {
 				c.Error(err)
 			}
-			stop := time.Now()
+			stop := time.Now().UTC()
 			latencyHuman := stop.Sub(start).String()
 
 			errMsg := ""

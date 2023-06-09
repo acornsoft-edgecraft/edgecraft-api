@@ -125,7 +125,7 @@ func (a *API) SetClusterHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, clusterSet, common.CodeInvalidData, err)
 	}
 
-	clusterTable, nodeSetTables := clusterSet.ToTable(cloudId, false, "system", time.Now())
+	clusterTable, nodeSetTables := clusterSet.ToTable(cloudId, false, "system", time.Now().UTC())
 
 	// Start. Transaction 얻어옴
 	txdb, err := a.Db.BeginTransaction()
@@ -218,7 +218,7 @@ func (a *API) UpdateClusterHandler(c echo.Context) error {
 	}
 
 	// 수신된 변경 정보 구성
-	clusterTable, nodeSetTables := clusterSet.ToTable(cloudId, false, "system", time.Now())
+	clusterTable, nodeSetTables := clusterSet.ToTable(cloudId, false, "system", time.Now().UTC())
 
 	// 트랜잭션 구간 처리
 	err = a.Db.TransactionScope(func(txDB db.DB) error {

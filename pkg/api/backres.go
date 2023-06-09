@@ -78,7 +78,7 @@ func (a *API) SetBackupHandler(c echo.Context) error {
 	}
 
 	// 데이터베이스 저장
-	backresTable := backresInfo.ToTable("system", time.Now())
+	backresTable := backresInfo.ToTable("system", time.Now().UTC())
 	err = a.Db.TransactionScope(func(txDB db.DB) error {
 		err = txDB.InsertBackRes(backresTable)
 		if err != nil {
@@ -102,21 +102,67 @@ func (a *API) SetBackupHandler(c echo.Context) error {
 // @ID          GetBackupList
 // @Produce     json
 // @Param       cloudId 	path     string true "Cloud ID"
+// @Param       clusterId 	path     string true "Cluster ID"
 // @Success     200     {object} response.ReturnData
-// @Router      /clouds/{cloudId}/backup [get]
+// @Router      /clouds/{cloudId}/clusters/{clusterId}/backup [get]
 func (a *API) GetBackupListHandler(c echo.Context) error {
 	// 파라미터 검사
 	cloudId := c.Param("cloudId")
 	if cloudId == "" {
 		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
 	}
+	clusterId := c.Param("clusterId")
+	if clusterId == "" {
+		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
+	}
 
+	// 클러스터 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.ClusterNotFound, nil)
+	}
+
+	// 반환 정보에 클러스터 정보 설정
+	backresResult := &model.BackResResult{}
+	backresResult.ClusterInfo.Name = clusterTable.Name
+	backresResult.ClusterInfo.Namespace = clusterTable.Namespace
+	backresResult.ClusterInfo.Status = clusterTable.Status
+	backresResult.ClusterInfo.BootstrapProvider = clusterTable.BootstrapProvider
+	backresResult.ClusterInfo.Version = clusterTable.Version
+
+	// 백업 정보 조회
 	result, err := a.Db.GetBackupList(cloudId)
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
 
-	return response.Write(c, nil, result)
+	// 반환 정보에 백업 정보 설정
+	var items []model.BackResInfo
+	for _, item := range result {
+		brInfo := model.BackResInfo{}
+		brInfo.FromTable(item)
+		items = append(items, brInfo)
+	}
+
+	// 복원 정보 조회
+	result, err = a.Db.GetRestoreList(cloudId)
+	if err != nil {
+		return response.Errorf(c, common.CodeFailedDatabase, err)
+	}
+
+	// 반환 정보에 복원 정보 설정
+	for _, item := range result {
+		brInfo := model.BackResInfo{}
+		brInfo.FromTable(item)
+		items = append(items, brInfo)
+	}
+
+	backresResult.List = items
+
+	return response.Write(c, nil, backresResult)
 }
 
 // DeleteBackupHandler - 클러스터의 백업 삭제
@@ -258,7 +304,7 @@ func (a *API) SetRestoreHandler(c echo.Context) error {
 	}
 
 	// 데이터베이스 저장
-	backresTable := backresInfo.ToTable("system", time.Now())
+	backresTable := backresInfo.ToTable("system", time.Now().UTC())
 	err = a.Db.TransactionScope(func(txDB db.DB) error {
 		err = txDB.InsertBackRes(backresTable)
 		if err != nil {
@@ -282,21 +328,53 @@ func (a *API) SetRestoreHandler(c echo.Context) error {
 // @ID          GetRestoreList
 // @Produce     json
 // @Param       cloudId 	path     string true "Cloud ID"
+// @Param       clusterId 	path     string true "Cluster ID"
 // @Success     200     {object} response.ReturnData
-// @Router      /clouds/{cloudId}/restore [get]
+// @Router      /clouds/{cloudId}/clusters/{clusterId}/restore [get]
 func (a *API) GetRestoreListHandler(c echo.Context) error {
 	// 파라미터 검사
 	cloudId := c.Param("cloudId")
 	if cloudId == "" {
 		return response.ErrorfReqRes(c, cloudId, common.CodeInvalidParm, nil)
 	}
+	clusterId := c.Param("clusterId")
+	if clusterId == "" {
+		return response.ErrorfReqRes(c, clusterId, common.CodeInvalidParm, nil)
+	}
 
+	// 클러스터 정보 조회
+	clusterTable, err := a.Db.GetOpenstackCluster(cloudId, clusterId)
+	if err != nil {
+		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
+	}
+	if clusterTable == nil {
+		return response.ErrorfReqRes(c, clusterTable, common.ClusterNotFound, nil)
+	}
+
+	// 반환 정보에 클러스터 정보 설정
+	backresResult := &model.BackResResult{}
+	backresResult.ClusterInfo.Name = clusterTable.Name
+	backresResult.ClusterInfo.Namespace = clusterTable.Namespace
+	backresResult.ClusterInfo.Status = clusterTable.Status
+	backresResult.ClusterInfo.BootstrapProvider = clusterTable.BootstrapProvider
+	backresResult.ClusterInfo.Version = clusterTable.Version
+
+	// 복원 정보 조회
 	result, err := a.Db.GetRestoreList(cloudId)
 	if err != nil {
 		return response.Errorf(c, common.CodeFailedDatabase, err)
 	}
 
-	return response.Write(c, nil, result)
+	// 반환 정보에 복원 정보 설정
+	var items []model.BackResInfo
+	for _, item := range result {
+		brInfo := model.BackResInfo{}
+		brInfo.FromTable(item)
+		items = append(items, brInfo)
+	}
+	backresResult.List = items
+
+	return response.Write(c, nil, backresResult)
 }
 
 // DeleteRestoreHandler - 클러스터의 복원 삭제

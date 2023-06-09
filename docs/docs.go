@@ -194,36 +194,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/clouds/{cloudId}/backup": {
-            "get": {
-                "description": "클러스터의 백업 리스트",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Openstack-Cluster-Backup"
-                ],
-                "summary": "GetBackupList",
-                "operationId": "GetBackupList",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Cloud ID",
-                        "name": "cloudId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.ReturnData"
-                        }
-                    }
-                }
-            }
-        },
         "/clouds/{cloudId}/clusters": {
             "get": {
                 "description": "전체 클러스터 리스트 (Openstack)",
@@ -443,6 +413,41 @@ const docTemplate = `{
             }
         },
         "/clouds/{cloudId}/clusters/{clusterId}/backup": {
+            "get": {
+                "description": "클러스터의 백업 리스트",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster-Backup"
+                ],
+                "summary": "GetBackupList",
+                "operationId": "GetBackupList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "클러스터의 백업 실행 (Velero)",
                 "produces": [
@@ -867,6 +872,41 @@ const docTemplate = `{
             }
         },
         "/clouds/{cloudId}/clusters/{clusterId}/restore": {
+            "get": {
+                "description": "클러스터의 복원 리스트",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Openstack-Cluster-Restore"
+                ],
+                "summary": "GetRestoreList",
+                "operationId": "GetRestoreList",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Cloud ID",
+                        "name": "cloudId",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Cluster ID",
+                        "name": "clusterId",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/response.ReturnData"
+                        }
+                    }
+                }
+            },
             "post": {
                 "description": "클러스터의 복원 실행 (Velero)",
                 "produces": [
@@ -1171,36 +1211,6 @@ const docTemplate = `{
                         "type": "string",
                         "description": "Node ID",
                         "name": "nodeId",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/response.ReturnData"
-                        }
-                    }
-                }
-            }
-        },
-        "/clouds/{cloudId}/restore": {
-            "get": {
-                "description": "클러스터의 복원 리스트",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Openstack-Cluster-Restore"
-                ],
-                "summary": "GetRestoreList",
-                "operationId": "GetRestoreList",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Cloud ID",
-                        "name": "cloudId",
                         "in": "path",
                         "required": true
                     }
