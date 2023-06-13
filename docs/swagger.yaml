@@ -2,7 +2,7 @@ basePath: /api/v1
 definitions:
   model.BackResParam:
     properties:
-      backresId:
+      backres_uid:
         type: string
       name:
         type: string

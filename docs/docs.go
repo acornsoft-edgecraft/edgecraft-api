@@ -1573,7 +1573,7 @@ const docTemplate = `{
         "model.BackResParam": {
             "type": "object",
             "properties": {
-                "backresId": {
+                "backres_uid": {
                     "type": "string"
                 },
                 "name": {

@@ -11,7 +11,7 @@ import (
 )
 
 type BackResParam struct {
-	BackResId string `json:"backresId"`
+	BackResId string `json:"backres_uid"`
 	Name      string `json:"name"`
 }
 
