@@ -299,18 +299,6 @@ func newJob(benchmarksId, name string) *batchV1.Job {
 						}, {
 							Name:      "output-volume",
 							MountPath: "/tmp/sonobuoy",
-						}, {
-							Name:      "etc-passwd",
-							MountPath: "/etc/passwd",
-						}, {
-							Name:      "etc-group",
-							MountPath: "/etc/group",
-						}, {
-							Name:      "var-log",
-							MountPath: "/var/log/",
-						}, {
-							Name:      "run-log",
-							MountPath: "/run/log/",
 						}},
 					}},
 					ServiceAccountName: serviceAccountName,
@@ -339,34 +327,6 @@ func newJob(benchmarksId, name string) *batchV1.Job {
 						Name: "output-volume",
 						VolumeSource: coreV1.VolumeSource{
 							EmptyDir: &coreV1.EmptyDirVolumeSource{},
-						},
-					}, {
-						Name: "etc-passwd",
-						VolumeSource: coreV1.VolumeSource{
-							HostPath: &coreV1.HostPathVolumeSource{
-								Path: "/etc/passwd",
-							},
-						},
-					}, {
-						Name: "etc-group",
-						VolumeSource: coreV1.VolumeSource{
-							HostPath: &coreV1.HostPathVolumeSource{
-								Path: "/etc/group",
-							},
-						},
-					}, {
-						Name: "var-log",
-						VolumeSource: coreV1.VolumeSource{
-							HostPath: &coreV1.HostPathVolumeSource{
-								Path: "/var/log",
-							},
-						},
-					}, {
-						Name: "run-log",
-						VolumeSource: coreV1.VolumeSource{
-							HostPath: &coreV1.HostPathVolumeSource{
-								Path: "/run/log",
-							},
 						},
 					}},
 				},
@@ -580,7 +540,7 @@ func getConfigPluginsData(role string, bootstrapProvider common.BootstrapProvide
 		cmd["matchCpOperator"] = "DoesNotExist"
 	}
 	if bootstrapProvider == common.K3s {
-		cmd["benchmarkVersion"] = "cis-1.6-k3s"
+		cmd["benchmarkVersion"] = "k3s-1.23"
 	} else if bootstrapProvider == common.MicroK8s {
 		cmd["matchCpKey"] = "node.kubernetes.io/microk8s-controlplane"
 	}

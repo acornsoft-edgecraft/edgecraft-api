@@ -12,8 +12,8 @@ api:
   langPath: './conf'
   mode: 'local' #local:개발자pc dev:kdtidc  prod:
   benchmarks:
-    image: 'vlatte/edge-benchmarks'
-    version: '0.2.2'
+    image: 'ghcr.io/acornsoft-edgecraft/edge-benchmarks'
+    version: 'latest'
     sonobuoy_image: 'vlatte/sonobuoy'
     sonobuoy_version: 'v0.56.15'
     debug: 'false'
