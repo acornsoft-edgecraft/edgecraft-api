@@ -14,25 +14,55 @@ podSpec:
   serviceAccountName: {{.serviceAccountName}}
   tolerations:
   - operator: Exists
-  volumes:
-  - hostPath:
-      path: /var/lib/etcd
-    name: var-lib-etcd
-  - hostPath:
-      path: /var/lib/kubelet
-    name: var-lib-kubelet
-  - hostPath:
-      path: /lib/systemd
-    name: lib-systemd
-  - hostPath:
+  volumes: 
+  - name: etc-passwd
+    hostPath:
+      path: /etc/passwd
+  - name: etc-group
+    hostPath:
+      path: /etc/group
+  - name: etc-cni-netd
+    hostPath:
+      path: /etc/cni/net.d
+  - name: var-log
+    hostPath:
+      path: /var/log
+  - name: run-log 
+    hostPath:
+      path: /run/log
+  - name: etc-systemd
+    hostPath:
       path: /etc/systemd
-    name: etc-systemd
-  - hostPath:
+  - name: lib-systemd
+    hostPath:
+      path: /lib/systemd
+  - name: srv-kubernetes
+    hostPath:
+      path: /srv/kubernetes
+  - name: etc-kubernetes
+    hostPath:
       path: /etc/kubernetes
-    name: etc-kubernetes
-  - hostPath:
-      path: /usr/bin
-    name: usr-bin
+  - name: var-lib-etcd
+    hostPath:
+      path: /var/lib/etcd
+  - name: var-lib-kubelet
+    hostPath:
+      path: /var/lib/kubelet
+  - name: var-lib-kube-scheduler
+    hostPath:
+      path: /var/lib/kube-scheduler
+  - name: var-lib-kube-controller-manager
+    hostPath:
+      path: /var/lib/kube-controller-manager
+  - name: rke-root
+    hostPath:
+      path: /var/lib/rancher
+  - name: rke-root-config
+    hostPath:
+      path: /etc/rancher
+  - name: snap-mk8s
+    hostPath: 
+      path: /var/snap/microk8s
 sonobuoy-config:
   driver: DaemonSet
   plugin-name: {{.pluginName}}
@@ -49,23 +79,37 @@ spec:
   image: {{.benchmarksImage}}
   name: {{.pluginName}}
   volumeMounts:
-  - mountPath: /tmp/results
-    name: results
-  - mountPath: /var/lib/etcd
-    name: var-lib-etcd
-    readOnly: true
-  - mountPath: /var/lib/kubelet
-    name: var-lib-kubelet
-    readOnly: true
-  - mountPath: /etc/systemd
-    name: etc-systemd
-    readOnly: true
-  - mountPath: /lib/systemd
-    name: lib-systemd
-    readOnly: true
-  - mountPath: /etc/kubernetes
-    name: etc-kubernetes
-    readOnly: true
-  - mountPath: /usr/local/mount-from-host/bin
-    name: usr-bin
-    readOnly: true
+  - name: results
+    mountPath: /tmp/results
+  - name: etc-passwd
+    mountPath: /etc/passwd
+  - name: etc-group
+    mountPath: /etc/group
+  - name: etc-cni-netd
+    mountPath: /etc/cni/net.d
+  - name: var-log
+    mountPath: /var/log
+  - name: run-log
+    mountPath: /run/log
+  - name: etc-systemd
+    mountPath: /etc/systemd
+  - name: lib-systemd
+    mountPath: /lib/systemd/
+  - name: srv-kubernetes
+    mountPath: /srv/kubernetes/
+  - name: etc-kubernetes
+    mountPath: /etc/kubernetes
+  - name: var-lib-etcd
+    mountPath: /var/lib/etcd
+  - name: var-lib-kubelet
+    mountPath: /var/lib/kubelet
+  - name: var-lib-kube-scheduler
+    mountPath: /var/lib/kube-scheduler
+  - name: var-lib-kube-controller-manager
+    mountPath: /var/lib/kube-controller-manager
+  - name: rke-root
+    mountPath: /var/lib/rancher
+  - name: rke-root-config
+    mountPath: /etc/rancher
+  - name: snap-mk8s
+    mountPath: /var/snap/microk8s
