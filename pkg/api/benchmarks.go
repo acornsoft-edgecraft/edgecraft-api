@@ -158,7 +158,7 @@ func (a *API) GetBenchmarksHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nil, common.CodeFailedDatabase, err)
 	}
 	if benchmarksTable == nil {
-		return response.ErrorfReqRes(c, benchmarksTable, common.ClusterNotFound, err)
+		return response.ErrorfReqRes(c, benchmarksTable, common.ClusterBenchmarksNotFound, err)
 	}
 
 	return response.Write(c, nil, benchmarksTable)
