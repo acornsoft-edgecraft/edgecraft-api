@@ -31,7 +31,7 @@ data:
     # Database
     database:
       type: 'postgres'
-      host: '192.168.88.201'
+      host: '192.168.88.79'
       port: '31000'
       database_name: 'edgecraft'
       schema_name: 'edgecraft'
