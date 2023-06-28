@@ -543,6 +543,7 @@ func getConfigPluginsData(role string, bootstrapProvider common.BootstrapProvide
 		cmd["benchmarkVersion"] = "k3s-1.23"
 	} else if bootstrapProvider == common.MicroK8s {
 		cmd["matchCpKey"] = "node.kubernetes.io/microk8s-controlplane"
+		cmd["benchmarkVersion"] = "mk8s-1.23"
 	}
 
 	return cmd
