@@ -100,6 +100,7 @@ spec:
       addons:
         - dns
         - ingress
+        - rbac
       #joinTokenTTLInSecs: 9000
     clusterConfiguration:
       portCompatibilityRemap: true
