@@ -264,3 +264,91 @@ func InvokeDeleteCheck(worker *IWorker, db db.DB, cloudId, clusterId, clusterNam
 
 	return nil
 }
+
+// applyRbacRoles - Apply RBAC Roles for microk8s
+func applyRbacRoles(task string, taskData interface{}) {
+	data := taskData.(*TaskData)
+	retryTicker := time.NewTicker(30 * time.Second)
+	count := 0
+	for range retryTicker.C {
+		count += 1
+		if count > 100 {
+			retryTicker.Stop()
+			logger.WithField("task", task).Info("Close apply RBAC Roles. retry count (100 times in hour) over.")
+			return
+		}
+
+		clusterTable, err := data.Database.GetOpenstackCluster(data.CloudId, data.ClusterId)
+		if err != nil {
+			logger.WithField("task", task).WithError(err).Infof("Get Openstack cluster info failed. (cause: %s)", err.Error())
+			retryTicker.Stop()
+			return
+		}
+		if clusterTable == nil {
+			logger.WithField("task", task).WithError(err).Infof("Get Openstack cluster info failed. (cause: %s)", err.Error())
+			retryTicker.Stop()
+			return
+		}
+		// 클러스터 상태 조회
+		if *clusterTable.Status != common.StatusProvisioned {
+			logger.WithField("task", task).Warnf("Openstack Cluster Status is not provisioned (status: %s)", *clusterTable.Status)
+			continue
+		}
+
+		// ClusterRole 확인
+		clusterRoleName := "system:kube-apiserver-to-kubelet"
+		roleExists, err := kubemethod.ExistsClusterRole(data.ClusterName, clusterRoleName)
+		if err != nil {
+			logger.WithField("task", task).Warnf("Exists ClusterRole failed. (cause: %s)", err.Error())
+			continue
+		}
+
+		// ClusterRoleBinding 확인
+		clusterRBName := "system:kube-apiserver"
+		rbExists, err := kubemethod.ExistsClusterRoleBinding(data.ClusterName, clusterRBName)
+		if err != nil {
+			logger.WithField("task", task).Warnf("Exists ClusterRoleBinding failed. (cause: %s)", err.Error())
+			continue
+		}
+
+		if roleExists && rbExists {
+			logger.WithField("task", task).Infof("ClusterRole & ClusterRoleBinding already exists.")
+			retryTicker.Stop()
+			return
+		} else {
+			logger.WithField("task", task).Info("Apply RBAC Roles manifest.")
+			// Apply rbac roles
+			err = kubemethod.Apply(data.ClusterName, data.CustomData.(string))
+			if err != nil {
+				logger.WithField("task", task).Warnf("Apply RBAC Roles manifest failed. (cause: %s)", err.Error())
+				continue
+			}
+			logger.WithField("task", task).Info("Apply RBAC Roles manifest completed.")
+		}
+	}
+}
+
+// InvokeProvisioned - Providion 완료 후 작업
+func InvokeProvisioned(worker *IWorker, db db.DB, cloudId, clusterId, clusterName, manifest string) error {
+	taskData := &TaskData{
+		Database:    db,
+		CloudId:     cloudId,
+		ClusterId:   clusterId,
+		ClusterName: clusterName,
+		CustomData:  manifest,
+	}
+
+	taskInfo := TaskInfo{
+		TaskData: taskData,
+		TaskFunc: applyRbacRoles,
+	}
+
+	// Apply RBAC Roles for microk8s
+	err := (*worker).QueueTask("apply-rbac-roles", zeroDuration, taskInfo)
+	if err != nil {
+		logger.Warnf("Failed apply-rbac-roles, err: %v", err)
+		return err
+	}
+
+	return nil
+}

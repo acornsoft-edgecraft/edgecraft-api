@@ -102,6 +102,8 @@ spec:
         - ingress
         - rbac
       #joinTokenTTLInSecs: 9000
+      extraKubeletArgs:
+        - "--authorization-mode=Webhook"
     clusterConfiguration:
       portCompatibilityRemap: true
   machineTemplate:

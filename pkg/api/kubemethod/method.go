@@ -17,6 +17,7 @@ import (
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/model/k8s"
 	coreV1 "k8s.io/api/core/v1"
+	kErrors "k8s.io/apimachinery/pkg/api/errors"
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/types"
@@ -395,4 +396,40 @@ func RemoveNodeSet(clusterName, nodeSetName, namespace string, bootstrapProvider
 	}
 
 	return nil
+}
+
+func ExistsClusterRole(clusterName string, clusterRoleName string) (bool, error) {
+	// Get kubernetes client
+	apiClient, err := config.HostCluster.GetKubernetesClient(clusterName)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = apiClient.RbacV1().ClusterRoles().Get(context.TODO(), clusterRoleName, metaV1.GetOptions{})
+	if kErrors.IsNotFound(err) {
+		logger.Infof("ClusterRoles \"%s\" not found", clusterRoleName)
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
+func ExistsClusterRoleBinding(clusterName string, clusterRoleBindingName string) (bool, error) {
+	// Get kubernetes client
+	apiClient, err := config.HostCluster.GetKubernetesClient(clusterName)
+	if err != nil {
+		return false, err
+	}
+
+	_, err = apiClient.RbacV1().ClusterRoleBindings().Get(context.TODO(), clusterRoleBindingName, metaV1.GetOptions{})
+	if kErrors.IsNotFound(err) {
+		logger.Infof("ClusterRoleBindings \"%s\" not found", clusterRoleBindingName)
+		return false, nil
+	} else if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

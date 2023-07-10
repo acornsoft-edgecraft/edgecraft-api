@@ -127,6 +127,12 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 		return err
 	}
 
+	// Provisioned 이후 검증 작업 등록 (Background)
+	err = InvokeProvisioned(worker, db, cluster, *cluster.BootstrapProvider)
+	if err != nil {
+		logger.WithError(err).Warnf("Openstack Cluster [%s] provisioned check job failed.", cluster.Name)
+	}
+
 	logger.Infof("Openstack Cluster [%s] provision submitted.", cluster.Name)
 	return nil
 }
@@ -251,6 +257,34 @@ func DeleteBackup(worker *job.IWorker, database db.DB, clusterName, namespace, b
 	err = kubemethod.Apply(clusterName, deleteBuff.String())
 	if err != nil {
 		logger.Errorf("delete backup failed. (cause: %s)", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// InvokeProvisioned - Provisioned 이후 작업 등록
+func InvokeProvisioned(worker *job.IWorker, database db.DB, cluster *model.OpenstackClusterTable, bootstrapProvider common.BootstrapProvider) error {
+
+	if bootstrapProvider != common.MicroK8s {
+		return nil
+	}
+
+	// Apply RBAC roles for microk8s
+	logger.Infof("Invoke Provisioned: apply microk8s cluster [%s] rbac roles", *cluster.Name)
+
+	temp := getFunctionalTemplate("./conf/templates/capi/mk8s_rbac_roles.yaml")
+	var rbacBuff bytes.Buffer
+	err := temp.Execute(&rbacBuff, "")
+	if err != nil {
+		logger.Errorf("Template execution failed [Apply RBAC Roles]. cause(%s) failed.", err.Error())
+		return err
+	}
+	logger.Infof("processed rbac roles templating yaml (%s)", rbacBuff.String())
+
+	// Job 실행 (Background)
+	err = job.InvokeProvisioned(worker, database, *cluster.CloudUid, *cluster.ClusterUid, *cluster.Name, rbacBuff.String())
+	if err != nil {
 		return err
 	}
 
