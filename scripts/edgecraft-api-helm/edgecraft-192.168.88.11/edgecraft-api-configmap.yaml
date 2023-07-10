@@ -36,7 +36,7 @@ data:
       database_name: 'edgecraft'
       schema_name: 'edgecraft'
       username: 'edgecraft'
-      password: 'trDksniESt'
+      password: 'edgecraft'
       max_idle_conns: 5
       max_open_conns: 40
     # Local Database
