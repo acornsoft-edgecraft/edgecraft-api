@@ -38,16 +38,15 @@ helm -n edgecraft upgrade postgresql bitnami/postgresql -i --create-namespace --
 
 - 3. 접속 정보
 ```sh
-Release "postgresql" does not exist. Installing it now.
 NAME: postgresql
-LAST DEPLOYED: Thu Jun  8 11:42:41 2023
+LAST DEPLOYED: Fri Jul  7 17:11:33 2023
 NAMESPACE: edgecraft
 STATUS: deployed
 REVISION: 1
 TEST SUITE: None
 NOTES:
 CHART NAME: postgresql
-CHART VERSION: 12.5.6
+CHART VERSION: 12.6.3
 APP VERSION: 15.3.0
 
 ** Please be patient while the chart is being deployed **

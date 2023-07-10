@@ -4,7 +4,10 @@
     "titleBar.activeBackground": "#033B90",
     "titleBar.activeForeground": "#FBFCFF"
   },
-  "prettier.bracketSpacing": false
+  "prettier.bracketSpacing": false,
+  "githubPullRequests.ignoredPullRequestBranches": [
+    "main"
+  ]
 }
 // // "workbench.colorCustomizations": {
 // //   "activityBar.background": "#42252A",
