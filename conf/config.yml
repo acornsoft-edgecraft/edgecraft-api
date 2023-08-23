@@ -24,7 +24,7 @@ auth:
 # Database
 database:
   type: 'postgres'
-  host: '192.168.77.43'
+  host: '192.168.88.79'
   port: '31000'
   database_name: 'edgecraft'
   schema_name: 'edgecraft'

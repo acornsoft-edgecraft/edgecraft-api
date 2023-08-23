@@ -10,7 +10,7 @@ data:
       type: 'echo'
       port: 8100
       host: '0.0.0.0'
-      homePageUrl: 'https://edgecraft.k3.acornsoft.io' # URL 셋팅 필요
+      homePageUrl: 'https://dashboard.edgecraft.acornsoft.io' # URL 셋팅 필요
       pathPrefix: '/api/v1'
       secret: 'test_secret'
       langs:

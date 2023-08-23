@@ -45,3 +45,20 @@ spec:
           items:
           - key: config.yml
             path: config.yml
+      - name: edgecraft-api-log
+        persistentVolumeClaim:
+          claimName: edgecraft-api-log-pvc
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: edgecraft-api-log-pvc
+  namespace: edgecraft
+spec:
+  storageClassName: nfs-csi
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 3Gi

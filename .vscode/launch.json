@@ -10,7 +10,7 @@
       "request": "launch",
       "mode": "auto",
       "program": "${workspaceFolder}",
-      "args": ["--kubeconfig", "strategy=file,path=${env:HOME}/.kube/config"]
+      "args": ["--kubeconfig", "strategy=file,path=${env:HOME}/.kube/edgecraft/kubeconfig-openstack-ml-edgecraft"]
     },
     {
       "name": "WorkerTest",

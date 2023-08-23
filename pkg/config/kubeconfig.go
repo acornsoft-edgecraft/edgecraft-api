@@ -147,7 +147,7 @@ func createClientSet(name string, restConfig *rest.Config) *ClientSet {
 		return client.NewDynamicClient(restConfig), nil
 	}
 
-	// ex. schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1alpha3", Resource: "virtualservices"}
+	// ex. schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1beta1", Resource: "virtualservices"}
 	cluster.NewDynamicClientSchema = func(group string, version string, resource string) (*client.DynamicClient, error) {
 		return client.NewDynamicClientSchema(restConfig, group, version, resource), nil
 	}

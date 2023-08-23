@@ -5,7 +5,9 @@ package api
 
 import (
 	"bytes"
+	"encoding/base64"
 	"errors"
+	"os"
 	"path"
 	"strings"
 	"text/template"
@@ -64,12 +66,32 @@ func getTemplatePath(providerType *common.BootstrapProvider, templateType string
 	}
 }
 
+func getBase64Ecoding(File string) string {
+	plainText, err := os.ReadFile(File)
+	if err != nil {
+		logger.Errorf("read file err: %v", err.Error())
+	}
+	return base64.URLEncoding.EncodeToString(plainText)
+}
+
 // ProvisioningOpenstackCluster - 오픈스택 클러스터 Provisioning
 func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.OpenstackClusterTable, nodeSets []*model.NodeSetTable, k8sVersion string) error {
 	// Make provision data
 	data := model.OpenstackClusterSet{}
 	data.FromTable(cluster, nodeSets)
 	data.K8s.VersionName = k8sVersion
+	if *cluster.BootstrapProvider == common.Kubeadm {
+		data.Openstack.CloudControllerManagerRoles = getBase64Ecoding("./conf/templates/ccm/cloud-controller-manager-role-bindings.yaml")
+		data.Openstack.CloudControllerManagerRoleBindings = getBase64Ecoding("./conf/templates/ccm/cloud-controller-manager-roles.yaml")
+		data.Openstack.PpenstackCloudControllerManagerDS = getBase64Ecoding("./conf/templates/ccm/openstack-cloud-controller-manager-ds.yaml")
+		if !strings.Contains(data.K8s.MasterExtraConfig.PostKubeadmCommands, "calico") {
+			prefix := "\n"
+			if data.K8s.MasterExtraConfig.PostKubeadmCommands == "" {
+				prefix = ""
+			}
+			data.K8s.MasterExtraConfig.PostKubeadmCommands += prefix + "- kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml"
+		}
+	}
 
 	// Processing template
 	temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider, "cluster"))

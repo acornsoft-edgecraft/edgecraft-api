@@ -8,7 +8,11 @@
 {{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
 {{$OpenstackCACertB64 := .Openstack.CACertB64 -}}
 {{$OpenstackLocalHostName := .Openstack.LocalHostName -}}
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+{{$OpenstackInstanceId := .Openstack.InstanceId -}}
+{{$OpenstackCloudControllerManagerRoles := .Openstack.CloudControllerManagerRoles -}}
+{{$OpenstackCloudControllerManagerRoleBindings := .Openstack.CloudControllerManagerRoleBindings -}}
+{{$OpenstackPpenstackCloudControllerManagerDS := .Openstack.PpenstackCloudControllerManagerDS -}}
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
 kind: OpenStackMachineTemplate
 metadata:
   name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
@@ -47,58 +51,55 @@ spec:
       {{end -}}  
       apiServer:
         extraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
-        extraVolumes:
-          - hostPath: /etc/kubernetes/cloud.conf
-            mountPath: /etc/kubernetes/cloud.conf
-            name: cloud
-            readOnly: true
+          cloud-provider: external
       controllerManager:
         extraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
-        extraVolumes:
-          - hostPath: /etc/kubernetes/cloud.conf
-            mountPath: /etc/kubernetes/cloud.conf
-            name: cloud
-            readOnly: true
-          - hostPath: /etc/certs/cacert
-            mountPath: /etc/certs/cacert
-            name: cacerts
-            readOnly: true
-      imageRepository: k8s.gcr.io
+          cloud-provider: external
+      # imageRepository: k8s.gcr.io
     files:
+      - content: {{$OpenstackCloudControllerManagerRoles}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/addon/openstack/cloud-controller-manager-roles.yaml
+        permissions: "0600"
+      - content: {{$OpenstackCloudControllerManagerRoleBindings}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/addon/openstack/cloud-controller-manager-role-bindings.yaml
+        permissions: "0600"
+      - content: {{$OpenstackPpenstackCloudControllerManagerDS}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/addon/openstack/openstack-cloud-controller-manager-ds.yaml
+        permissions: "0600"
       - content: {{$OpenstackProviderConfB64}}
         encoding: base64
         owner: root
         path: /etc/kubernetes/cloud.conf
         permissions: "0600"
-      - content: {{$OpenstackCACertB64}}
-        encoding: base64
-        owner: root
-        path: /etc/certs/cacert
-        permissions: "0600"
     initConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
+          cloud-provider: external
+          provider-id: openstack:///'{{ $OpenstackInstanceId }}'
         name: "{{ $OpenstackLocalHostName }}"
     joinConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
-          cloud-config: /etc/kubernetes/cloud.conf
-          cloud-provider: openstack
+          cloud-provider: external
+          provider-id: openstack:///'{{ $OpenstackInstanceId }}'
         name: "{{ $OpenstackLocalHostName }}"
-    {{if .K8s.MasterExtraConfig.PostKubeadmCommands -}}
+    
     # calico preinstall, notice if closed cloud environment
     postKubeadmCommands:
-      - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/calico.yaml
-    {{- end}}
+      - kubectl --kubeconfig=/etc/kubernetes/admin.conf create secret -n kube-system generic cloud-config --from-file=/etc/kubernetes/cloud.conf
+      - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /etc/kubernetes/addon/openstack/cloud-controller-manager-roles.yaml
+      - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /etc/kubernetes/addon/openstack/cloud-controller-manager-role-bindings.yaml
+      - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /etc/kubernetes/addon/openstack/openstack-cloud-controller-manager-ds.yaml
+      {{ .K8s.MasterExtraConfig.PostKubeadmCommands }}
   machineTemplate:
     infrastructureRef:
-      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
       kind: OpenStackMachineTemplate
       name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}

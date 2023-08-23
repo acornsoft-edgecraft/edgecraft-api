@@ -73,23 +73,27 @@ func (ocs *OpenstackClusterSet) FromTable(clusterTable *OpenstackClusterTable, n
 
 // OpenstackInfo - Configuration for Openstack
 type OpenstackInfo struct {
-	Cloud               string `json:"openstack_cloud" example:"openstack"`
-	LocalHostName       string `json:"-"` // go-template에서 충돌이 발생하는 self binding 처리용 {{local_hostname}}
-	ProviderConfB64     string `json:"openstack_cloud_provider_conf_b64" example:"W0dsb2JhbF0KYXV0aC11cmw9aHR0cDovLzE5Mi4xNjguNzcuMTEvaWRlbnRpdHkKdXNlcm5hbWU9InN1bm1pIgpwYXNzd29yZD0iZmtmZms0NDgiCnRlbmFudC1pZD0iNTQyZTdhMDRmNjkxNDgyOWI0M2U3N2Y5ZWYxMmI3NzkiCnRlbmFudC1uYW1lPSJlZGdlY3JhZnQiCmRvbWFpbi1uYW1lPSJEZWZhdWx0IgpyZWdpb249IlJlZ2lvbk9uZSIK"`
-	YamlB64             string `json:"openstack_cloud_yaml_b64" example:"Y2xvdWRzOgogIG9wZW5zdGFjazoKICAgIGF1dGg6CiAgICAgIGF1dGhfdXJsOiBodHRwOi8vMTkyLjE2OC43Ny4xMS9pZGVudGl0eQogICAgICB1c2VybmFtZTogInN1bm1pIgogICAgICBwYXNzd29yZDogImZrZmZrNDQ4IgogICAgICBwcm9qZWN0X2lkOiA1NDJlN2EwNGY2OTE0ODI5YjQzZTc3ZjllZjEyYjc3OQogICAgICBwcm9qZWN0X25hbWU6ICJlZGdlY3JhZnQiCiAgICAgIHVzZXJfZG9tYWluX25hbWU6ICJEZWZhdWx0IgogICAgcmVnaW9uX25hbWU6ICJSZWdpb25PbmUiCiAgICBpbnRlcmZhY2U6ICJwdWJsaWMiCiAgICBpZGVudGl0eV9hcGlfdmVyc2lvbjogMwo="`
-	CACertB64           string `json:"openstack_cloud_cacert_b64" example:"Cg=="`
-	DNSNameServers      string `json:"dns_nameservers" example:"168.126.63.1"`
-	FailureDomain       string `json:"failure_domain" example:""` // nova
-	ImageName           string `json:"image_name" example:"ubuntu-2004-kube-v1.23.3"`
-	SSHKeyName          string `json:"ssh_key_name" example:"sunmi"`
-	ExternalNetworkID   string `json:"external_network_id" example:""` // public
-	APIServerFloatingIP string `json:"api_server_floating_ip" example:""`
-	NodeCidr            string `json:"node_cidr" example:"10.96.0.0/24"`
-	UseBastionHost      bool   `json:"use_bastion_host" example:"false"`
-	BastionFlavor       string `json:"bastion_flavor" example:""`
-	BastionImageName    string `json:"bastion_image_name" example:""`
-	BastionSSHKeyName   string `json:"bastion_ssh_key_name" example:""`
-	BastionFloatingIP   string `json:"bastion_floating_ip" example:""`
+	Cloud                              string `json:"openstack_cloud" example:"openstack"`
+	LocalHostName                      string `json:"-"` // go-template에서 충돌이 발생하는 self binding 처리용 {{local_hostname}}
+	InstanceId                         string `json:"-"` // go-template에서 충돌이 발생하는 self binding 처리용 {{instance_id}}
+	ProviderConfB64                    string `json:"openstack_cloud_provider_conf_b64" example:"W0dsb2JhbF0KYXV0aC11cmw9aHR0cDovLzE5Mi4xNjguNzcuMTEvaWRlbnRpdHkKdXNlcm5hbWU9InN1bm1pIgpwYXNzd29yZD0iZmtmZms0NDgiCnRlbmFudC1pZD0iNTQyZTdhMDRmNjkxNDgyOWI0M2U3N2Y5ZWYxMmI3NzkiCnRlbmFudC1uYW1lPSJlZGdlY3JhZnQiCmRvbWFpbi1uYW1lPSJEZWZhdWx0IgpyZWdpb249IlJlZ2lvbk9uZSIK"`
+	YamlB64                            string `json:"openstack_cloud_yaml_b64" example:"Y2xvdWRzOgogIG9wZW5zdGFjazoKICAgIGF1dGg6CiAgICAgIGF1dGhfdXJsOiBodHRwOi8vMTkyLjE2OC43Ny4xMS9pZGVudGl0eQogICAgICB1c2VybmFtZTogInN1bm1pIgogICAgICBwYXNzd29yZDogImZrZmZrNDQ4IgogICAgICBwcm9qZWN0X2lkOiA1NDJlN2EwNGY2OTE0ODI5YjQzZTc3ZjllZjEyYjc3OQogICAgICBwcm9qZWN0X25hbWU6ICJlZGdlY3JhZnQiCiAgICAgIHVzZXJfZG9tYWluX25hbWU6ICJEZWZhdWx0IgogICAgcmVnaW9uX25hbWU6ICJSZWdpb25PbmUiCiAgICBpbnRlcmZhY2U6ICJwdWJsaWMiCiAgICBpZGVudGl0eV9hcGlfdmVyc2lvbjogMwo="`
+	CACertB64                          string `json:"openstack_cloud_cacert_b64" example:"Cg=="`
+	DNSNameServers                     string `json:"dns_nameservers" example:"168.126.63.1"`
+	FailureDomain                      string `json:"failure_domain" example:""` // nova
+	ImageName                          string `json:"image_name" example:"ubuntu-2004-kube-v1.23.3"`
+	SSHKeyName                         string `json:"ssh_key_name" example:"sunmi"`
+	ExternalNetworkID                  string `json:"external_network_id" example:""` // public
+	APIServerFloatingIP                string `json:"api_server_floating_ip" example:""`
+	NodeCidr                           string `json:"node_cidr" example:"10.96.0.0/24"`
+	UseBastionHost                     bool   `json:"use_bastion_host" example:"false"`
+	BastionFlavor                      string `json:"bastion_flavor" example:""`
+	BastionImageName                   string `json:"bastion_image_name" example:""`
+	BastionSSHKeyName                  string `json:"bastion_ssh_key_name" example:""`
+	BastionFloatingIP                  string `json:"bastion_floating_ip" example:""`
+	CloudControllerManagerRoles        string `json:"-"` // cloud-provider: openstack ->  cloud-provider: external 변경
+	CloudControllerManagerRoleBindings string `json:"-"` // cloud-provider: openstack ->  cloud-provider: external 변경
+	PpenstackCloudControllerManagerDS  string `json:"-"` // cloud-provider: openstack ->  cloud-provider: external 변경
 }
 
 // ToTable - Openstack 정보를 테이블로 설정
@@ -100,6 +104,7 @@ func (osi *OpenstackInfo) ToTable(clusterTable *OpenstackClusterTable) {
 
 	clusterTable.OpenstackInfo.Cloud = osi.Cloud
 	clusterTable.OpenstackInfo.LocalHostName = "{{ local_hostname }}" // 고정 값
+	clusterTable.OpenstackInfo.InstanceId = "{{ instance_id }}"       // 고정 값
 	clusterTable.OpenstackInfo.ProviderConfB64 = osi.ProviderConfB64
 	clusterTable.OpenstackInfo.YamlB64 = osi.YamlB64
 	clusterTable.OpenstackInfo.CACertB64 = osi.CACertB64
@@ -121,6 +126,7 @@ func (osi *OpenstackInfo) ToTable(clusterTable *OpenstackClusterTable) {
 func (osi *OpenstackInfo) FromTable(clusterTable *OpenstackClusterTable) {
 	osi.Cloud = clusterTable.OpenstackInfo.Cloud
 	osi.LocalHostName = "{{ local_hostname }}" // 고정 값
+	osi.InstanceId = "{{ instance_id }}"       // 고정 값
 	osi.ProviderConfB64 = clusterTable.OpenstackInfo.ProviderConfB64
 	osi.YamlB64 = clusterTable.OpenstackInfo.YamlB64
 	osi.CACertB64 = clusterTable.OpenstackInfo.CACertB64

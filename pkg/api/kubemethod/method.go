@@ -25,12 +25,12 @@ import (
 
 const (
 	openstack_cluster_group     string = "cluster.x-k8s.io"
-	openstack_cluster_version   string = "v1alpha3"
+	openstack_cluster_version   string = "v1beta1"
 	openstack_cluster_resources string = "clusters"
 
 	// Maser, Controlplanes
 	openstack_controlplane_group          string = "controlplane.cluster.x-k8s.io"
-	openstack_controlplane_version        string = "v1alpha3"
+	openstack_controlplane_version        string = "v1beta1"
 	openstack_controlplane_k3s_version    string = "v1beta1"
 	openstack_controlplane_mk8s_version   string = "v1beta1"
 	openstack_controlplane_resources      string = "kubeadmcontrolplanes"
@@ -39,17 +39,17 @@ const (
 
 	// Worker, MachineDeployments
 	openstack_machinedeploy_group     string = "cluster.x-k8s.io"
-	openstack_machinedeploy_version   string = "v1alpha3"
+	openstack_machinedeploy_version   string = "v1beta1"
 	openstack_machinedeploy_resources string = "machinedeployments"
 
 	// Worker, MachineTemplate
 	openstack_machinetemplate_group     string = "infrastructure.cluster.x-k8s.io"
-	openstack_machinetemplate_version   string = "v1alpha3"
+	openstack_machinetemplate_version   string = "v1alpha6"
 	openstack_machinetemplate_resources string = "openstackmachinetemplates"
 
 	// Worker, ConfigTemplates
 	openstack_configtemplate_group          string = "bootstrap.cluster.x-k8s.io"
-	openstack_configtemplate_version        string = "v1alpha3"
+	openstack_configtemplate_version        string = "v1beta1"
 	openstack_configtemplate_resources      string = "kubeadmconfigtemplates"
 	openstack_configtemplate_k3s_version    string = "v1beta1"
 	openstack_configtemplate_k3s_resources  string = "kthreesconfigtemplates"

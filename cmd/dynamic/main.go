@@ -38,7 +38,7 @@ func main() {
 	//PrintRuntimeHandlers(client)
 	PrintResources(client, "os-ka-upd")
 
-	PrintStatus(client, "default", "os-ka-upd-m", "controlplane.cluster.x-k8s.io", "v1alpha3", "kubeadmcontrolplanes")
+	PrintStatus(client, "default", "os-ka-upd-m", "controlplane.cluster.x-k8s.io", "v1beta1", "kubeadmcontrolplanes")
 }
 
 // func RegisterRuntimeClassCRD(config *rest.Config) {
@@ -161,7 +161,7 @@ func main() {
 // }
 
 func PrintResources(client dynamic.Interface, clusterName string) {
-	gvr := schema.GroupVersionResource{Group: "infrastructure.cluster.x-k8s.io", Version: "v1alpha3", Resource: "openstackclusters"}
+	gvr := schema.GroupVersionResource{Group: "infrastructure.cluster.x-k8s.io", Version: "v1beta1", Resource: "openstackclusters"}
 	rs := fmt.Sprintf("%s/%s", gvr.Group, gvr.Resource)
 	log.Printf("Listing %s objects", rs)
 	res := client.Resource(gvr).Namespace("default")

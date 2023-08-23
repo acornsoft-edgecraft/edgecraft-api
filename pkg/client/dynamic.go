@@ -322,7 +322,7 @@ func NewDynamicClient(config *rest.Config) *DynamicClient {
 }
 
 // NewDynamicClientSchema - Config, Group, Version, Resource 기준의 Restful Client 생성
-// ex. schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1alpha3", Resource: "virtualservices"}
+// ex. schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1beta1", Resource: "virtualservices"}
 func NewDynamicClientSchema(config *rest.Config, group, version, resource string) *DynamicClient {
 	return &DynamicClient{
 		config:       config,
