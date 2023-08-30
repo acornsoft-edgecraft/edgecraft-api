@@ -11,7 +11,7 @@
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
 kind: OpenStackMachineTemplate
 metadata:
-  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   namespace: {{or $Namespace "default"}}
 spec:
   template:
@@ -100,7 +100,7 @@ spec:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
       kind: OpenStackMachineTemplate
-      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
   version: v{{$KubernetesVersion}}
 ---
@@ -108,7 +108,7 @@ spec:
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
 kind: OpenStackMachineTemplate
 metadata:
-  name: {{$ClusterName}}-{{.Name}}-v{{replace $KubernetesVersion "." "-"}}
+  name: {{$ClusterName}}-{{.Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   namespace: {{or $Namespace "default"}}
 spec:
   template:
@@ -143,7 +143,7 @@ spec:
       infrastructureRef:
         apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
         kind: OpenStackMachineTemplate
-        name: {{$ClusterName}}-{{.Name}}-v{{replace $KubernetesVersion "." "-"}}
+        name: {{$ClusterName}}-{{.Name}}-v{{ $KubernetesVersion | replace "." "-" }}
       version: v{{$KubernetesVersion}}
 ---
 {{end}}

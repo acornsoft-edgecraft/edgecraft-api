@@ -11,7 +11,7 @@
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
 kind: OpenStackMachineTemplate
 metadata:
-  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   namespace: {{or $Namespace "default"}}
 spec:
   template:
@@ -67,7 +67,9 @@ spec:
             mountPath: /etc/certs/cacert
             name: cacerts
             readOnly: true
+      {{ if ge (semver $KubernetesVersion | (semver "1.24.17").Compare) 0 -}}
       imageRepository: k8s.gcr.io
+      {{ end -}}
     files:
       - content: {{$OpenstackProviderConfB64}}
         encoding: base64
@@ -100,6 +102,6 @@ spec:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
       kind: OpenStackMachineTemplate
-      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
   version: v{{$KubernetesVersion}}

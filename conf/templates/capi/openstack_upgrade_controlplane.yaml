@@ -15,7 +15,7 @@
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
 kind: OpenStackMachineTemplate
 metadata:
-  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+  name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   namespace: {{or $Namespace "default"}}
 spec:
   template:
@@ -55,28 +55,30 @@ spec:
       controllerManager:
         extraArgs:
           cloud-provider: external
-      # imageRepository: k8s.gcr.io
+      {{ if ge (semver $KubernetesVersion | (semver "1.24.17").Compare) 0 -}}
+      imageRepository: k8s.gcr.io
+      {{ end -}}
     files:
-      - content: {{$OpenstackCloudControllerManagerRoles}}
-        encoding: base64
-        owner: root
-        path: /etc/kubernetes/addon/openstack/cloud-controller-manager-roles.yaml
-        permissions: "0600"
-      - content: {{$OpenstackCloudControllerManagerRoleBindings}}
-        encoding: base64
-        owner: root
-        path: /etc/kubernetes/addon/openstack/cloud-controller-manager-role-bindings.yaml
-        permissions: "0600"
-      - content: {{$OpenstackPpenstackCloudControllerManagerDS}}
-        encoding: base64
-        owner: root
-        path: /etc/kubernetes/addon/openstack/openstack-cloud-controller-manager-ds.yaml
-        permissions: "0600"
-      - content: {{$OpenstackProviderConfB64}}
-        encoding: base64
-        owner: root
-        path: /etc/kubernetes/cloud.conf
-        permissions: "0600"
+    - content: {{$OpenstackCloudControllerManagerRoles}}
+      encoding: base64
+      owner: root
+      path: /etc/kubernetes/addon/openstack/cloud-controller-manager-roles.yaml
+      permissions: "0600"
+    - content: {{$OpenstackCloudControllerManagerRoleBindings}}
+      encoding: base64
+      owner: root
+      path: /etc/kubernetes/addon/openstack/cloud-controller-manager-role-bindings.yaml
+      permissions: "0600"
+    - content: {{$OpenstackPpenstackCloudControllerManagerDS}}
+      encoding: base64
+      owner: root
+      path: /etc/kubernetes/addon/openstack/openstack-cloud-controller-manager-ds.yaml
+      permissions: "0600"
+    - content: {{$OpenstackProviderConfB64}}
+      encoding: base64
+      owner: root
+      path: /etc/kubernetes/cloud.conf
+      permissions: "0600"
     initConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
@@ -89,7 +91,6 @@ spec:
           cloud-provider: external
           provider-id: openstack:///'{{ $OpenstackInstanceId }}'
         name: "{{ $OpenstackLocalHostName }}"
-    
     # calico preinstall, notice if closed cloud environment
     postKubeadmCommands:
       - kubectl --kubeconfig=/etc/kubernetes/admin.conf create secret -n kube-system generic cloud-config --from-file=/etc/kubernetes/cloud.conf
@@ -101,6 +102,6 @@ spec:
     infrastructureRef:
       apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
       kind: OpenStackMachineTemplate
-      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{replace $KubernetesVersion "." "-"}}
+      name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
   version: v{{$KubernetesVersion}}

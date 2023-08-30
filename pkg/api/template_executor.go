@@ -12,6 +12,8 @@ import (
 	"strings"
 	"text/template"
 
+	"github.com/Masterminds/sprig/v3"
+
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/api/kubemethod"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/common"
 	"github.com/acornsoft-edgecraft/edgecraft-api/pkg/db"
@@ -28,6 +30,11 @@ func replace(input, from, to string) string {
 // getFunctionalTemplate - 템플릿에 사용할 함수가 설정된 템플릿 반환
 func getFunctionalTemplate(filePath string) *template.Template {
 	return template.Must(template.New(path.Base(filePath)).Funcs(template.FuncMap{"replace": replace, "ToLower": strings.ToLower, "ToUpper": strings.ToUpper}).ParseFiles(filePath))
+}
+
+// getFunctionalTemplate - yaml 템플릿에 사용할 함수가 설정된 템플릿 반환
+func getFunctionalTemplateToYaml(filePath string) *template.Template {
+	return template.Must(template.New(path.Base(filePath)).Funcs(sprig.FuncMap()).ParseFiles(filePath))
 }
 
 // getTemplatePath - Bootstrap Provider 정보에 따라 처리할 템플릿 파일을 결정한다.
@@ -94,15 +101,16 @@ func ProvisioningOpenstackCluster(worker *job.IWorker, db db.DB, cluster *model.
 	}
 
 	// Processing template
-	temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider, "cluster"))
-	if err != nil {
-		logger.Errorf("Template has errors. cause(%s)", err.Error())
-		return err
-	}
+	temp := getFunctionalTemplateToYaml(getTemplatePath(cluster.BootstrapProvider, "cluster"))
+	// temp, err := template.ParseFiles(getTemplatePath(cluster.BootstrapProvider, "cluster"))
+	// if err != nil {
+	// 	logger.Errorf("Template has errors. cause(%s)", err.Error())
+	// 	return err
+	// }
 
 	// TODO: 진행상황을 어떻게 클라이언트에 보여줄 것인가?
 	var buff bytes.Buffer
-	err = temp.Execute(&buff, data)
+	err := temp.Execute(&buff, data)
 	if err != nil {
 		logger.Errorf("Template execution failed. cause(%s)", err.Error())
 		return err
@@ -204,7 +212,7 @@ func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cl
 	data.Openstack.ImageName = upgradeInfo.Image
 
 	// Processing Template for control plane
-	temp := getFunctionalTemplate(getTemplatePath(cluster.BootstrapProvider, "upgrade_controlplanes"))
+	temp := getFunctionalTemplateToYaml(getTemplatePath(cluster.BootstrapProvider, "upgrade_controlplanes"))
 	var controlPlanesBuff bytes.Buffer
 	err := temp.Execute(&controlPlanesBuff, data)
 	if err != nil {
@@ -214,7 +222,7 @@ func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cl
 	logger.Infof("processed control-plane upgrade templating yaml (%s)", controlPlanesBuff.String())
 
 	// Processing Template for workers
-	temp = getFunctionalTemplate(getTemplatePath(cluster.BootstrapProvider, "upgrade_workers"))
+	temp = getFunctionalTemplateToYaml(getTemplatePath(cluster.BootstrapProvider, "upgrade_workers"))
 	var workersBuff bytes.Buffer
 	err = temp.Execute(&workersBuff, data)
 	if err != nil {
