@@ -12,6 +12,11 @@
 {{$OpenstackCloudControllerManagerRoles := .Openstack.CloudControllerManagerRoles -}}
 {{$OpenstackCloudControllerManagerRoleBindings := .Openstack.CloudControllerManagerRoleBindings -}}
 {{$OpenstackPpenstackCloudControllerManagerDS := .Openstack.PpenstackCloudControllerManagerDS -}}
+{{$K8sRegistry := "registry.k8s.io" -}}
+{{ if ge (semver $KubernetesVersion | (semver "1.25.0").Compare) 0 -}}
+{{$K8sRegistry = "k8s.gcr.io" -}}
+{{ end -}}
+
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
 kind: OpenStackMachineTemplate
 metadata:
@@ -55,9 +60,7 @@ spec:
       controllerManager:
         extraArgs:
           cloud-provider: external
-      {{ if ge (semver $KubernetesVersion | (semver "1.24.17").Compare) 0 -}}
-      imageRepository: k8s.gcr.io
-      {{ end -}}
+      imageRepository: {{$K8sRegistry}}
     files:
     - content: {{$OpenstackCloudControllerManagerRoles}}
       encoding: base64

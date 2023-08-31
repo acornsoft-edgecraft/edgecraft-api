@@ -130,9 +130,6 @@ spec:
       controllerManager:
         extraArgs:
           cloud-provider: external
-      {{ if ge (semver $KubernetesVersion | (semver "1.24.17").Compare) 0 -}}
-      imageRepository: k8s.gcr.io
-      {{ end -}}
     files:
     - content: {{$OpenstackCloudControllerManagerRoles}}
       encoding: base64

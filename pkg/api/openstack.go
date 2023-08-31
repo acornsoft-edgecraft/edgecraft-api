@@ -518,6 +518,10 @@ func (a *API) UpgradeClusterK8sVersionHandler(c echo.Context) error {
 		return response.ErrorfReqRes(c, nil, common.K8sUpgradeClusterJobFailed, err)
 	}
 
+	// Cluster version 정보 업그레이드
+	clusterTable.Version = &upgradeInfo.Version
+	clusterTable.OpenstackInfo.ImageName = upgradeInfo.Image
+
 	// 데이터베이스에 버전 정보 갱신 (트랜잭션 구간)
 	err = a.Db.TransactionScope(func(txDB db.DB) error {
 		// Cluster 갱신

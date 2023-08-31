@@ -210,6 +210,18 @@ func K8sVersionUpgradingOpenstackCluster(worker *job.IWorker, database db.DB, cl
 	data.FromTable(cluster, nodeSets)
 	data.K8s.VersionName = k8sVersion
 	data.Openstack.ImageName = upgradeInfo.Image
+	if *cluster.BootstrapProvider == common.Kubeadm {
+		data.Openstack.CloudControllerManagerRoles = getBase64Ecoding("./conf/templates/ccm/cloud-controller-manager-role-bindings.yaml")
+		data.Openstack.CloudControllerManagerRoleBindings = getBase64Ecoding("./conf/templates/ccm/cloud-controller-manager-roles.yaml")
+		data.Openstack.PpenstackCloudControllerManagerDS = getBase64Ecoding("./conf/templates/ccm/openstack-cloud-controller-manager-ds.yaml")
+		if !strings.Contains(data.K8s.MasterExtraConfig.PostKubeadmCommands, "calico") {
+			prefix := "\n"
+			if data.K8s.MasterExtraConfig.PostKubeadmCommands == "" {
+				prefix = ""
+			}
+			data.K8s.MasterExtraConfig.PostKubeadmCommands += prefix + "- kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.25.1/manifests/calico.yaml"
+		}
+	}
 
 	// Processing Template for control plane
 	temp := getFunctionalTemplateToYaml(getTemplatePath(cluster.BootstrapProvider, "upgrade_controlplanes"))
