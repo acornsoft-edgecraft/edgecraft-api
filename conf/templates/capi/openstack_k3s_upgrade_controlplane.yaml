@@ -8,7 +8,7 @@
 {{$OpenstackProviderConfB64 := .Openstack.ProviderConfB64 -}}
 {{$OpenstackCACertB64 := .Openstack.CACertB64 -}}
 {{$OpenstackLocalHostName := .Openstack.LocalHostName -}}
-apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
 kind: OpenStackMachineTemplate
 metadata:
   name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-"}}
@@ -100,7 +100,7 @@ spec:
     {{end}}
   machineTemplate:
     infrastructureRef:
-      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha5
+      apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
       kind: OpenStackMachineTemplate
       name: {{$ClusterName}}-{{(index .Nodes.MasterSets 0).Name}}-v{{ $KubernetesVersion | replace "." "-" }}
   replicas: {{(index .Nodes.MasterSets 0).NodeCount}}
