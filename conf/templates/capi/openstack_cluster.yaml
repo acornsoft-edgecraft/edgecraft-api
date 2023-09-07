@@ -216,7 +216,9 @@ metadata:
   name: {{$ClusterName}}
   namespace: {{or $Namespace "default"}}
   labels:
+    csiNfsChart: enabled
     dashboardChart: enabled
+    veleroChart: enabled
 spec:
   clusterNetwork:
     pods:

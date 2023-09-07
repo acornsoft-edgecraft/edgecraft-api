@@ -151,9 +151,9 @@ metadata:
   name: {{$ClusterName}}
   namespace: {{or $Namespace "default"}}
   labels:
-    csiNfsChart: disable
-    dashboardChart: disable
-    veleroChart: disable
+    csiNfsChart: enabled
+    dashboardChart: enabled
+    veleroChart: enabled
 spec:
   clusterNetwork:
     pods:

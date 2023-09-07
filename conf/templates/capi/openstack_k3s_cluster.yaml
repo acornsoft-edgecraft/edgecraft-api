@@ -152,7 +152,9 @@ metadata:
   labels:
     ccm: external # labels for ccm
     cni: calico # labels for cni
+    csiNfsChart: enabled
     dashboardChart: enabled
+    veleroChart: enabled
 spec:
   clusterNetwork:
     pods:
