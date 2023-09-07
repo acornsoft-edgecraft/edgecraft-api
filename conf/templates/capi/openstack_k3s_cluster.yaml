@@ -28,6 +28,8 @@ metadata:
 spec:
   template:
     spec:
+      securityGroups:
+        - name: edgecraft-nodeport
       cloudName: {{$OpenstackCloud}}
       flavor: {{(index .Nodes.MasterSets 0).Flavor}}
       identityRef:
