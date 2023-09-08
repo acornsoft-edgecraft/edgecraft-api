@@ -1,5 +1,15 @@
 basePath: /api/v1
 definitions:
+  common.BootstrapProvider:
+    enum:
+    - 1
+    - 2
+    - 3
+    type: integer
+    x-enum-varnames:
+    - Kubeadm
+    - MicroK8s
+    - K3s
   model.BackResParam:
     properties:
       backres_uid:
@@ -190,8 +200,9 @@ definitions:
   model.KubernetesInfo:
     properties:
       bootstrap_provider:
+        allOf:
+        - $ref: '#/definitions/common.BootstrapProvider'
         example: 1
-        type: integer
       cp_kubeadm_extra_config:
         $ref: '#/definitions/model.ExtraConfig'
       pod_cidr:

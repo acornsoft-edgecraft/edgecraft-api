@@ -1565,6 +1565,19 @@
         }
     },
     "definitions": {
+        "common.BootstrapProvider": {
+            "type": "integer",
+            "enum": [
+                1,
+                2,
+                3
+            ],
+            "x-enum-varnames": [
+                "Kubeadm",
+                "MicroK8s",
+                "K3s"
+            ]
+        },
         "model.BackResParam": {
             "type": "object",
             "properties": {
@@ -1836,7 +1849,11 @@
             "type": "object",
             "properties": {
                 "bootstrap_provider": {
-                    "type": "integer",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/common.BootstrapProvider"
+                        }
+                    ],
                     "example": 1
                 },
                 "cp_kubeadm_extra_config": {

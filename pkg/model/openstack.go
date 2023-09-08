@@ -303,13 +303,14 @@ func (osnsi *OpenstackNodeSetInfo) FromTable(clusterTable *OpenstackClusterTable
 
 // OpenstackClusterList - Cluster list for openstack
 type OpenstackClusterList struct {
-	CloudUID   string    `json:"cloud_uid" db:"cloud_uid"`
-	ClusterUID string    `json:"cluster_uid" db:"cluster_uid"`
-	Name       string    `json:"name" db:"name"`
-	Status     int       `json:"status" db:"state"`
-	NodeCount  int       `json:"node_count" db:"node_count"`
-	Version    int       `json:"version" db:"version"`
-	Created    time.Time `json:"created" db:"created_at"`
+	CloudUID          string                   `json:"cloud_uid" db:"cloud_uid"`
+	ClusterUID        string                   `json:"cluster_uid" db:"cluster_uid"`
+	Name              string                   `json:"name" db:"name"`
+	Status            int                      `json:"status" db:"state"`
+	NodeCount         int                      `json:"node_count" db:"node_count"`
+	Version           int                      `json:"version" db:"version"`
+	BootstrapProvider common.BootstrapProvider `json:"bootstrap_provider" db:"bootstrap_provider"`
+	Created           time.Time                `json:"created" db:"created_at"`
 }
 
 // NOTE: Openstack Cluster Name Reg Validatiaon 필요. (소문자, -, . 만 가능, 처음과 끝은 반드시 alphanumeric) '[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*'

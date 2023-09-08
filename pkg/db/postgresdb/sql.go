@@ -136,11 +136,13 @@ SELECT
 	A.state,
 	(SELECT SUM(node_count) FROM "edgecraft"."tbl_nodeset" B WHERE B.cluster_uid = A.cluster_uid GROUP BY B.cluster_uid) AS node_count,
 	A.version,
+	A.bootstrap_provider,
 	A.created_at
 FROM 
 	"edgecraft"."tbl_cluster" A
 WHERE
 	A.cloud_uid = $1
+ORDER BY A.created_at DESC
 `
 
 const deleteOpenstackClustersSQL = `
