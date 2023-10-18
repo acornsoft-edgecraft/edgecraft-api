@@ -28,12 +28,42 @@ spec:
           owner: root
           path: /etc/certs/cacert
           permissions: "0600"
+        - path: /etc/containerd/config.toml
+          content: |
+            version = 2
+            imports = ["/etc/containerd/conf.d/*.toml"]
+            [plugins]
+              [plugins."io.containerd.grpc.v1.cri"]
+                sandbox_image = "registry.k8s.io/pause:3.9"
+              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                runtime_type = "io.containerd.runc.v2"
+              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+                SystemdCgroup = true
+                [plugins."io.containerd.grpc.v1.cri".registry]
+                  config_path = "/etc/containerd/certs.d"
+        - path: /etc/containerd/certs.d/192.168.88.206/hosts.toml
+          content: |
+            server = "https://192.168.88.206"
+
+            [host."https://192.168.88.206"]
+              ca = "/etc/docker/certs.d/192.168.88.206/ca.crt"
+        - path: /etc/containerd/certs.d/docker.io/hosts.toml
+          content: |
+            server = "https://docker.io"
+
+            [host."https://192.168.88.206/v2/docker.io/"]
+              capabilities = ["pull", "resolve"]
+              ca = "/etc/docker/certs.d/192.168.88.206/ca.crt"
+              override_path = true
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs:
             cloud-provider: external
             provider-id: openstack:///'{{ $OpenstackInstanceId }}'
           name: "{{ $OpenstackLocalHostName }}"
+      preKubeadmCommands:
+        - mkdir -p /etc/docker/certs.d/192.168.88.206
+        - curl -Lk https://192.168.88.206/api/v2.0/systeminfo/getcert -o /etc/docker/certs.d/192.168.88.206/ca.crt
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
 kind: OpenStackMachineTemplate

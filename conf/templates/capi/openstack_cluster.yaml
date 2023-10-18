@@ -51,17 +51,47 @@ spec:
   template:
     spec:
       files:
-      - content: {{$OpenstackCACertB64}}
-        encoding: base64
-        owner: root
-        path: /etc/certs/cacert
-        permissions: "0600"
+        - content: {{$OpenstackCACertB64}}
+          encoding: base64
+          owner: root
+          path: /etc/certs/cacert
+          permissions: "0600"
+        - path: /etc/containerd/config.toml
+          content: |
+            version = 2
+            imports = ["/etc/containerd/conf.d/*.toml"]
+            [plugins]
+              [plugins."io.containerd.grpc.v1.cri"]
+                sandbox_image = "registry.k8s.io/pause:3.9"
+              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                runtime_type = "io.containerd.runc.v2"
+              [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+                SystemdCgroup = true
+                [plugins."io.containerd.grpc.v1.cri".registry]
+                  config_path = "/etc/containerd/certs.d"
+        - path: /etc/containerd/certs.d/192.168.88.206/hosts.toml
+          content: |
+            server = "https://192.168.88.206"
+
+            [host."https://192.168.88.206"]
+              ca = "/etc/docker/certs.d/192.168.88.206/ca.crt"
+        - path: /etc/containerd/certs.d/docker.io/hosts.toml
+          content: |
+            server = "https://docker.io"
+
+            [host."https://192.168.88.206/v2/docker.io/"]
+              capabilities = ["pull", "resolve"]
+              ca = "/etc/docker/certs.d/192.168.88.206/ca.crt"
+              override_path = true
       joinConfiguration:
         nodeRegistration:
           kubeletExtraArgs:
             cloud-provider: external
             provider-id: openstack:///'{{ $OpenstackInstanceId }}'
           name: "{{ $OpenstackLocalHostName }}"
+      preKubeadmCommands:
+        - mkdir -p /etc/docker/certs.d/192.168.88.206
+        - curl -Lk https://192.168.88.206/api/v2.0/systeminfo/getcert -o /etc/docker/certs.d/192.168.88.206/ca.crt
 ---
 apiVersion: infrastructure.cluster.x-k8s.io/v1alpha6
 kind: OpenStackMachineTemplate
@@ -133,26 +163,53 @@ spec:
         extraArgs:
           cloud-provider: external
     files:
-    - content: {{$OpenstackCloudControllerManagerRoles}}
-      encoding: base64
-      owner: root
-      path: /etc/kubernetes/addon/openstack/cloud-controller-manager-roles.yaml
-      permissions: "0600"
-    - content: {{$OpenstackCloudControllerManagerRoleBindings}}
-      encoding: base64
-      owner: root
-      path: /etc/kubernetes/addon/openstack/cloud-controller-manager-role-bindings.yaml
-      permissions: "0600"
-    - content: {{$OpenstackPpenstackCloudControllerManagerDS}}
-      encoding: base64
-      owner: root
-      path: /etc/kubernetes/addon/openstack/openstack-cloud-controller-manager-ds.yaml
-      permissions: "0600"
-    - content: {{$OpenstackProviderConfB64}}
-      encoding: base64
-      owner: root
-      path: /etc/kubernetes/cloud.conf
-      permissions: "0600"
+      - content: {{$OpenstackCloudControllerManagerRoles}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/addon/openstack/cloud-controller-manager-roles.yaml
+        permissions: "0600"
+      - content: {{$OpenstackCloudControllerManagerRoleBindings}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/addon/openstack/cloud-controller-manager-role-bindings.yaml
+        permissions: "0600"
+      - content: {{$OpenstackPpenstackCloudControllerManagerDS}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/addon/openstack/openstack-cloud-controller-manager-ds.yaml
+        permissions: "0600"
+      - content: {{$OpenstackProviderConfB64}}
+        encoding: base64
+        owner: root
+        path: /etc/kubernetes/cloud.conf
+        permissions: "0600"
+      - path: /etc/containerd/config.toml
+        content: |
+          version = 2
+          imports = ["/etc/containerd/conf.d/*.toml"]
+          [plugins]
+            [plugins."io.containerd.grpc.v1.cri"]
+              sandbox_image = "registry.k8s.io/pause:3.9"
+            [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+              runtime_type = "io.containerd.runc.v2"
+            [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+              SystemdCgroup = true
+              [plugins."io.containerd.grpc.v1.cri".registry]
+                config_path = "/etc/containerd/certs.d"
+      - path: /etc/containerd/certs.d/192.168.88.206/hosts.toml
+        content: |
+          server = "https://192.168.88.206"
+
+          [host."https://192.168.88.206"]
+            ca = "/etc/docker/certs.d/192.168.88.206/ca.crt"
+      - path: /etc/containerd/certs.d/docker.io/hosts.toml
+        content: |
+          server = "https://docker.io"
+
+          [host."https://192.168.88.206/v2/docker.io/"]
+            capabilities = ["pull", "resolve"]
+            ca = "/etc/docker/certs.d/192.168.88.206/ca.crt"
+            override_path = true
     initConfiguration:
       nodeRegistration:
         kubeletExtraArgs:
@@ -166,6 +223,9 @@ spec:
           provider-id: openstack:///'{{ $OpenstackInstanceId }}'
         name: "{{ $OpenstackLocalHostName }}"
     # calico preinstall, notice if closed cloud environment
+    preKubeadmCommands:
+      - mkdir -p /etc/docker/certs.d/192.168.88.206
+      - curl -Lk https://192.168.88.206/api/v2.0/systeminfo/getcert -o /etc/docker/certs.d/192.168.88.206/ca.crt
     postKubeadmCommands:
       - kubectl --kubeconfig=/etc/kubernetes/admin.conf create secret -n kube-system generic cloud-config --from-file=/etc/kubernetes/cloud.conf
       - kubectl --kubeconfig=/etc/kubernetes/admin.conf apply -f /etc/kubernetes/addon/openstack/cloud-controller-manager-roles.yaml
