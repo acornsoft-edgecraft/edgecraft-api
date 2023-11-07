@@ -33,9 +33,6 @@
 - `./pkg/server` folder for web framework functions
 - `./pkg/utils` folder with utility functions (error checker, etc)
 
-### ./scripts
-**빌드, 설치, 분석, 기타 작업을 위한 스크립트들.**
-
 -----
 ## Project workflow  
 ![Project Structure](./docs/images/Project-Structure.png)
@@ -44,5 +41,8 @@
 
 ![Cluster API Workflow](./docs/images/edgecraft-capi-flow.png)
 
+----
+## Documents
 
+- See our documentation in the /docs repository, please [find the index here](/docs/README.md).
 
