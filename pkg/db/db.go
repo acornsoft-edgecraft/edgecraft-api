@@ -103,6 +103,11 @@ type DB interface {
 	DeleteCodeByGroup(string) (int64, error)
 
 	// tbl_user
-	GetUserByEmail(email string) (*model.User, error)
+	GetUserByEmail(email string) (*model.UserTable, error)
+	GetUserList() ([]*model.UserTable, error)
+	GetUser(userId string) (*model.UserTable, error)
+	InsertUser(*model.UserTable) error
+	UpdateUser(*model.UserTable) (int64, error)
+	DeleteUser(string) (int64, error)
 	// GetUserById(id string) (*model.User, error)
 }

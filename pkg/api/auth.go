@@ -42,7 +42,7 @@ func (a *API) LoginHandler(c echo.Context) error {
 		return response.Errorf(c, common.CodeInvalidUser, err)
 	}
 	// TODO: Check status codes
-	if user.Status != common.UserStatusActivated {
+	if *user.Status != common.UserStatusActivated {
 		return response.Errorf(c, common.CodeFaildStatusUser, nil)
 	}
 
@@ -72,4 +72,20 @@ func (a *API) LoginHandler(c echo.Context) error {
 	tr.User = &loginUser
 
 	return response.Write(c, c.Request(), tr)
+}
+
+// LogoutHandler - 사용자 로그아웃 처리
+// @Tags        Auth
+// @Summary     Logout
+// @Description User Logout
+// @ID          Logout
+// @Produce     json
+// @Param       loginInfo body     model.Login true "Request json"
+// @Success     200       {object} response.ReturnData
+// @Router      /auth/logout [post]
+func (a *API) LogoutHandler(c echo.Context) error {
+	// var login model.Login
+	// TODO: Logout
+
+	return response.Write(c, c.Request(), nil)
 }

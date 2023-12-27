@@ -143,18 +143,18 @@ func setHTTPRoutes(api *api.API, server *server.Instance) {
 	// v1.DELETE("/images/:imageID", api.DeleteImageHandler) // 이미지 삭제
 
 	// Security Verification
-	// v1.GET("/securities/:Version", api.GetVCByVersionHandler)   // 보안검증항목 조회
+	// v1.GET("/securities/:Version", api.GetVCByVersionHandler)   // 보안검증항목 조회
 	// v1.POST("/securities", api.AddVCHandler)                     // 보안검증항목 등록
 	// v1.PUT("/securities/:Version", api.UpdateVCByVersionHandler) // 보안검증항목 등록 정보 업데이트
 
 	// Accouts
-	// v1.GET("/users", api.GetUsersHandler)              // 사용자 목록 조회
-	// v1.GET("/users/:userID", api.GetUserByIdHandler)   // 사용자 상세 기본 정보 조회
-	// v1.POST("/users", api.AddUserHandler)              // 사용자 등록
-	// v1.PUT("/users/:userID", api.UpdateUserHandler)    // 사용자 등록 정보 수정 및 업데이트
-	// v1.DELETE("/users/:userID", api.DeleteUserHandler) // 사용자 삭제
+	v1.GET("/users", api.GetUserListHandler)           // 사용자 목록 조회
+	v1.GET("/users/:userId", api.GetUserHandler)       // 사용자 상세 기본 정보 조회
+	v1.POST("/users", api.SetUserHandler)              // 사용자 등록
+	v1.PUT("/users/:userId", api.UpdateUserHandler)    // 사용자 정보 수정
+	v1.DELETE("/users/:userId", api.DeleteUserHandler) // 사용자 삭제
 
 	// Auth
-	v1.POST("/auth", api.LoginHandler) // 사용자 로그인
-	//v1.POST("/auth/logout", api.LogoutHandler) // 사용자 로그아웃
+	v1.POST("/auth", api.LoginHandler)         // 사용자 로그인
+	v1.POST("/auth/logout", api.LogoutHandler) // 사용자 로그아웃
 }

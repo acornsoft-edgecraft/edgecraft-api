@@ -1,19 +1,48 @@
 package postgresdb
 
-// 2	user_role	int2	YES	NULL	NULL		NULL
-// 3	user_name	varchar(50)	YES	NULL	NULL		NULL
-// 4	user_id	varchar(50)	NO	NULL	NULL		NULL
-// 5	password	varchar(100)	YES	NULL	NULL		NULL
-// 6	email	varchar(40)	YES	NULL	NULL		NULL
-// 7	last_login	timestamp	YES	NULL	NULL		NULL
-// 8	password_expiration_begin_time	timestamp	NO	NULL	NULL		NULL
-// 9	password_expiration_end_time	timestamp	NO	NULL	NULL		NULL
-// 10	reset_password_yn	bpchar(1)	YES	NULL	"'N'::bpchar"		NULL
-// 11	active_datetime	timestamp	YES	NULL	NULL		NULL
-// 12	inactive_yn	bpchar(1)	YES	NULL	"'N'::bpchar"		NULL
-// 13	user_state	bpchar(1)	YES	NULL	NULL		NULL
-// 14	creator	varchar(50)	NO	NULL	NULL		NULL
-// 15	created	timestamp	YES	NULL	NULL		NULL
-// 16	updater	varchar(50)	YES	NULL	NULL		NULL
-// 17	updated	timestamp	YES	NULL	NULL		NULL
-// 18	user_uid	uuid	NO	NULL	uuid_generate_v4()		NULL
+import "github.com/acornsoft-edgecraft/edgecraft-api/pkg/model"
+
+// GetUserList - 사용자 목록
+func (db *DB) GetUserList() ([]*model.UserTable, error) {
+	var res []*model.UserTable
+	_, err := db.GetClient().Select(&res, getUserListSQL)
+	if err != nil {
+		return nil, err
+	}
+	return res, nil
+}
+
+// GetUser - 사용자 조회
+func (db *DB) GetUser(userId string) (*model.UserTable, error) {
+	data, err := db.GetClient().Get(&model.UserTable{}, userId)
+	if err != nil {
+		return nil, err
+	}
+	if data != nil {
+		return data.(*model.UserTable), nil
+	}
+	return nil, nil
+}
+
+// InsertUser - 사용자 등록
+func (db *DB) InsertUser(user *model.UserTable) error {
+	return db.GetClient().Insert(user)
+}
+
+// UpdateUser - 사용자 수정
+func (db *DB) UpdateUser(ut *model.UserTable) (int64, error) {
+	count, err := db.GetClient().Update(ut)
+	if err != nil {
+		return -1, err
+	}
+	return count, nil
+}
+
+// DeleteUser - 사용자 삭제
+func (db *DB) DeleteUser(userId string) (int64, error) {
+	count, err := db.GetClient().Delete(&model.UserTable{UserUID: &userId})
+	if err != nil {
+		return -1, err
+	}
+	return count, nil
+}

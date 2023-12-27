@@ -417,6 +417,24 @@ definitions:
         example: ""
         type: string
     type: object
+  model.User:
+    properties:
+      created:
+        type: string
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        description: ID      string    `json:"userId" db:"id"`
+        type: string
+      role:
+        type: integer
+      status:
+        type: integer
+      user_uid:
+        type: string
+    type: object
   response.ReturnData:
     properties:
       code:
@@ -451,6 +469,27 @@ paths:
           schema:
             $ref: '#/definitions/response.ReturnData'
       summary: Login
+      tags:
+      - Auth
+  /auth/logout:
+    post:
+      description: User Logout
+      operationId: Logout
+      parameters:
+      - description: Request json
+        in: body
+        name: loginInfo
+        required: true
+        schema:
+          $ref: '#/definitions/model.Login'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: Logout
       tags:
       - Auth
   /clouds:
@@ -1482,6 +1521,104 @@ paths:
       summary: Health check k8s-api-gateway
       tags:
       - Common
+  /users:
+    get:
+      description: 전체 사용자 리스트
+      operationId: GetUserList
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetUserList
+      tags:
+      - User
+    post:
+      description: 사용자 등록
+      operationId: SetUser
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: SetUser
+      tags:
+      - User
+  /users/{userId}:
+    delete:
+      description: 사용자 삭제
+      operationId: DeleteUser
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: DeleteUser
+      tags:
+      - User
+    get:
+      description: 사용자 상세 조회
+      operationId: GetUser
+      parameters:
+      - description: User UID
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: GetUser
+      tags:
+      - User
+    put:
+      description: 사용자 수정
+      operationId: UpdateUser
+      parameters:
+      - description: User ID
+        in: path
+        name: userId
+        required: true
+        type: string
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.User'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.ReturnData'
+      summary: UpdateUser
+      tags:
+      - User
 schemes:
 - http
 - https

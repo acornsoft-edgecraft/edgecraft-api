@@ -63,6 +63,7 @@ SELECT
 FROM
 	"edgecraft"."tbl_cloud" A
 	LEFT JOIN "edgecraft"."tbl_cloud_cluster" B ON (B.cloud_uid = A.cloud_uid)
+ORDER BY A.created_at DESC	
 `
 
 /***************************
@@ -290,4 +291,38 @@ AND		backres_uid = $3
 
 const getBackResDuplicate = `
 SELECT EXISTS(SELECT 1 FROM "edgecraft"."tbl_cluster_backres" WHERE name = $1)
+`
+
+/***************************************
+ * User
+ ****************************************/
+
+const getAuthUserSQL = `
+  SELECT
+	user_uid,
+	role,
+	name,
+	password,
+	email,
+	state,
+	creator,
+	created_at,
+	updater,
+	updated_at
+FROM tbl_user tu 
+WHERE email = $1
+  AND state = 1
+`
+
+const getUserListSQL = `
+SELECT
+	user_uid,
+	role,
+	name,
+	email,
+	state,
+	created_at
+FROM tbl_user tu 
+WHERE state = 1
+ORDER BY created_at DESC
 `

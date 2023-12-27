@@ -96,6 +96,9 @@ const (
 	// CodeInvalidVerification -
 	CodeInvalidVerification = 22102
 
+	// UserNotFound
+	UserNotFound = 22500
+
 	//############################################################
 	// 메일 관련 메시지
 	//############################################################

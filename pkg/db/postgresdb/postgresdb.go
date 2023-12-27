@@ -167,6 +167,7 @@ func newDbMap(conf *Config) *gorp.DbMap {
 	dbmap.AddTableWithName(model.OpenstackBenchmarksTable{}, "tbl_cluster_benchmarks").SetKeys(false, "cluster_uid", "benchmarks_uid")
 	dbmap.AddTableWithName(model.BackResTable{}, "tbl_cluster_backres").SetKeys(false, "cloud_uid", "cluster_uid", "backres_uid")
 
+	dbmap.AddTableWithName(model.UserTable{}, "tbl_user").SetKeys(false, "user_uid")
 	// // SetKeys(isAutoIncr bool, fieldNames ...string)
 	// // SetKeys(true) means we have a auto increment primary key, which
 	// // will get automatically bound to your struct post-insert
